@@ -51,6 +51,7 @@ export default function ExamManagementPage() {
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<ExamSession | null>(null);
   const [statsSessionId, setStatsSessionId] = useState<string>('');
+  const [resultEntrySessionId, setResultEntrySessionId] = useState<string>('');
 
   const { data: examTypes, isLoading: typesLoading, error: typesError } = useExamTypes();
   const { data: allSessions = [], refetch: refetchSessions } = useExamSessions();
@@ -69,8 +70,10 @@ export default function ExamManagementPage() {
     statsSessionId || undefined
   );
 
-  const selectedSession = allSessions.find((s) => s.id === statsSessionId);
-  const subjectsForSelectedSession = useExamSubjects(selectedSession?.exam_type_id);
+  const resultEntrySession = allSessions.find((s) => s.id === resultEntrySessionId);
+  const subjectsForResultEntry = useExamSubjects(
+    resultEntrySessionId ? resultEntrySession?.exam_type_id : undefined
+  );
 
   const handleCreateExam = async (data: {
     exam_type_id: string;
@@ -246,15 +249,14 @@ export default function ExamManagementPage() {
           <PracticeExamsTab
             examTypes={examTypes || []}
             sessions={allSessions}
-            subjects={subjectsForSelectedSession.data || []}
+            subjects={subjectsForResultEntry.data || []}
             students={students}
             onCreateExam={handleCreateExam}
-            onEditExam={handleEditSession}
-            onDeleteExam={handleDeleteSession}
             onViewStatistics={handleViewStatistics}
             onImportExcel={handleImportExcel}
             onDownloadTemplate={handleDownloadTemplate}
             onSaveResults={handleSaveResults}
+            onResultSessionChange={setResultEntrySessionId}
             isCreating={createSession.isPending}
           />
         </TabsContent>

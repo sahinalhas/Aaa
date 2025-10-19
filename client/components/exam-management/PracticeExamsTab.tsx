@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -11,29 +10,20 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   FileText,
-  MoreVertical,
-  Edit,
-  Trash2,
-  BarChart3,
-  Upload,
   Search,
   Filter,
   Calendar,
-  Users,
+  User,
+  FileSpreadsheet,
+  BarChart3,
+  Plus,
 } from 'lucide-react';
 import { QuickExamCreate } from './QuickExamCreate';
-import { QuickResultEntry } from './QuickResultEntry';
-import { ExamSessionDialog } from './ExamSessionDialog';
-import { ExamResultsEntry } from './ExamResultsEntry';
+import { ExamResultDialog } from './ExamResultDialog';
+import { ExcelImportDialog } from './ExcelImportDialog';
 import type {
   ExamType,
   ExamSession,
@@ -57,12 +47,11 @@ interface PracticeExamsTabProps {
     exam_date: string;
     description?: string;
   }) => Promise<void>;
-  onEditExam: (session: ExamSession) => void;
-  onDeleteExam: (sessionId: string) => Promise<void>;
   onViewStatistics: (session: ExamSession) => void;
   onImportExcel: (sessionId: string, file: File) => Promise<{ success: boolean; message: string }>;
   onDownloadTemplate: (examTypeId: string) => void;
   onSaveResults: (sessionId: string, studentId: string, results: SubjectResults[]) => Promise<void>;
+  onResultSessionChange: (sessionId: string) => void;
   isCreating?: boolean;
 }
 
@@ -72,18 +61,17 @@ export function PracticeExamsTab({
   subjects,
   students,
   onCreateExam,
-  onEditExam,
-  onDeleteExam,
   onViewStatistics,
   onImportExcel,
   onDownloadTemplate,
   onSaveResults,
+  onResultSessionChange,
   isCreating = false,
 }: PracticeExamsTabProps) {
   const [filterExamType, setFilterExamType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSessionForResult, setSelectedSessionForResult] = useState<string>('');
-  const [showResultEntry] = useState(false);
+  const [resultDialogSession, setResultDialogSession] = useState<ExamSession | null>(null);
+  const [excelDialogSession, setExcelDialogSession] = useState<ExamSession | null>(null);
 
   const filteredSessions = sessions.filter((session) => {
     const matchesType = filterExamType === 'all' || session.exam_type_id === filterExamType;
@@ -95,6 +83,20 @@ export function PracticeExamsTab({
     return examTypes.find((t) => t.id === examTypeId)?.name || examTypeId;
   };
 
+  const handleIndividualEntryClick = (session: ExamSession) => {
+    onResultSessionChange(session.id);
+    setResultDialogSession(session);
+  };
+
+  const handleBulkEntryClick = (session: ExamSession) => {
+    onResultSessionChange(session.id);
+    setExcelDialogSession(session);
+  };
+
+  const handleStatisticsClick = (session: ExamSession) => {
+    onViewStatistics(session);
+  };
+
   return (
     <div className="space-y-6">
       <QuickExamCreate
@@ -102,14 +104,6 @@ export function PracticeExamsTab({
         onCreateExam={onCreateExam}
         defaultExamTypeId={filterExamType === 'all' ? undefined : filterExamType}
         isLoading={isCreating}
-      />
-
-      <QuickResultEntry
-        sessions={sessions}
-        onSelectSession={setSelectedSessionForResult}
-        onImportExcel={onImportExcel}
-        onDownloadTemplate={onDownloadTemplate}
-        selectedSessionId={selectedSessionForResult}
       />
 
       <Card>
@@ -162,64 +156,59 @@ export function PracticeExamsTab({
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredSessions.map((session) => (
-                <Card key={session.id} className="hover:shadow-md transition-shadow">
+                <Card key={session.id} className="hover:shadow-md transition-shadow border-2">
                   <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1 flex-1">
-                        <h3 className="font-semibold text-lg leading-none">{session.name}</h3>
-                        <Badge variant="outline" className="mt-2">
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-lg leading-none">{session.name}</h3>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">
                           {getExamTypeName(session.exam_type_id)}
                         </Badge>
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => onEditExam(session)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Düzenle
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onViewStatistics(session)}>
-                            <BarChart3 className="mr-2 h-4 w-4" />
-                            İstatistikler
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onDeleteExam(session.id)}
-                            className="text-destructive"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Sil
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3 pt-0">
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {new Date(session.exam_date).toLocaleDateString('tr-TR', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })}
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Calendar className="h-3.5 w-3.5" />
+                          {new Date(session.exam_date).toLocaleDateString('tr-TR')}
+                        </div>
                       </div>
                       {session.description && (
-                        <p className="text-xs line-clamp-2">{session.description}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {session.description}
+                        </p>
                       )}
                     </div>
-                    <Button
-                      onClick={() => onViewStatistics(session)}
-                      variant="outline"
-                      className="w-full"
-                      size="sm"
-                    >
-                      <BarChart3 className="mr-2 h-4 w-4" />
-                      İstatistikleri Gör
-                    </Button>
+                  </CardHeader>
+                  <CardContent className="space-y-2 pt-0">
+                    <div className="grid grid-cols-3 gap-2">
+                      <Button
+                        onClick={() => handleIndividualEntryClick(session)}
+                        variant="outline"
+                        size="sm"
+                        className="flex-col h-auto py-3 gap-1"
+                        title="Bireysel Sonuç Girişi"
+                      >
+                        <User className="h-4 w-4" />
+                        <span className="text-xs">Bireysel</span>
+                      </Button>
+                      <Button
+                        onClick={() => handleBulkEntryClick(session)}
+                        variant="outline"
+                        size="sm"
+                        className="flex-col h-auto py-3 gap-1"
+                        title="Toplu Sonuç Girişi (Excel)"
+                      >
+                        <FileSpreadsheet className="h-4 w-4" />
+                        <span className="text-xs">Toplu</span>
+                      </Button>
+                      <Button
+                        onClick={() => handleStatisticsClick(session)}
+                        variant="outline"
+                        size="sm"
+                        className="flex-col h-auto py-3 gap-1"
+                        title="İstatistikleri Görüntüle"
+                      >
+                        <BarChart3 className="h-4 w-4" />
+                        <span className="text-xs">İstatistik</span>
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -228,20 +217,25 @@ export function PracticeExamsTab({
         </CardContent>
       </Card>
 
-      {selectedSessionForResult && showResultEntry && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Bireysel Sonuç Girişi</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ExamResultsEntry
-              sessions={sessions}
-              subjects={subjects}
-              students={students}
-              onSave={onSaveResults}
-            />
-          </CardContent>
-        </Card>
+      {resultDialogSession && (
+        <ExamResultDialog
+          open={!!resultDialogSession}
+          onOpenChange={(open) => !open && setResultDialogSession(null)}
+          session={resultDialogSession}
+          subjects={subjects}
+          students={students}
+          onSave={onSaveResults}
+        />
+      )}
+
+      {excelDialogSession && (
+        <ExcelImportDialog
+          open={!!excelDialogSession}
+          onOpenChange={(open) => !open && setExcelDialogSession(null)}
+          session={excelDialogSession}
+          onImport={onImportExcel}
+          onDownloadTemplate={onDownloadTemplate}
+        />
       )}
     </div>
   );
