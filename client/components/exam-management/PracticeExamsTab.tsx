@@ -362,7 +362,6 @@ export function PracticeExamsTab({
           open={!!bulkEntrySession}
           onOpenChange={(open) => !open && setBulkEntrySession(null)}
           session={bulkEntrySession}
-          subjects={getSessionSubjects(bulkEntrySession)}
           students={students}
           onSave={onSaveResults}
         />

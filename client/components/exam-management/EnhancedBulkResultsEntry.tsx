@@ -24,6 +24,7 @@ import {
   AlertCircle,
   Clock,
 } from 'lucide-react';
+import { useExamSubjects } from '@/hooks/useExamManagement';
 import type {
   ExamSession,
   ExamSubject,
@@ -55,7 +56,6 @@ interface EnhancedBulkResultsEntryProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   session: ExamSession;
-  subjects: ExamSubject[];
   students: Student[];
   onSave: (sessionId: string, studentId: string, results: SubjectResults[]) => Promise<void>;
 }
@@ -64,10 +64,10 @@ export function EnhancedBulkResultsEntry({
   open,
   onOpenChange,
   session,
-  subjects,
   students,
   onSave,
 }: EnhancedBulkResultsEntryProps) {
+  const { data: subjects = [], isLoading: subjectsLoading } = useExamSubjects(session.exam_type_id);
   const [results, setResults] = useState<Map<string, StudentResult>>(new Map());
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
