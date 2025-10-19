@@ -73,6 +73,12 @@ export const MAIN_TABS = [
     description: "Kariyer planlama ve hedefler"
   },
   {
+    value: "olcme-degerlendirme",
+    label: "Ölçme Değerlendirme",
+    icon: ClipboardList,
+    description: "Deneme sınavları, okul notları ve değerlendirmeler"
+  },
+  {
     value: "ai-tools",
     label: "AI Araçları",
     icon: Bot,

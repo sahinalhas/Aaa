@@ -39,6 +39,9 @@ import AileKatilimiSection from "@/components/student-profile/sections/AileKatil
 import HedeflerPlanlamaSection from "@/components/student-profile/sections/HedeflerPlanlamaSection";
 import CareerGuidanceSection from "@/components/student-profile/sections/CareerGuidanceSection";
 
+// Ölçme Değerlendirme bileşenleri
+import StudentExamResultsSection from "@/components/student-profile/sections/StudentExamResultsSection";
+
 // Birleştirilmiş bileşenler (Yeni!)
 import UnifiedRiskSection from "@/components/student-profile/sections/UnifiedRiskSection";
 import UnifiedMeetingsSection from "@/components/student-profile/sections/UnifiedMeetingsSection";
@@ -317,6 +320,11 @@ export function StudentProfileTabs({
             />
           </TabsContent>
         </Tabs>
+      </TabsContent>
+
+      {/* ÖLÇME DEĞERLENDİRME */}
+      <TabsContent value="olcme-degerlendirme" className="mt-4 min-h-[400px]">
+        <StudentExamResultsSection studentId={studentId} />
       </TabsContent>
 
       {/* AI ARAÇLARI - BİRLEŞTİRİLMİŞ */}
