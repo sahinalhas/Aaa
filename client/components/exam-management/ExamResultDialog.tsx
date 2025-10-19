@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Save, ArrowRight, Copy, Info } from 'lucide-react';
+import { CheckCircle2, Save, ArrowRight, Copy, Info, AlertCircle } from 'lucide-react';
 import type {
   ExamSession,
   ExamSubject,
@@ -286,6 +286,24 @@ export function ExamResultDialog({
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800">
                 Sonuçlar başarıyla kaydedildi!
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {!selectedStudent && (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Lütfen yukarıdan bir öğrenci seçin
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {selectedStudent && subjects.length === 0 && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Bu sınav türü için ders bilgisi bulunamadı. Lütfen önce sınav türüne dersler ekleyin.
               </AlertDescription>
             </Alert>
           )}

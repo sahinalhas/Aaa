@@ -112,13 +112,21 @@ export function PracticeExamsTab({
   };
 
   const handleIndividualEntryClick = (session: ExamSession) => {
+    console.log('Opening individual entry for session:', session.name, 'exam_type_id:', session.exam_type_id);
     onResultSessionChange(session.id);
-    setResultDialogSession(session);
+    // Small delay to ensure subjects are loaded
+    setTimeout(() => {
+      setResultDialogSession(session);
+    }, 100);
   };
 
   const handleBulkTableEntryClick = (session: ExamSession) => {
+    console.log('Opening bulk entry for session:', session.name, 'exam_type_id:', session.exam_type_id);
     onResultSessionChange(session.id);
-    setBulkEntrySession(session);
+    // Small delay to ensure subjects are loaded
+    setTimeout(() => {
+      setBulkEntrySession(session);
+    }, 100);
   };
 
   const handleExcelEntryClick = (session: ExamSession) => {
@@ -151,7 +159,11 @@ export function PracticeExamsTab({
 
   const getSessionSubjects = (session: ExamSession | null) => {
     if (!session) return [];
-    return subjects.filter((s) => s.exam_type_id === session.exam_type_id);
+    const filtered = subjects.filter((s) => s.exam_type_id === session.exam_type_id);
+    console.log('getSessionSubjects - Session:', session.name, 'exam_type_id:', session.exam_type_id);
+    console.log('getSessionSubjects - All subjects:', subjects.length);
+    console.log('getSessionSubjects - Filtered subjects:', filtered.length, filtered);
+    return filtered;
   };
 
   return (
