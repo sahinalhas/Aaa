@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card } from '@/components/ui/card';
-import { ClipboardList } from 'lucide-react';
+import { ClipboardList, FileText, GraduationCap, BarChart3 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -14,21 +13,17 @@ import {
   useUpdateExamSession,
   useDeleteExamSession,
   useUpsertExamResult,
-  useBatchUpsertResults,
   useSessionStatistics,
   useImportExcelResults,
   downloadExcelTemplate,
-  downloadExcelResults,
   useSchoolExamsByStudent,
   useCreateSchoolExam,
   useDeleteSchoolExam,
 } from '@/hooks/useExamManagement';
 import { ExamSessionDialog } from '@/components/exam-management/ExamSessionDialog';
-import { ExamSessionsList } from '@/components/exam-management/ExamSessionsList';
-import { ExamResultsEntry } from '@/components/exam-management/ExamResultsEntry';
-import { ExcelImportExport } from '@/components/exam-management/ExcelImportExport';
-import { ExamStatistics } from '@/components/exam-management/ExamStatistics';
-import { SchoolExamsManagement } from '@/components/exam-management/SchoolExamsManagement';
+import { PracticeExamsTab } from '@/components/exam-management/PracticeExamsTab';
+import { SchoolExamsTab } from '@/components/exam-management/SchoolExamsTab';
+import { StatisticsTab } from '@/components/exam-management/StatisticsTab';
 import type {
   ExamSession,
   SubjectResults,
@@ -52,15 +47,13 @@ function useStudents() {
 }
 
 export default function ExamManagementPage() {
-  const [selectedExamType, setSelectedExamType] = useState<string>('tyt');
-  const [activeTab, setActiveTab] = useState<string>('sessions');
+  const [activeTab, setActiveTab] = useState<string>('practice-exams');
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<ExamSession | null>(null);
   const [statsSessionId, setStatsSessionId] = useState<string>('');
 
   const { data: examTypes, isLoading: typesLoading, error: typesError } = useExamTypes();
-  const { data: sessions = [], refetch: refetchSessions } = useExamSessions(selectedExamType);
-  const { data: subjects = [] } = useExamSubjects(selectedExamType);
+  const { data: allSessions = [], refetch: refetchSessions } = useExamSessions();
   const { data: students = [] } = useStudents();
   const { data: schoolExams = [] } = useSchoolExamsByStudent(undefined);
 
@@ -68,7 +61,6 @@ export default function ExamManagementPage() {
   const updateSession = useUpdateExamSession();
   const deleteSession = useDeleteExamSession();
   const upsertResult = useUpsertExamResult();
-  const batchUpsertResults = useBatchUpsertResults();
   const importExcel = useImportExcelResults();
   const createSchoolExam = useCreateSchoolExam();
   const deleteSchoolExam = useDeleteSchoolExam();
@@ -76,6 +68,25 @@ export default function ExamManagementPage() {
   const { data: statistics, isLoading: statsLoading } = useSessionStatistics(
     statsSessionId || undefined
   );
+
+  const selectedSession = allSessions.find((s) => s.id === statsSessionId);
+  const subjectsForSelectedSession = useExamSubjects(selectedSession?.exam_type_id);
+
+  const handleCreateExam = async (data: {
+    exam_type_id: string;
+    name: string;
+    exam_date: string;
+    description?: string;
+  }) => {
+    try {
+      await createSession.mutateAsync(data);
+      toast.success('Deneme sınavı oluşturuldu');
+      refetchSessions();
+    } catch (error) {
+      toast.error('Deneme sınavı oluşturulamadı');
+      throw error;
+    }
+  };
 
   const handleSaveSession = async (data: {
     name: string;
@@ -90,13 +101,10 @@ export default function ExamManagementPage() {
         });
         toast.success('Deneme sınavı güncellendi');
       } else {
-        await createSession.mutateAsync({
-          exam_type_id: selectedExamType,
-          ...data,
-        });
-        toast.success('Deneme sınavı oluşturuldu');
+        toast.error('Geçersiz işlem');
       }
       setEditingSession(null);
+      setSessionDialogOpen(false);
       refetchSessions();
     } catch (error) {
       toast.error('Bir hata oluştu');
@@ -114,18 +122,13 @@ export default function ExamManagementPage() {
       toast.success('Deneme sınavı silindi');
       refetchSessions();
     } catch (error) {
-      toast.error('Bir hata oluştu');
+      toast.error('Deneme sınavı silinemedi');
     }
   };
 
-  const handleCreateSession = () => {
-    setEditingSession(null);
-    setSessionDialogOpen(true);
-  };
-
-  const handleViewResults = (session: ExamSession) => {
-    setActiveTab('stats');
+  const handleViewStatistics = (session: ExamSession) => {
     setStatsSessionId(session.id);
+    setActiveTab('statistics');
   };
 
   const handleSaveResults = async (
@@ -161,11 +164,6 @@ export default function ExamManagementPage() {
         message: error.message || 'Bir hata oluştu',
       };
     }
-  };
-
-  const handleExportExcel = async (sessionId: string) => {
-    downloadExcelResults(sessionId);
-    toast.success('İndirme başlatıldı');
   };
 
   const handleDownloadTemplate = async (examTypeId: string) => {
@@ -216,8 +214,6 @@ export default function ExamManagementPage() {
     );
   }
 
-  const currentExamType = examTypes?.find((t) => t.id === selectedExamType);
-
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
@@ -230,88 +226,67 @@ export default function ExamManagementPage() {
         </p>
       </div>
 
-      <Tabs value={selectedExamType} onValueChange={setSelectedExamType}>
-        <TabsList className="grid w-full max-w-md grid-cols-4">
-          {examTypes?.map((type) => (
-            <TabsTrigger key={type.id} value={type.id}>
-              {type.name}
-            </TabsTrigger>
-          ))}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full max-w-3xl grid-cols-3">
+          <TabsTrigger value="practice-exams" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Deneme Sınavları
+          </TabsTrigger>
+          <TabsTrigger value="school-exams" className="flex items-center gap-2">
+            <GraduationCap className="h-4 w-4" />
+            Okul Sınavları
+          </TabsTrigger>
+          <TabsTrigger value="statistics" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            İstatistikler
+          </TabsTrigger>
         </TabsList>
 
-        {examTypes?.map((type) => (
-          <TabsContent key={type.id} value={type.id} className="mt-6">
-            <Card>
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <div className="border-b px-6 pt-6">
-                  <TabsList className="w-full justify-start">
-                    <TabsTrigger value="sessions">Deneme Sınavları</TabsTrigger>
-                    <TabsTrigger value="entry">Sonuç Girişi</TabsTrigger>
-                    <TabsTrigger value="excel">Toplu İşlemler</TabsTrigger>
-                    <TabsTrigger value="stats">İstatistikler</TabsTrigger>
-                  </TabsList>
-                </div>
+        <TabsContent value="practice-exams" className="mt-6">
+          <PracticeExamsTab
+            examTypes={examTypes || []}
+            sessions={allSessions}
+            subjects={subjectsForSelectedSession.data || []}
+            students={students}
+            onCreateExam={handleCreateExam}
+            onEditExam={handleEditSession}
+            onDeleteExam={handleDeleteSession}
+            onViewStatistics={handleViewStatistics}
+            onImportExcel={handleImportExcel}
+            onDownloadTemplate={handleDownloadTemplate}
+            onSaveResults={handleSaveResults}
+            isCreating={createSession.isPending}
+          />
+        </TabsContent>
 
-                <div className="p-6">
-                  <TabsContent value="sessions" className="mt-0">
-                    <ExamSessionsList
-                      sessions={sessions}
-                      examTypeName={type.name}
-                      onEdit={handleEditSession}
-                      onDelete={handleDeleteSession}
-                      onCreate={handleCreateSession}
-                      onViewResults={handleViewResults}
-                    />
-                  </TabsContent>
+        <TabsContent value="school-exams" className="mt-6">
+          <SchoolExamsTab
+            students={students}
+            schoolExams={schoolExams}
+            onSave={handleSaveSchoolExam}
+            onDelete={handleDeleteSchoolExam}
+          />
+        </TabsContent>
 
-                  <TabsContent value="entry" className="mt-0">
-                    <ExamResultsEntry
-                      sessions={sessions}
-                      subjects={subjects}
-                      students={students}
-                      onSave={handleSaveResults}
-                    />
-                  </TabsContent>
-
-                  <TabsContent value="excel" className="mt-0">
-                    <ExcelImportExport
-                      sessions={sessions}
-                      examTypeId={type.id}
-                      examTypeName={type.name}
-                      onImport={handleImportExcel}
-                      onExport={handleExportExcel}
-                      onDownloadTemplate={handleDownloadTemplate}
-                    />
-                  </TabsContent>
-
-                  <TabsContent value="stats" className="mt-0">
-                    <ExamStatistics
-                      sessions={sessions}
-                      selectedSession={statsSessionId}
-                      onSessionChange={setStatsSessionId}
-                      statistics={statistics || null}
-                      isLoading={statsLoading}
-                    />
-                  </TabsContent>
-                </div>
-              </Tabs>
-            </Card>
-          </TabsContent>
-        ))}
+        <TabsContent value="statistics" className="mt-6">
+          <StatisticsTab
+            examTypes={examTypes || []}
+            sessions={allSessions}
+            statistics={statistics || null}
+            isLoading={statsLoading}
+            onSessionChange={setStatsSessionId}
+            selectedSessionId={statsSessionId}
+          />
+        </TabsContent>
       </Tabs>
-
-      <SchoolExamsManagement
-        students={students}
-        schoolExams={schoolExams}
-        onSave={handleSaveSchoolExam}
-        onDelete={handleDeleteSchoolExam}
-      />
 
       <ExamSessionDialog
         open={sessionDialogOpen}
         onOpenChange={setSessionDialogOpen}
-        examTypeId={selectedExamType}
-        examTypeName={currentExamType?.name || ''}
+        examTypeId={editingSession?.exam_type_id || ''}
+        examTypeName={
+          examTypes?.find((t) => t.id === editingSession?.exam_type_id)?.name || ''
+        }
         session={editingSession || undefined}
         onSave={handleSaveSession}
       />
