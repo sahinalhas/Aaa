@@ -108,13 +108,15 @@ export function ComparisonAnalysisTab({ examTypes, sessions }: ComparisonAnalysi
   }, [comparisonData]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <GitCompare className="h-6 w-6 text-primary" />
+        <h2 className="text-3xl font-bold flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <GitCompare className="h-7 w-7 text-primary" />
+          </div>
           Deneme Karşılaştırma
         </h2>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-2 text-base">
           Farklı denemeleri karşılaştırarak performans trendlerini görüntüleyin
         </p>
       </div>
@@ -342,11 +344,18 @@ export function ComparisonAnalysisTab({ examTypes, sessions }: ComparisonAnalysi
       )}
 
       {!comparisonData && (
-        <Card className="border-dashed">
-          <CardContent className="p-12">
-            <div className="text-center text-muted-foreground">
-              <GitCompare className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>Karşılaştırmak için yukarıdan en az 2 deneme seçin ve "Karşılaştır" butonuna tıklayın.</p>
+        <Card className="border-2 border-dashed border-muted-foreground/30 bg-muted/20">
+          <CardContent className="p-16">
+            <div className="text-center space-y-4">
+              <div className="mx-auto w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                <GitCompare className="h-10 w-10 text-muted-foreground" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg mb-2">Karşılaştırma Hazır</h3>
+                <p className="text-muted-foreground max-w-md mx-auto">
+                  Yukarıdan en az 2 deneme seçin ve "Karşılaştır" butonuna tıklayarak detaylı performans karşılaştırması yapın.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>

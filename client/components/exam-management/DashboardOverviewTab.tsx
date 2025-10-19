@@ -63,22 +63,42 @@ export function DashboardOverviewTab({ onNavigateToTab, onCreateSession }: Dashb
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map(i => (
-            <Skeleton key={i} className="h-32" />
+            <Skeleton key={i} className="h-32 rounded-xl" />
           ))}
         </div>
-        <Skeleton className="h-96" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Skeleton className="h-80 rounded-xl" />
+          <Skeleton className="h-80 rounded-xl" />
+        </div>
       </div>
     );
   }
 
   if (error || !overview) {
     return (
-      <Card className="border-destructive">
-        <CardContent className="p-6">
-          <p className="text-destructive">Dashboard verileri yüklenemedi. Lütfen sayfayı yenileyin.</p>
+      <Card className="border-2 border-red-200 bg-red-50/50">
+        <CardContent className="p-12">
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+              <AlertTriangle className="h-8 w-8 text-red-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg text-red-900">Dashboard Yüklenemedi</h3>
+              <p className="text-red-700 mt-2">Veriler yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
+            </div>
+            <Button onClick={() => window.location.reload()} variant="outline" className="border-red-300 text-red-700 hover:bg-red-100">
+              Sayfayı Yenile
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
@@ -93,14 +113,16 @@ export function DashboardOverviewTab({ onNavigateToTab, onCreateSession }: Dashb
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <LayoutDashboard className="h-6 w-6 text-primary" />
+          <h2 className="text-3xl font-bold flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <LayoutDashboard className="h-7 w-7 text-primary" />
+            </div>
             Genel Bakış
           </h2>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-2 text-base">
             Ölçme değerlendirme sisteminin özeti ve hızlı erişim
           </p>
         </div>

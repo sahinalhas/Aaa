@@ -85,13 +85,15 @@ export function TrendAnalysisTab({ examTypes }: TrendAnalysisTabProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <TrendingUp className="h-6 w-6 text-primary" />
+        <h2 className="text-3xl font-bold flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <TrendingUp className="h-7 w-7 text-primary" />
+          </div>
           Trend Analizi
         </h2>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-2 text-base">
           Sınav performans trendlerini zaman içinde takip edin
         </p>
       </div>
@@ -137,18 +139,30 @@ export function TrendAnalysisTab({ examTypes }: TrendAnalysisTabProps) {
       </Card>
 
       {isLoading && (
-        <div className="space-y-4">
-          <Skeleton className="h-48" />
-          <Skeleton className="h-96" />
+        <div className="space-y-4 animate-in fade-in duration-300">
+          <Skeleton className="h-48 rounded-xl" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Skeleton className="h-32 rounded-xl" />
+            <Skeleton className="h-32 rounded-xl" />
+            <Skeleton className="h-32 rounded-xl" />
+          </div>
+          <Skeleton className="h-96 rounded-xl" />
         </div>
       )}
 
       {!isLoading && !selectedExamType && (
-        <Card className="border-dashed">
-          <CardContent className="p-12">
-            <div className="text-center text-muted-foreground">
-              <TrendingUp className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>Trend analizini görüntülemek için yukarıdan bir sınav türü seçin.</p>
+        <Card className="border-2 border-dashed border-muted-foreground/30 bg-muted/20">
+          <CardContent className="p-16">
+            <div className="text-center space-y-4">
+              <div className="mx-auto w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                <TrendingUp className="h-10 w-10 text-muted-foreground" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg mb-2">Trend Analizi Hazır</h3>
+                <p className="text-muted-foreground max-w-md mx-auto">
+                  Yukarıdan bir sınav türü seçerek zaman içindeki performans trendlerini görüntüleyin.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
