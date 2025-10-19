@@ -220,26 +220,26 @@ export default function ExamManagementPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <ClipboardList className="h-8 w-8" />
+        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+          <ClipboardList className="h-6 w-6 text-primary" />
           Ölçme Değerlendirme
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-muted-foreground mt-1.5 text-sm">
           Deneme sınavları, okul notları ve değerlendirme sonuçlarını yönetin
         </p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full max-w-3xl grid-cols-3">
-          <TabsTrigger value="practice-exams" className="flex items-center gap-2">
+        <TabsList className="grid w-full max-w-2xl grid-cols-3 h-11">
+          <TabsTrigger value="practice-exams" className="flex items-center gap-2 text-sm">
             <FileText className="h-4 w-4" />
             Deneme Sınavları
           </TabsTrigger>
-          <TabsTrigger value="school-exams" className="flex items-center gap-2">
+          <TabsTrigger value="school-exams" className="flex items-center gap-2 text-sm">
             <GraduationCap className="h-4 w-4" />
             Okul Sınavları
           </TabsTrigger>
-          <TabsTrigger value="statistics" className="flex items-center gap-2">
+          <TabsTrigger value="statistics" className="flex items-center gap-2 text-sm">
             <BarChart3 className="h-4 w-4" />
             İstatistikler
           </TabsTrigger>

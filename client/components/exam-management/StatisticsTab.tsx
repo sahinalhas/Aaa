@@ -52,21 +52,25 @@ export function StatisticsTab({
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-6 w-6" />
-            İstatistikler ve Analizler
-          </CardTitle>
-          <CardDescription>
-            Deneme sınavı sonuçlarını analiz edin ve performans trendlerini görüntüleyin
-          </CardDescription>
+    <div className="space-y-5">
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-gradient-to-br from-primary/10 via-background to-accent/10 border-b">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                İstatistikler ve Analizler
+              </CardTitle>
+              <CardDescription className="mt-1">
+                Deneme sınavı sonuçlarını analiz edin ve performans trendlerini görüntüleyin
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="stats-exam-type">Sınav Türü Filtresi</Label>
+        <CardContent className="space-y-4 pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="stats-exam-type" className="text-sm">Sınav Türü Filtresi</Label>
               <Select value={filterExamType} onValueChange={setFilterExamType}>
                 <SelectTrigger id="stats-exam-type">
                   <Filter className="h-4 w-4 mr-2" />
@@ -83,8 +87,8 @@ export function StatisticsTab({
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="stats-session">Deneme Seçin</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="stats-session" className="text-sm">Deneme Seçin</Label>
               <Select value={selectedSessionId} onValueChange={onSessionChange}>
                 <SelectTrigger id="stats-session">
                   <SelectValue placeholder="Deneme sınavı seçin" />
@@ -129,11 +133,14 @@ export function StatisticsTab({
       </Card>
 
       {sessions.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Genel Özet</CardTitle>
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-gradient-to-br from-primary/5 via-background to-accent/5 border-b">
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              Genel Özet
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Toplam Deneme</p>

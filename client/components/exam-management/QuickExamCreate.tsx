@@ -79,9 +79,9 @@ export function QuickExamCreate({
       </CardHeader>
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="exam-type" className="text-sm font-medium">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="exam-type" className="text-sm">
                 Sınav Türü
               </Label>
               <Select value={examTypeId} onValueChange={setExamTypeId}>
@@ -98,8 +98,8 @@ export function QuickExamCreate({
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="exam-name" className="text-sm font-medium">
+            <div className="space-y-1.5">
+              <Label htmlFor="exam-name" className="text-sm">
                 Deneme Adı
               </Label>
               <Input
@@ -112,8 +112,8 @@ export function QuickExamCreate({
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="exam-date" className="text-sm font-medium">
+            <div className="space-y-1.5">
+              <Label htmlFor="exam-date" className="text-sm">
                 Tarih
               </Label>
               <Input
@@ -126,8 +126,8 @@ export function QuickExamCreate({
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="exam-description" className="text-sm font-medium">
+            <div className="space-y-1.5">
+              <Label htmlFor="exam-description" className="text-sm">
                 Açıklama
               </Label>
               <Input
