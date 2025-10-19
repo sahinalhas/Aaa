@@ -126,12 +126,13 @@ export default function Index() {
     async function fetchDashboardData() {
       setIsLoading(true);
       try {
-        const [studentsData, distributions, sessions] = await Promise.all([
-          apiClient.get<Student[]>(STUDENT_ENDPOINTS.BASE, { showErrorToast: false }),
+        const [studentsResponse, distributions, sessions] = await Promise.all([
+          apiClient.get<{ data: Student[] }>(STUDENT_ENDPOINTS.BASE, { showErrorToast: false }),
           apiClient.get<any[]>(SURVEY_ENDPOINTS.DISTRIBUTIONS, { showErrorToast: false }),
           apiClient.get<CounselingSession[]>(COUNSELING_ENDPOINTS.BASE, { showErrorToast: false }),
         ]);
 
+        const studentsData = studentsResponse?.data || [];
         if (studentsData) {
           setStudents(studentsData);
           setStats(prev => ({ ...prev, studentCount: studentsData.length }));
