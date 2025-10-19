@@ -149,6 +149,11 @@ export function PracticeExamsTab({
     setShowEntryOptions(session);
   };
 
+  const getSessionSubjects = (session: ExamSession | null) => {
+    if (!session) return [];
+    return subjects.filter((s) => s.exam_type_id === session.exam_type_id);
+  };
+
   return (
     <div className="space-y-5">
       <QuickExamCreate
@@ -335,7 +340,7 @@ export function PracticeExamsTab({
           open={!!resultDialogSession}
           onOpenChange={(open) => !open && setResultDialogSession(null)}
           session={resultDialogSession}
-          subjects={subjects}
+          subjects={getSessionSubjects(resultDialogSession)}
           students={students}
           onSave={onSaveResults}
         />
@@ -346,7 +351,7 @@ export function PracticeExamsTab({
           open={!!bulkEntrySession}
           onOpenChange={(open) => !open && setBulkEntrySession(null)}
           session={bulkEntrySession}
-          subjects={subjects}
+          subjects={getSessionSubjects(bulkEntrySession)}
           students={students}
           onSave={onSaveResults}
         />
