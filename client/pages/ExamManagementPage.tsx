@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ClipboardList, FileText, GraduationCap, BarChart3 } from 'lucide-react';
+import { ClipboardList, FileText, GraduationCap, BarChart3, LayoutDashboard, GitCompare, TrendingUp } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -24,6 +24,9 @@ import { ExamSessionDialog } from '@/components/exam-management/ExamSessionDialo
 import { PracticeExamsTab } from '@/components/exam-management/PracticeExamsTab';
 import { SchoolExamsTab } from '@/components/exam-management/SchoolExamsTab';
 import { StatisticsTab } from '@/components/exam-management/StatisticsTab';
+import { DashboardOverviewTab } from '@/components/exam-management/DashboardOverviewTab';
+import { ComparisonAnalysisTab } from '@/components/exam-management/ComparisonAnalysisTab';
+import { TrendAnalysisTab } from '@/components/exam-management/TrendAnalysisTab';
 import type {
   ExamSession,
   SubjectResults,
@@ -47,7 +50,7 @@ function useStudents() {
 }
 
 export default function ExamManagementPage() {
-  const [activeTab, setActiveTab] = useState<string>('practice-exams');
+  const [activeTab, setActiveTab] = useState<string>('overview');
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<ExamSession | null>(null);
   const [statsSessionId, setStatsSessionId] = useState<string>('');
@@ -230,10 +233,14 @@ export default function ExamManagementPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full max-w-2xl grid-cols-3 h-11">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-1">
+          <TabsTrigger value="overview" className="flex items-center gap-2 text-sm">
+            <LayoutDashboard className="h-4 w-4" />
+            Genel Bakış
+          </TabsTrigger>
           <TabsTrigger value="practice-exams" className="flex items-center gap-2 text-sm">
             <FileText className="h-4 w-4" />
-            Deneme Sınavları
+            Denemeler
           </TabsTrigger>
           <TabsTrigger value="school-exams" className="flex items-center gap-2 text-sm">
             <GraduationCap className="h-4 w-4" />
@@ -243,7 +250,24 @@ export default function ExamManagementPage() {
             <BarChart3 className="h-4 w-4" />
             İstatistikler
           </TabsTrigger>
+          <TabsTrigger value="comparison" className="flex items-center gap-2 text-sm">
+            <GitCompare className="h-4 w-4" />
+            Karşılaştırma
+          </TabsTrigger>
+          <TabsTrigger value="trend" className="flex items-center gap-2 text-sm">
+            <TrendingUp className="h-4 w-4" />
+            Trend Analizi
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="overview" className="mt-6">
+          <DashboardOverviewTab
+            onNavigateToTab={setActiveTab}
+            onCreateSession={() => {
+              setActiveTab('practice-exams');
+            }}
+          />
+        </TabsContent>
 
         <TabsContent value="practice-exams" className="mt-6">
           <PracticeExamsTab
@@ -280,6 +304,19 @@ export default function ExamManagementPage() {
             isLoading={statsLoading}
             onSessionChange={setStatsSessionId}
             selectedSessionId={statsSessionId}
+          />
+        </TabsContent>
+
+        <TabsContent value="comparison" className="mt-6">
+          <ComparisonAnalysisTab
+            examTypes={examTypes || []}
+            sessions={allSessions}
+          />
+        </TabsContent>
+
+        <TabsContent value="trend" className="mt-6">
+          <TrendAnalysisTab
+            examTypes={examTypes || []}
           />
         </TabsContent>
       </Tabs>

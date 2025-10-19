@@ -283,3 +283,194 @@ export interface SchoolExamResultsFilter {
   limit?: number;
   offset?: number;
 }
+
+// ============================================================================
+// Dashboard Overview Types
+// ============================================================================
+
+export interface DashboardOverview {
+  summary: DashboardSummary;
+  recent_sessions: RecentSessionSummary[];
+  student_performance: StudentPerformanceOverview;
+  at_risk_students: AtRiskStudent[];
+  quick_actions: QuickAction[];
+}
+
+export interface DashboardSummary {
+  total_sessions: number;
+  total_students: number;
+  total_results_count: number;
+  avg_participation_rate: number;
+  avg_overall_success: number;
+  sessions_this_month: number;
+  sessions_last_month: number;
+  trend: 'up' | 'down' | 'stable';
+}
+
+export interface RecentSessionSummary {
+  session_id: string;
+  session_name: string;
+  exam_type_id: string;
+  exam_type_name: string;
+  exam_date: string;
+  participants: number;
+  avg_net: number;
+  completion_rate: number;
+  days_ago: number;
+}
+
+export interface StudentPerformanceOverview {
+  high_performers: number;
+  average_performers: number;
+  needs_attention: number;
+  performance_distribution: PerformanceDistribution[];
+}
+
+export interface PerformanceDistribution {
+  range: string;
+  count: number;
+  percentage: number;
+}
+
+export interface AtRiskStudent {
+  student_id: string;
+  student_name: string;
+  risk_level: 'high' | 'medium' | 'low';
+  recent_avg_net: number;
+  trend: 'declining' | 'stable' | 'improving';
+  weak_subjects: string[];
+  last_exam_date: string;
+}
+
+export interface QuickAction {
+  id: string;
+  type: 'create_session' | 'enter_results' | 'view_statistics' | 'export_report';
+  title: string;
+  description: string;
+  icon: string;
+  url?: string;
+}
+
+// ============================================================================
+// Comparison and Trend Analysis Types
+// ============================================================================
+
+export interface SessionComparison {
+  sessions: SessionComparisonItem[];
+  comparison_type: 'overall' | 'subject' | 'student';
+  subject_comparisons?: SubjectComparisonData[];
+}
+
+export interface SessionComparisonItem {
+  session_id: string;
+  session_name: string;
+  exam_date: string;
+  avg_net: number;
+  highest_net: number;
+  lowest_net: number;
+  participants: number;
+}
+
+export interface SubjectComparisonData {
+  subject_name: string;
+  sessions: {
+    session_id: string;
+    session_name: string;
+    avg_net: number;
+  }[];
+}
+
+export interface TrendAnalysis {
+  exam_type_id: string;
+  exam_type_name: string;
+  period: string;
+  data_points: TrendDataPoint[];
+  overall_trend: 'improving' | 'declining' | 'stable';
+  trend_percentage: number;
+}
+
+export interface TrendDataPoint {
+  session_id: string;
+  session_name: string;
+  exam_date: string;
+  avg_net: number;
+  participants: number;
+}
+
+// ============================================================================
+// AI Analysis Types
+// ============================================================================
+
+export interface AIAnalysisResult {
+  student_id?: string;
+  session_id?: string;
+  analysis_type: 'risk' | 'weak_subject' | 'recommendation' | 'prediction';
+  insights: AIInsight[];
+  recommendations: AIRecommendation[];
+  generated_at: string;
+}
+
+export interface AIInsight {
+  id: string;
+  category: string;
+  severity: 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  data_points: any[];
+  confidence: number;
+}
+
+export interface AIRecommendation {
+  id: string;
+  type: 'intervention' | 'support' | 'enrichment';
+  priority: 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  actionable_steps: string[];
+  expected_impact: string;
+}
+
+export interface WeakSubjectAnalysis {
+  student_id: string;
+  student_name: string;
+  weak_subjects: WeakSubjectDetail[];
+  analysis_period: string;
+}
+
+export interface WeakSubjectDetail {
+  subject_id: string;
+  subject_name: string;
+  avg_net: number;
+  avg_success_rate: number;
+  trend: 'improving' | 'declining' | 'stable';
+  common_mistakes: string[];
+  improvement_suggestions: string[];
+}
+
+// ============================================================================
+// Report Types
+// ============================================================================
+
+export interface ExamReportConfig {
+  report_type: 'session' | 'student' | 'comparative' | 'comprehensive';
+  session_ids?: string[];
+  student_ids?: string[];
+  exam_type_id?: string;
+  date_range?: {
+    start_date: string;
+    end_date: string;
+  };
+  include_charts: boolean;
+  include_recommendations: boolean;
+  format: 'pdf' | 'excel';
+}
+
+export interface GeneratedReport {
+  id: string;
+  report_type: string;
+  title: string;
+  generated_at: string;
+  file_path?: string;
+  download_url?: string;
+  metadata: any;
+}

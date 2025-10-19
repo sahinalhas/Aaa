@@ -33,4 +33,15 @@ router.post('/school-exams', simpleRateLimit(100, 60 * 60 * 1000), routes.create
 router.put('/school-exams/:id', simpleRateLimit(100, 60 * 60 * 1000), routes.updateSchoolExam);
 router.delete('/school-exams/:id', simpleRateLimit(50, 60 * 60 * 1000), routes.deleteSchoolExam);
 
+router.get('/dashboard/overview', routes.getDashboardOverview);
+router.post('/comparison/sessions', routes.getSessionComparison);
+router.get('/trend/:examTypeId', routes.getTrendAnalysis);
+
+router.get('/ai/risk/:studentId', routes.getStudentRiskAnalysis);
+router.get('/ai/weak-subjects/:studentId', routes.getWeakSubjects);
+router.get('/ai/recommendations/:sessionId', routes.getSessionRecommendations);
+
+router.get('/reports/session/:sessionId', routes.generateSessionReportData);
+router.get('/reports/student/:studentId', routes.generateStudentReportData);
+
 export default router;

@@ -6,6 +6,10 @@ import * as examResultsRepo from '../repository/exam-results.repository.js';
 import * as schoolExamsRepo from '../repository/school-exams.repository.js';
 import * as statisticsService from '../services/statistics.service.js';
 import * as excelService from '../services/excel.service.js';
+import * as dashboardService from '../services/dashboard-overview.service.js';
+import * as comparisonService from '../services/comparison.service.js';
+import * as aiAnalysisService from '../services/ai-analysis.service.js';
+import * as pdfReportService from '../services/pdf-report.service.js';
 import { sanitizeString } from '../../../middleware/validation.js';
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -380,5 +384,149 @@ export const deleteSchoolExam: RequestHandler = (req, res) => {
   } catch (error) {
     console.error('Error deleting school exam result:', error);
     res.status(500).json({ success: false, error: 'Okul sınav sonucu silinemedi' });
+  }
+};
+
+export const getDashboardOverview: RequestHandler = (req, res) => {
+  try {
+    const overview = dashboardService.getDashboardOverview();
+    res.json({ success: true, data: overview });
+  } catch (error) {
+    console.error('Error fetching dashboard overview:', error);
+    res.status(500).json({ success: false, error: 'Dashboard verileri yüklenemedi' });
+  }
+};
+
+export const getSessionComparison: RequestHandler = (req, res) => {
+  try {
+    const { sessionIds, comparisonType } = req.body;
+    
+    if (!sessionIds || !Array.isArray(sessionIds) || sessionIds.length < 2) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'En az 2 deneme seçilmelidir' 
+      });
+    }
+    
+    const comparison = comparisonService.compareExamSessions(
+      sessionIds, 
+      comparisonType as 'overall' | 'subject' | 'student'
+    );
+    
+    if (!comparison) {
+      return res.status(404).json({ success: false, error: 'Karşılaştırma yapılamadı' });
+    }
+    
+    res.json({ success: true, data: comparison });
+  } catch (error) {
+    console.error('Error comparing sessions:', error);
+    res.status(500).json({ success: false, error: 'Karşılaştırma yapılamadı' });
+  }
+};
+
+export const getTrendAnalysis: RequestHandler = (req, res) => {
+  try {
+    const { examTypeId } = req.params;
+    const { period } = req.query;
+    
+    const trend = comparisonService.getTrendAnalysis(
+      examTypeId,
+      (period as 'last_6' | 'last_12' | 'all') || 'last_6'
+    );
+    
+    if (!trend) {
+      return res.status(404).json({ success: false, error: 'Trend analizi yapılamadı' });
+    }
+    
+    res.json({ success: true, data: trend });
+  } catch (error) {
+    console.error('Error analyzing trend:', error);
+    res.status(500).json({ success: false, error: 'Trend analizi yapılamadı' });
+  }
+};
+
+export const getStudentRiskAnalysis: RequestHandler = (req, res) => {
+  try {
+    const { studentId } = req.params;
+    
+    const analysis = aiAnalysisService.analyzeStudentRisk(studentId);
+    
+    if (!analysis) {
+      return res.status(404).json({ success: false, error: 'Risk analizi yapılamadı' });
+    }
+    
+    res.json({ success: true, data: analysis });
+  } catch (error) {
+    console.error('Error analyzing student risk:', error);
+    res.status(500).json({ success: false, error: 'Risk analizi yapılamadı' });
+  }
+};
+
+export const getWeakSubjects: RequestHandler = (req, res) => {
+  try {
+    const { studentId } = req.params;
+    
+    const analysis = aiAnalysisService.identifyWeakSubjects(studentId);
+    
+    if (!analysis) {
+      return res.status(404).json({ success: false, error: 'Zayıf konu analizi yapılamadı' });
+    }
+    
+    res.json({ success: true, data: analysis });
+  } catch (error) {
+    console.error('Error identifying weak subjects:', error);
+    res.status(500).json({ success: false, error: 'Zayıf konu analizi yapılamadı' });
+  }
+};
+
+export const getSessionRecommendations: RequestHandler = (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    
+    const analysis = aiAnalysisService.generateSessionRecommendations(sessionId);
+    
+    if (!analysis) {
+      return res.status(404).json({ success: false, error: 'Öneri oluşturulamadı' });
+    }
+    
+    res.json({ success: true, data: analysis });
+  } catch (error) {
+    console.error('Error generating recommendations:', error);
+    res.status(500).json({ success: false, error: 'Öneri oluşturulamadı' });
+  }
+};
+
+export const generateSessionReportData: RequestHandler = (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    
+    const reportData = pdfReportService.generateSessionReport(sessionId);
+    
+    if (!reportData) {
+      return res.status(404).json({ success: false, error: 'Rapor oluşturulamadı' });
+    }
+    
+    res.json({ success: true, data: reportData });
+  } catch (error) {
+    console.error('Error generating session report:', error);
+    res.status(500).json({ success: false, error: 'Rapor oluşturulamadı' });
+  }
+};
+
+export const generateStudentReportData: RequestHandler = (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const { examTypeId } = req.query;
+    
+    const reportData = pdfReportService.generateStudentReport(studentId, examTypeId as string | undefined);
+    
+    if (!reportData) {
+      return res.status(404).json({ success: false, error: 'Rapor oluşturulamadı' });
+    }
+    
+    res.json({ success: true, data: reportData });
+  } catch (error) {
+    console.error('Error generating student report:', error);
+    res.status(500).json({ success: false, error: 'Rapor oluşturulamadı' });
   }
 };

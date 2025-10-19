@@ -15,6 +15,9 @@ import type {
   ExamManagementApiResponse,
   ExamStatistics,
   StudentExamStatistics,
+  DashboardOverview,
+  SessionComparison,
+  TrendAnalysis,
 } from '../../shared/types/exam-management.types';
 
 const API_BASE = '/api/exam-management';
@@ -354,4 +357,102 @@ export function downloadExcelTemplate(examTypeId: string, includeStudents: boole
 export function downloadExcelResults(sessionId: string) {
   const url = `${API_BASE}/excel/export/${sessionId}`;
   window.open(url, '_blank');
+}
+
+export function useDashboardOverview() {
+  return useQuery<DashboardOverview>({
+    queryKey: [API_BASE, 'dashboard', 'overview'],
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/dashboard/overview`);
+      if (!response.ok) throw new Error('Dashboard verileri yüklenemedi');
+      const data: ExamManagementApiResponse<DashboardOverview> = await response.json();
+      if (!data.data) throw new Error('Dashboard verileri bulunamadı');
+      return data.data;
+    },
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useSessionComparison() {
+  return useMutation({
+    mutationFn: async (params: { 
+      sessionIds: string[]; 
+      comparisonType?: 'overall' | 'subject' | 'student';
+    }) => {
+      const response = await fetch(`${API_BASE}/comparison/sessions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionIds: params.sessionIds,
+          comparisonType: params.comparisonType || 'overall'
+        }),
+      });
+      if (!response.ok) throw new Error('Karşılaştırma yapılamadı');
+      const data: ExamManagementApiResponse<SessionComparison> = await response.json();
+      if (!data.data) throw new Error('Karşılaştırma verileri bulunamadı');
+      return data.data;
+    },
+  });
+}
+
+export function useTrendAnalysis(examTypeId: string | undefined, period: 'last_6' | 'last_12' | 'all' = 'last_6') {
+  return useQuery<TrendAnalysis>({
+    queryKey: [API_BASE, 'trend', examTypeId, period],
+    queryFn: async () => {
+      if (!examTypeId) throw new Error('Sınav türü gerekli');
+      const response = await fetch(`${API_BASE}/trend/${examTypeId}?period=${period}`);
+      if (!response.ok) throw new Error('Trend analizi yapılamadı');
+      const data: ExamManagementApiResponse<TrendAnalysis> = await response.json();
+      if (!data.data) throw new Error('Trend analizi bulunamadı');
+      return data.data;
+    },
+    enabled: !!examTypeId,
+    staleTime: 10 * 60 * 1000,
+  });
+}
+
+export function useStudentRiskAnalysis(studentId: string | undefined) {
+  return useQuery({
+    queryKey: [API_BASE, 'ai', 'risk', studentId],
+    queryFn: async () => {
+      if (!studentId) throw new Error('Öğrenci ID gerekli');
+      const response = await fetch(`${API_BASE}/ai/risk/${studentId}`);
+      if (!response.ok) throw new Error('Risk analizi yapılamadı');
+      const data = await response.json();
+      return data.data;
+    },
+    enabled: !!studentId,
+    staleTime: 10 * 60 * 1000,
+  });
+}
+
+export function useWeakSubjectsAnalysis(studentId: string | undefined) {
+  return useQuery({
+    queryKey: [API_BASE, 'ai', 'weak-subjects', studentId],
+    queryFn: async () => {
+      if (!studentId) throw new Error('Öğrenci ID gerekli');
+      const response = await fetch(`${API_BASE}/ai/weak-subjects/${studentId}`);
+      if (!response.ok) throw new Error('Zayıf konu analizi yapılamadı');
+      const data = await response.json();
+      return data.data;
+    },
+    enabled: !!studentId,
+    staleTime: 10 * 60 * 1000,
+  });
+}
+
+export function useSessionRecommendations(sessionId: string | undefined) {
+  return useQuery({
+    queryKey: [API_BASE, 'ai', 'recommendations', sessionId],
+    queryFn: async () => {
+      if (!sessionId) throw new Error('Deneme ID gerekli');
+      const response = await fetch(`${API_BASE}/ai/recommendations/${sessionId}`);
+      if (!response.ok) throw new Error('Öneri oluşturulamadı');
+      const data = await response.json();
+      return data.data;
+    },
+    enabled: !!sessionId,
+    staleTime: 10 * 60 * 1000,
+  });
 }
