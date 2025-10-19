@@ -352,7 +352,6 @@ export function PracticeExamsTab({
           open={!!resultDialogSession}
           onOpenChange={(open) => !open && setResultDialogSession(null)}
           session={resultDialogSession}
-          subjects={getSessionSubjects(resultDialogSession)}
           students={students}
           onSave={onSaveResults}
         />

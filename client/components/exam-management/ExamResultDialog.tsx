@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, Save, ArrowRight, Copy, Info, AlertCircle } from 'lucide-react';
+import { useExamSubjects } from '@/hooks/useExamManagement';
 import type {
   ExamSession,
   ExamSubject,
@@ -36,7 +37,6 @@ interface ExamResultDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   session: ExamSession;
-  subjects: ExamSubject[];
   students: Student[];
   onSave: (sessionId: string, studentId: string, results: SubjectResults[]) => Promise<void>;
 }
@@ -45,10 +45,10 @@ export function ExamResultDialog({
   open,
   onOpenChange,
   session,
-  subjects,
   students,
   onSave,
 }: ExamResultDialogProps) {
+  const { data: subjects = [], isLoading: subjectsLoading } = useExamSubjects(session.exam_type_id);
   const [selectedStudent, setSelectedStudent] = useState<string>('');
   const [studentSearch, setStudentSearch] = useState<string>('');
   const [subjectResults, setSubjectResults] = useState<Map<string, SubjectResults>>(new Map());

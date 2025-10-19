@@ -72,7 +72,7 @@ export default function ExamManagementPage() {
 
   const resultEntrySession = allSessions.find((s) => s.id === resultEntrySessionId);
   const subjectsForResultEntry = useExamSubjects(
-    resultEntrySessionId ? resultEntrySession?.exam_type_id : undefined
+    resultEntrySession?.exam_type_id
   );
 
   const handleCreateExam = async (data: {
