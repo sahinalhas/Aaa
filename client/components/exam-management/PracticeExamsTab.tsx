@@ -83,7 +83,7 @@ export function PracticeExamsTab({
   const [filterExamType, setFilterExamType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSessionForResult, setSelectedSessionForResult] = useState<string>('');
-  const [showResultEntry, setShowResultEntry] = useState(false);
+  const [showResultEntry] = useState(false);
 
   const filteredSessions = sessions.filter((session) => {
     const matchesType = filterExamType === 'all' || session.exam_type_id === filterExamType;
@@ -93,11 +93,6 @@ export function PracticeExamsTab({
 
   const getExamTypeName = (examTypeId: string) => {
     return examTypes.find((t) => t.id === examTypeId)?.name || examTypeId;
-  };
-
-  const handleResultEntryClick = (sessionId: string) => {
-    setSelectedSessionForResult(sessionId);
-    setShowResultEntry(true);
   };
 
   return (
@@ -217,12 +212,13 @@ export function PracticeExamsTab({
                       )}
                     </div>
                     <Button
-                      onClick={() => handleResultEntryClick(session.id)}
+                      onClick={() => onViewStatistics(session)}
+                      variant="outline"
                       className="w-full"
                       size="sm"
                     >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Sonuç Gir
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      İstatistikleri Gör
                     </Button>
                   </CardContent>
                 </Card>
@@ -232,7 +228,7 @@ export function PracticeExamsTab({
         </CardContent>
       </Card>
 
-      {showResultEntry && selectedSessionForResult && (
+      {selectedSessionForResult && showResultEntry && (
         <Card>
           <CardHeader>
             <CardTitle>Bireysel Sonuç Girişi</CardTitle>
@@ -240,14 +236,9 @@ export function PracticeExamsTab({
           <CardContent>
             <ExamResultsEntry
               sessions={sessions}
-              subjects={subjects.filter(
-                (s) =>
-                  s.exam_type_id ===
-                  sessions.find((session) => session.id === selectedSessionForResult)?.exam_type_id
-              )}
+              subjects={subjects}
               students={students}
               onSave={onSaveResults}
-              preSelectedSessionId={selectedSessionForResult}
             />
           </CardContent>
         </Card>
