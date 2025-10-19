@@ -1,0 +1,384 @@
+import { Request, Response, NextFunction, RequestHandler } from 'express';
+import multer from 'multer';
+import * as examTypesRepo from '../repository/exam-types.repository.js';
+import * as examSessionsRepo from '../repository/exam-sessions.repository.js';
+import * as examResultsRepo from '../repository/exam-results.repository.js';
+import * as schoolExamsRepo from '../repository/school-exams.repository.js';
+import * as statisticsService from '../services/statistics.service.js';
+import * as excelService from '../services/excel.service.js';
+import { sanitizeString } from '../../../middleware/validation.js';
+
+const upload = multer({ storage: multer.memoryStorage() });
+
+export const getExamTypes: RequestHandler = (req, res) => {
+  try {
+    const types = examTypesRepo.getAllExamTypes();
+    res.json({ success: true, data: types });
+  } catch (error) {
+    console.error('Error fetching exam types:', error);
+    res.status(500).json({ success: false, error: 'Sınav türleri yüklenemedi' });
+  }
+};
+
+export const getSubjectsByType: RequestHandler = (req, res) => {
+  try {
+    const { typeId } = req.params;
+    const subjects = examTypesRepo.getSubjectsByExamType(typeId);
+    res.json({ success: true, data: subjects });
+  } catch (error) {
+    console.error('Error fetching subjects:', error);
+    res.status(500).json({ success: false, error: 'Dersler yüklenemedi' });
+  }
+};
+
+export const getAllExamSessions: RequestHandler = (req, res) => {
+  try {
+    const { typeId } = req.query;
+    const sessions = typeId 
+      ? examSessionsRepo.getExamSessionsByType(typeId as string)
+      : examSessionsRepo.getAllExamSessions();
+    res.json({ success: true, data: sessions });
+  } catch (error) {
+    console.error('Error fetching exam sessions:', error);
+    res.status(500).json({ success: false, error: 'Deneme sınavları yüklenemedi' });
+  }
+};
+
+export const getExamSessionById: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+    const session = examSessionsRepo.getExamSessionById(id);
+    
+    if (!session) {
+      return res.status(404).json({ success: false, error: 'Deneme sınavı bulunamadı' });
+    }
+    
+    res.json({ success: true, data: session });
+  } catch (error) {
+    console.error('Error fetching exam session:', error);
+    res.status(500).json({ success: false, error: 'Deneme sınavı yüklenemedi' });
+  }
+};
+
+export const createExamSession: RequestHandler = (req, res) => {
+  try {
+    const input = req.body;
+    
+    if (!input.exam_type_id || !input.name || !input.exam_date) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Sınav türü, deneme adı ve tarihi zorunludur' 
+      });
+    }
+    
+    const session = examSessionsRepo.createExamSession(input);
+    res.json({ success: true, data: session, message: 'Deneme sınavı oluşturuldu' });
+  } catch (error) {
+    console.error('Error creating exam session:', error);
+    res.status(500).json({ success: false, error: 'Deneme sınavı oluşturulamadı' });
+  }
+};
+
+export const updateExamSession: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+    const input = req.body;
+    
+    const session = examSessionsRepo.updateExamSession(id, input);
+    res.json({ success: true, data: session, message: 'Deneme sınavı güncellendi' });
+  } catch (error: any) {
+    console.error('Error updating exam session:', error);
+    if (error.message.includes('not found')) {
+      return res.status(404).json({ success: false, error: 'Deneme sınavı bulunamadı' });
+    }
+    res.status(500).json({ success: false, error: 'Deneme sınavı güncellenemedi' });
+  }
+};
+
+export const deleteExamSession: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+    examSessionsRepo.deleteExamSession(id);
+    res.json({ success: true, message: 'Deneme sınavı silindi' });
+  } catch (error) {
+    console.error('Error deleting exam session:', error);
+    res.status(500).json({ success: false, error: 'Deneme sınavı silinemedi' });
+  }
+};
+
+export const getResultsBySession: RequestHandler = (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const results = examResultsRepo.getExamResultsBySession(sessionId);
+    res.json({ success: true, data: results });
+  } catch (error) {
+    console.error('Error fetching results by session:', error);
+    res.status(500).json({ success: false, error: 'Sınav sonuçları yüklenemedi' });
+  }
+};
+
+export const getResultsByStudent: RequestHandler = (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const results = examResultsRepo.getExamResultsByStudent(studentId);
+    res.json({ success: true, data: results });
+  } catch (error) {
+    console.error('Error fetching results by student:', error);
+    res.status(500).json({ success: false, error: 'Öğrenci sınav sonuçları yüklenemedi' });
+  }
+};
+
+export const createExamResult: RequestHandler = (req, res) => {
+  try {
+    const input = req.body;
+    
+    if (!input.session_id || !input.student_id || !input.subject_id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Deneme, öğrenci ve ders bilgisi zorunludur' 
+      });
+    }
+    
+    const result = examResultsRepo.createExamResult(input);
+    res.json({ success: true, data: result, message: 'Sonuç kaydedildi' });
+  } catch (error: any) {
+    console.error('Error creating exam result:', error);
+    if (error.message.includes('already exists')) {
+      return res.status(409).json({ success: false, error: 'Bu sonuç zaten mevcut' });
+    }
+    res.status(500).json({ success: false, error: 'Sonuç kaydedilemedi' });
+  }
+};
+
+export const upsertExamResult: RequestHandler = (req, res) => {
+  try {
+    const input = req.body;
+    
+    if (!input.session_id || !input.student_id || !input.subject_id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Deneme, öğrenci ve ders bilgisi zorunludur' 
+      });
+    }
+    
+    const result = examResultsRepo.upsertExamResult(input);
+    res.json({ success: true, data: result, message: 'Sonuç kaydedildi' });
+  } catch (error) {
+    console.error('Error upserting exam result:', error);
+    res.status(500).json({ success: false, error: 'Sonuç kaydedilemedi' });
+  }
+};
+
+export const batchUpsertResults: RequestHandler = (req, res) => {
+  try {
+    const { results } = req.body;
+    
+    if (!Array.isArray(results)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Sonuçlar array olmalıdır' 
+      });
+    }
+    
+    const savedResults = examResultsRepo.batchUpsertExamResults(results);
+    res.json({ 
+      success: true, 
+      data: savedResults, 
+      message: `${savedResults.length} sonuç kaydedildi` 
+    });
+  } catch (error) {
+    console.error('Error batch upserting results:', error);
+    res.status(500).json({ success: false, error: 'Sonuçlar kaydedilemedi' });
+  }
+};
+
+export const updateExamResult: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+    const input = req.body;
+    
+    const result = examResultsRepo.updateExamResult(id, input);
+    res.json({ success: true, data: result, message: 'Sonuç güncellendi' });
+  } catch (error: any) {
+    console.error('Error updating exam result:', error);
+    if (error.message.includes('not found')) {
+      return res.status(404).json({ success: false, error: 'Sonuç bulunamadı' });
+    }
+    res.status(500).json({ success: false, error: 'Sonuç güncellenemedi' });
+  }
+};
+
+export const deleteExamResult: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+    examResultsRepo.deleteExamResult(id);
+    res.json({ success: true, message: 'Sonuç silindi' });
+  } catch (error) {
+    console.error('Error deleting exam result:', error);
+    res.status(500).json({ success: false, error: 'Sonuç silinemedi' });
+  }
+};
+
+export const getSessionStatistics: RequestHandler = (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const stats = statisticsService.calculateExamSessionStatistics(sessionId);
+    
+    if (!stats) {
+      return res.status(404).json({ success: false, error: 'İstatistik hesaplanamadı' });
+    }
+    
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    console.error('Error calculating session statistics:', error);
+    res.status(500).json({ success: false, error: 'İstatistik hesaplanamadı' });
+  }
+};
+
+export const getStudentStatistics: RequestHandler = (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const { examTypeId } = req.query;
+    
+    const stats = statisticsService.calculateStudentExamStatistics(
+      studentId, 
+      examTypeId as string | undefined
+    );
+    
+    if (!stats) {
+      return res.status(404).json({ success: false, error: 'İstatistik hesaplanamadı' });
+    }
+    
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    console.error('Error calculating student statistics:', error);
+    res.status(500).json({ success: false, error: 'İstatistik hesaplanamadı' });
+  }
+};
+
+export const downloadExcelTemplate: RequestHandler = (req, res) => {
+  try {
+    const { examTypeId } = req.params;
+    const includeStudents = req.query.includeStudents === 'true';
+    
+    const buffer = excelService.generateExcelTemplate({
+      exam_type_id: examTypeId,
+      include_student_info: includeStudents
+    });
+    
+    const examType = examTypesRepo.getExamTypeById(examTypeId);
+    const filename = `${examType?.name || 'Sinav'}_Sablonu.xlsx`;
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+    res.send(buffer);
+  } catch (error) {
+    console.error('Error generating Excel template:', error);
+    res.status(500).json({ success: false, error: 'Excel şablonu oluşturulamadı' });
+  }
+};
+
+export const importExcelResults = [
+  upload.single('file'),
+  (async (req: Request, res: Response) => {
+    try {
+      const { sessionId } = req.body;
+      
+      if (!sessionId) {
+        return res.status(400).json({ success: false, error: 'Deneme sınavı ID gerekli' });
+      }
+      
+      const file = (req as any).file;
+      if (!file) {
+        return res.status(400).json({ success: false, error: 'Excel dosyası yüklenmedi' });
+      }
+      
+      const result = await excelService.importExcelResults(sessionId, file.buffer);
+      
+      res.json({ 
+        success: result.success, 
+        data: result,
+        message: result.success 
+          ? `${result.imported_count} sonuç başarıyla yüklendi` 
+          : 'Excel dosyası işlenirken hata oluştu'
+      });
+    } catch (error) {
+      console.error('Error importing Excel results:', error);
+      res.status(500).json({ success: false, error: 'Excel dosyası işlenemedi' });
+    }
+  }) as RequestHandler
+];
+
+export const exportExcelResults: RequestHandler = (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    
+    const buffer = excelService.exportExamResultsToExcel(sessionId);
+    const session = examSessionsRepo.getExamSessionById(sessionId);
+    const filename = `${session?.name || 'Sinav'}_Sonuclari.xlsx`;
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+    res.send(buffer);
+  } catch (error) {
+    console.error('Error exporting Excel results:', error);
+    res.status(500).json({ success: false, error: 'Excel raporu oluşturulamadı' });
+  }
+};
+
+export const getSchoolExamsByStudent: RequestHandler = (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const results = schoolExamsRepo.getSchoolExamResultsByStudent(studentId);
+    res.json({ success: true, data: results });
+  } catch (error) {
+    console.error('Error fetching school exam results:', error);
+    res.status(500).json({ success: false, error: 'Okul sınav sonuçları yüklenemedi' });
+  }
+};
+
+export const createSchoolExam: RequestHandler = (req, res) => {
+  try {
+    const input = req.body;
+    
+    if (!input.student_id || !input.subject_name || !input.exam_type || !input.exam_date) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Öğrenci, ders, sınav türü ve tarih zorunludur' 
+      });
+    }
+    
+    const result = schoolExamsRepo.createSchoolExamResult(input);
+    res.json({ success: true, data: result, message: 'Okul sınav sonucu kaydedildi' });
+  } catch (error) {
+    console.error('Error creating school exam result:', error);
+    res.status(500).json({ success: false, error: 'Okul sınav sonucu kaydedilemedi' });
+  }
+};
+
+export const updateSchoolExam: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+    const input = req.body;
+    
+    const result = schoolExamsRepo.updateSchoolExamResult(id, input);
+    res.json({ success: true, data: result, message: 'Okul sınav sonucu güncellendi' });
+  } catch (error: any) {
+    console.error('Error updating school exam result:', error);
+    if (error.message.includes('not found')) {
+      return res.status(404).json({ success: false, error: 'Sonuç bulunamadı' });
+    }
+    res.status(500).json({ success: false, error: 'Okul sınav sonucu güncellenemedi' });
+  }
+};
+
+export const deleteSchoolExam: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+    schoolExamsRepo.deleteSchoolExamResult(id);
+    res.json({ success: true, message: 'Okul sınav sonucu silindi' });
+  } catch (error) {
+    console.error('Error deleting school exam result:', error);
+    res.status(500).json({ success: false, error: 'Okul sınav sonucu silinemedi' });
+  }
+};
