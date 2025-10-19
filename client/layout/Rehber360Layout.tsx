@@ -60,6 +60,7 @@ import {
   Brain,
   ChevronDown,
   Sparkles,
+  ClipboardList,
 } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { loadSettings, updateSettings, SETTINGS_KEY, AppSettings } from "@/lib/app-settings";
@@ -108,6 +109,7 @@ function useBreadcrumbs() {
       gorusmeler: "Görüşmeler",
       anketler: "Anket & Test",
       raporlar: "Raporlama",
+      "olcme-degerlendirme": "Ölçme Değerlendirme",
       ayarlar: "Ayarlar",
       "ai-araclari": "AI Araçları",
       risk: "Risk Takip",
@@ -285,6 +287,14 @@ export default function Rehber360Layout() {
                   <SidebarMenuButton asChild tooltip="Raporlama">
                     <NavLink to="/raporlar">
                       <FileText /> <span>Raporlama</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Ölçme Değerlendirme">
+                    <NavLink to="/olcme-degerlendirme">
+                      <ClipboardList /> <span>Ölçme Değerlendirme</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

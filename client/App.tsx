@@ -27,6 +27,7 @@ const InterventionTracking = lazy(() => import("./pages/InterventionTracking"));
 const ParentAccess = lazy(() => import("./pages/ParentAccess"));
 const SchoolDashboard = lazy(() => import("./pages/SchoolDashboard"));
 const BackupManagement = lazy(() => import("./pages/BackupManagement"));
+const ExamManagementPage = lazy(() => import("./pages/ExamManagementPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -78,6 +79,10 @@ const App = () => {
                   <Route
                     path="/raporlar"
                     element={<Suspense fallback={<LoadingFallback />}><Reports /></Suspense>}
+                  />
+                  <Route
+                    path="/olcme-degerlendirme"
+                    element={<Suspense fallback={<LoadingFallback />}><ExamManagementPage /></Suspense>}
                   />
                   <Route path="/ayarlar" element={<Suspense fallback={<LoadingFallback />}><SettingsPage /></Suspense>} />
                   <Route

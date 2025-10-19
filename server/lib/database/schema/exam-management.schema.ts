@@ -51,8 +51,9 @@ export function createExamManagementTables(db: Database.Database): void {
   `);
 
   // Sınav Sonuçları (Öğrenci bazında, ders bazında D/Y/B)
+  // Not: 'exam_session_results' adını kullanıyoruz çünkü 'exam_results' zaten academic.schema.ts'de var
   db.exec(`
-    CREATE TABLE IF NOT EXISTS exam_results (
+    CREATE TABLE IF NOT EXISTS exam_session_results (
       id TEXT PRIMARY KEY,
       session_id TEXT NOT NULL,
       student_id TEXT NOT NULL,
@@ -69,9 +70,9 @@ export function createExamManagementTables(db: Database.Database): void {
       UNIQUE(session_id, student_id, subject_id)
     );
     
-    CREATE INDEX IF NOT EXISTS idx_exam_results_session ON exam_results(session_id);
-    CREATE INDEX IF NOT EXISTS idx_exam_results_student ON exam_results(student_id);
-    CREATE INDEX IF NOT EXISTS idx_exam_results_subject ON exam_results(subject_id);
+    CREATE INDEX IF NOT EXISTS idx_exam_session_results_session ON exam_session_results(session_id);
+    CREATE INDEX IF NOT EXISTS idx_exam_session_results_student ON exam_session_results(student_id);
+    CREATE INDEX IF NOT EXISTS idx_exam_session_results_subject ON exam_session_results(subject_id);
   `);
 
   // Okul Sınavları (Dönem sonu, yazılılar vb.)

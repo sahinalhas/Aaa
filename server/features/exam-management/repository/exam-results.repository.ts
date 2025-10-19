@@ -16,7 +16,7 @@ function ensureInitialized(): void {
   const db = getDatabase();
   
   statements = {
-    getById: db.prepare('SELECT * FROM exam_results WHERE id = ?'),
+    getById: db.prepare('SELECT * FROM exam_session_results WHERE id = ?'),
     getBySession: db.prepare(`
       SELECT 
         er.*,
@@ -24,7 +24,7 @@ function ensureInitialized(): void {
         es.subject_name,
         sess.name as session_name,
         sess.exam_type_id
-      FROM exam_results er
+      FROM exam_session_results er
       LEFT JOIN students s ON er.student_id = s.id
       LEFT JOIN exam_subjects es ON er.subject_id = es.id
       LEFT JOIN exam_sessions sess ON er.session_id = sess.id
@@ -39,7 +39,7 @@ function ensureInitialized(): void {
         sess.name as session_name,
         sess.exam_type_id,
         sess.exam_date
-      FROM exam_results er
+      FROM exam_session_results er
       LEFT JOIN students s ON er.student_id = s.id
       LEFT JOIN exam_subjects es ON er.subject_id = es.id
       LEFT JOIN exam_sessions sess ON er.session_id = sess.id
@@ -47,28 +47,28 @@ function ensureInitialized(): void {
       ORDER BY sess.exam_date DESC, es.order_index
     `),
     getBySessionAndStudent: db.prepare(`
-      SELECT * FROM exam_results 
+      SELECT * FROM exam_session_results 
       WHERE session_id = ? AND student_id = ?
     `),
     checkExists: db.prepare(`
-      SELECT id FROM exam_results 
+      SELECT id FROM exam_session_results 
       WHERE session_id = ? AND student_id = ? AND subject_id = ?
     `),
     insert: db.prepare(`
-      INSERT INTO exam_results (
+      INSERT INTO exam_session_results (
         id, session_id, student_id, subject_id, 
         correct_count, wrong_count, empty_count, net_score
       )
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `),
     update: db.prepare(`
-      UPDATE exam_results 
+      UPDATE exam_session_results 
       SET correct_count = ?, wrong_count = ?, empty_count = ?, 
           net_score = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `),
     upsert: db.prepare(`
-      INSERT INTO exam_results (
+      INSERT INTO exam_session_results (
         id, session_id, student_id, subject_id, 
         correct_count, wrong_count, empty_count, net_score
       )
@@ -81,8 +81,8 @@ function ensureInitialized(): void {
         net_score = excluded.net_score,
         updated_at = CURRENT_TIMESTAMP
     `),
-    delete: db.prepare('DELETE FROM exam_results WHERE id = ?'),
-    deleteBySession: db.prepare('DELETE FROM exam_results WHERE session_id = ?'),
+    delete: db.prepare('DELETE FROM exam_session_results WHERE id = ?'),
+    deleteBySession: db.prepare('DELETE FROM exam_session_results WHERE session_id = ?'),
   };
   
   isInitialized = true;
