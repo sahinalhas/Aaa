@@ -39,14 +39,14 @@ export default function SchoolWideAIInsights({ onHide, className }: SchoolWideAI
         const { apiClient, createApiHandler } = await import('@/lib/api/api-client');
         const students = await createApiHandler(
           async () => {
-            return await apiClient.get<{ students: Array<{ className?: string }> }>(
+            return await apiClient.get<{ data: Array<{ className?: string }> }>(
               '/api/students',
               { showErrorToast: false }
             );
           },
-          { students: [] }
+          { data: [] }
         )();
-        const classes = [...new Set(students.students?.map((s: any) => s.className).filter(Boolean))];
+        const classes = [...new Set(students.data?.map((s: any) => s.className).filter(Boolean))];
         if (classes.length > 0) {
           setSelectedClass(classes[0] as string);
         }

@@ -50,7 +50,8 @@ export default function ParentAccess() {
   const { data: students } = useQuery({
     queryKey: ["students"],
     queryFn: async () => {
-      return await apiClient.get<any[]>('/api/students');
+      const response = await apiClient.get<{ data: any[] }>('/api/students');
+      return response.data;
     },
   });
 

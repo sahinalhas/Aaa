@@ -6,7 +6,7 @@ import { sanitizeString } from "../../../middleware/validation.js";
 export const getStudents: RequestHandler = (req, res) => {
   try {
     const students = studentsService.getAllStudents();
-    res.json(students);
+    res.json({ data: students });
   } catch (error) {
     console.error('Error fetching students:', error);
     res.status(500).json({ error: ERROR_MESSAGES.FAILED_TO_FETCH_STUDENTS });
