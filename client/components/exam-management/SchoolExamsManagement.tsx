@@ -150,7 +150,7 @@ export function SchoolExamsManagement({
     setDialogOpen(true);
   };
 
-  const filteredExams = selectedStudent
+  const filteredExams = selectedStudent && selectedStudent !== 'all'
     ? schoolExams.filter((e) => e.student_id === selectedStudent)
     : schoolExams;
 
@@ -180,7 +180,7 @@ export function SchoolExamsManagement({
                 <SelectValue placeholder="Tüm öğrenciler" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tüm öğrenciler</SelectItem>
+                <SelectItem value="all">Tüm öğrenciler</SelectItem>
                 {students.map((student) => (
                   <SelectItem key={student.id} value={student.id}>
                     {student.name}
