@@ -166,11 +166,11 @@ export function seedExamData(db: Database.Database): void {
 
   const lgsSubjects = [
     { id: 'lgs_turk', name: 'Türkçe', count: 20, order: 1 },
-    { id: 'lgs_mat', name: 'Matematik', count: 20, order: 2 },
-    { id: 'lgs_fen', name: 'Fen Bilimleri', count: 20, order: 3 },
-    { id: 'lgs_ink', name: 'İnkılap Tarihi', count: 10, order: 4 },
-    { id: 'lgs_din', name: 'Din Kültürü', count: 10, order: 5 },
-    { id: 'lgs_ing', name: 'İngilizce', count: 10, order: 6 }
+    { id: 'lgs_ink', name: 'T.C. İnkılap Tarihi ve Atatürkçülük', count: 10, order: 2 },
+    { id: 'lgs_din', name: 'Din Kültürü ve Ahlak Bilgisi', count: 10, order: 3 },
+    { id: 'lgs_ing', name: 'Yabancı Dil (İngilizce)', count: 10, order: 4 },
+    { id: 'lgs_mat', name: 'Matematik', count: 20, order: 5 },
+    { id: 'lgs_fen', name: 'Fen Bilimleri', count: 20, order: 6 }
   ];
 
   for (const subject of lgsSubjects) {
