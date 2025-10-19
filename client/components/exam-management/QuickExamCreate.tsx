@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -64,24 +63,30 @@ export function QuickExamCreate({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Plus className="h-5 w-5" />
-          Hızlı Deneme Oluştur
-        </CardTitle>
-        <CardDescription>
-          Deneme sınavını oluşturun ve hemen sonuç girişine başlayın
-        </CardDescription>
+    <Card className="overflow-hidden">
+      <CardHeader className="bg-gradient-to-br from-primary/10 via-background to-accent/10 border-b">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Plus className="h-5 w-5 text-primary" />
+              Hızlı Deneme Oluştur
+            </CardTitle>
+            <CardDescription className="mt-1">
+              Deneme sınavını oluşturun ve hemen sonuç girişine başlayın
+            </CardDescription>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="exam-type">Sınav Türü *</Label>
+              <Label htmlFor="exam-type" className="text-sm font-medium">
+                Sınav Türü
+              </Label>
               <Select value={examTypeId} onValueChange={setExamTypeId}>
-                <SelectTrigger id="exam-type">
-                  <SelectValue placeholder="Sınav türü seçin" />
+                <SelectTrigger id="exam-type" className="h-9">
+                  <SelectValue placeholder="Seçin" />
                 </SelectTrigger>
                 <SelectContent>
                   {examTypes.map((type) => (
@@ -94,45 +99,53 @@ export function QuickExamCreate({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="exam-name">Deneme Adı *</Label>
+              <Label htmlFor="exam-name" className="text-sm font-medium">
+                Deneme Adı
+              </Label>
               <Input
                 id="exam-name"
                 placeholder="örn: 1. Deneme"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="h-9"
                 required
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="exam-date">Sınav Tarihi *</Label>
+              <Label htmlFor="exam-date" className="text-sm font-medium">
+                Tarih
+              </Label>
               <Input
                 id="exam-date"
                 type="date"
                 value={examDate}
                 onChange={(e) => setExamDate(e.target.value)}
+                className="h-9"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="exam-description">Açıklama</Label>
+              <Label htmlFor="exam-description" className="text-sm font-medium">
+                Açıklama
+              </Label>
               <Input
                 id="exam-description"
                 placeholder="Opsiyonel"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                className="h-9"
               />
             </div>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end pt-2">
             <Button
               type="submit"
               disabled={!examTypeId || !name || !examDate || isLoading}
-              className="min-w-[200px]"
+              size="sm"
+              className="min-w-[140px]"
             >
               {isLoading ? (
                 <>
@@ -142,7 +155,7 @@ export function QuickExamCreate({
               ) : (
                 <>
                   <Plus className="mr-2 h-4 w-4" />
-                  Deneme Oluştur
+                  Oluştur
                 </>
               )}
             </Button>

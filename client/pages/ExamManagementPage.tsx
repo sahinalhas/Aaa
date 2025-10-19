@@ -257,6 +257,8 @@ export default function ExamManagementPage() {
             onDownloadTemplate={handleDownloadTemplate}
             onSaveResults={handleSaveResults}
             onResultSessionChange={setResultEntrySessionId}
+            onEditSession={handleEditSession}
+            onDeleteSession={handleDeleteSession}
             isCreating={createSession.isPending}
           />
         </TabsContent>

@@ -71,7 +71,7 @@ export function ExcelImportDialog({
       } else {
         setUploadResult({
           success: false,
-          message: 'Lütfen geçerli bir Excel dosyası (.xlsx veya .xls) yükleyin',
+          message: 'Lütfen geçerli bir Excel dosyası yükleyin (.xlsx veya .xls)',
         });
       }
     },
@@ -124,27 +124,26 @@ export function ExcelImportDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5" />
-            Excel ile Toplu Sonuç Yükleme
+          <DialogTitle className="flex items-center gap-2 text-lg">
+            <FileSpreadsheet className="h-5 w-5 text-primary" />
+            Excel ile Toplu Giriş
           </DialogTitle>
           <DialogDescription>
-            {session.name} - Excel dosyası ile toplu sonuç girişi yapın
+            {session.name}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription className="text-sm space-y-2">
-              <p className="font-medium">Excel ile toplu giriş nasıl yapılır?</p>
-              <ol className="list-decimal list-inside space-y-1 text-xs">
-                <li>Aşağıdaki "Şablon İndir" butonuna tıklayın</li>
-                <li>İndirilen Excel dosyasını açın</li>
-                <li>Öğrenci bilgilerini ve sınav sonuçlarını doldurun</li>
-                <li>Dosyayı kaydedin ve buraya yükleyin</li>
+          <Alert className="bg-primary/5 border-primary/20">
+            <Info className="h-4 w-4 text-primary" />
+            <AlertDescription className="text-xs space-y-1.5">
+              <p className="font-medium text-foreground">Nasıl kullanılır?</p>
+              <ol className="list-decimal list-inside space-y-0.5 text-muted-foreground">
+                <li>Şablon indirin ve Excel'de açın</li>
+                <li>Öğrenci bilgilerini ve sonuçları girin</li>
+                <li>Dosyayı buraya yükleyin</li>
               </ol>
             </AlertDescription>
           </Alert>
@@ -154,8 +153,8 @@ export function ExcelImportDialog({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={`
-              border-2 border-dashed rounded-lg p-8 text-center transition-all
-              ${isDragging ? 'border-primary bg-primary/5 scale-[1.02]' : 'border-muted-foreground/25'}
+              border-2 border-dashed rounded-xl p-8 text-center transition-all
+              ${isDragging ? 'border-primary bg-primary/5 scale-[1.01]' : 'border-border'}
               ${isUploading ? 'opacity-50 pointer-events-none' : 'cursor-pointer hover:border-primary/50 hover:bg-accent/5'}
             `}
           >
@@ -173,26 +172,25 @@ export function ExcelImportDialog({
             >
               {isUploading ? (
                 <>
-                  <Loader2 className="h-12 w-12 text-primary animate-spin" />
+                  <Loader2 className="h-10 w-10 text-primary animate-spin" />
                   <div className="w-full max-w-xs space-y-2">
-                    <Progress value={uploadProgress} className="h-2" />
+                    <Progress value={uploadProgress} className="h-1.5" />
                     <p className="text-sm font-medium text-primary">
-                      Yükleniyor... {uploadProgress}%
+                      {uploadProgress}%
                     </p>
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="relative">
-                    <FileSpreadsheet className="h-12 w-12 text-muted-foreground" />
-                    <Upload className="h-5 w-5 text-primary absolute -bottom-1 -right-1" />
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                    <Upload className="h-6 w-6 text-primary" />
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm font-medium">
-                      Excel dosyasını sürükleyip bırakın veya tıklayın
+                      Dosya yükleyin veya sürükleyin
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Desteklenen formatlar: .xlsx, .xls (Maksimum 10MB)
+                      .xlsx veya .xls formatı
                     </p>
                   </div>
                 </>
@@ -201,33 +199,34 @@ export function ExcelImportDialog({
           </div>
 
           {uploadResult && (
-            <Alert variant={uploadResult.success ? 'default' : 'destructive'}>
+            <Alert variant={uploadResult.success ? 'default' : 'destructive'} className="border-l-4">
               {uploadResult.success ? (
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
               ) : (
                 <AlertCircle className="h-4 w-4" />
               )}
-              <AlertDescription className="flex items-center gap-2">
+              <AlertDescription className="text-sm">
                 {uploadResult.message}
               </AlertDescription>
             </Alert>
           )}
 
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2">
             <Button
               variant="outline"
               className="flex-1"
               onClick={() => onDownloadTemplate(session.exam_type_id)}
               disabled={isUploading}
+              size="sm"
             >
               <Download className="mr-2 h-4 w-4" />
               Şablon İndir
             </Button>
             <Button
-              variant="outline"
-              className="flex-1"
+              variant="ghost"
               onClick={() => onOpenChange(false)}
               disabled={isUploading}
+              size="sm"
             >
               Kapat
             </Button>
