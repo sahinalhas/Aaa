@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle2, Save } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle2, Save, ArrowRight, Copy, Info } from 'lucide-react';
 import type {
   ExamSession,
   ExamSubject,
@@ -53,6 +54,8 @@ export function ExamResultDialog({
   const [subjectResults, setSubjectResults] = useState<Map<string, SubjectResults>>(new Map());
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [lastSavedResults, setLastSavedResults] = useState<Map<string, SubjectResults>>(new Map());
+  const [savedStudentsCount, setSavedStudentsCount] = useState(0);
 
   const filteredStudents = students.filter((student) => {
     const searchLower = studentSearch.toLowerCase();
@@ -66,6 +69,19 @@ export function ExamResultDialog({
       studentId.includes(searchLower)
     );
   });
+
+  const currentStudentIndex = useMemo(() => {
+    return students.findIndex((s) => s.id === selectedStudent);
+  }, [students, selectedStudent]);
+
+  const hasNextStudent = currentStudentIndex < students.length - 1;
+  const hasPreviousStudent = currentStudentIndex > 0;
+
+  useEffect(() => {
+    if (open) {
+      setSavedStudentsCount(0);
+    }
+  }, [open]);
 
   const handleSubjectChange = (
     subjectId: string,
@@ -96,7 +112,14 @@ export function ExamResultDialog({
     return subjects.reduce((total, subject) => total + calculateNet(subject.id), 0);
   };
 
-  const handleSave = async () => {
+  const copyLastResults = () => {
+    if (lastSavedResults.size > 0) {
+      setSubjectResults(new Map(lastSavedResults));
+      setSaveSuccess(false);
+    }
+  };
+
+  const handleSave = async (moveToNext: boolean = false) => {
     if (!selectedStudent) return;
 
     try {
@@ -114,14 +137,28 @@ export function ExamResultDialog({
       });
 
       await onSave(session.id, selectedStudent, results);
-      setSaveSuccess(true);
-      setSubjectResults(new Map());
-      setSelectedStudent('');
       
-      setTimeout(() => {
-        setSaveSuccess(false);
-        onOpenChange(false);
-      }, 1500);
+      setLastSavedResults(new Map(subjectResults));
+      setSaveSuccess(true);
+      setSavedStudentsCount((prev) => prev + 1);
+
+      if (moveToNext && hasNextStudent) {
+        setTimeout(() => {
+          const nextStudent = students[currentStudentIndex + 1];
+          setSelectedStudent(nextStudent.id);
+          setSubjectResults(new Map());
+          setSaveSuccess(false);
+        }, 500);
+      } else if (!moveToNext) {
+        setTimeout(() => {
+          setSaveSuccess(false);
+          setSubjectResults(new Map());
+          setSelectedStudent('');
+          if (!hasNextStudent) {
+            onOpenChange(false);
+          }
+        }, 1500);
+      }
     } catch (error) {
       console.error('Error saving exam results:', error);
     } finally {
@@ -129,50 +166,120 @@ export function ExamResultDialog({
     }
   };
 
+  const handleNext = () => {
+    if (hasNextStudent) {
+      const nextStudent = students[currentStudentIndex + 1];
+      setSelectedStudent(nextStudent.id);
+      setSubjectResults(new Map());
+      setSaveSuccess(false);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (hasPreviousStudent) {
+      const prevStudent = students[currentStudentIndex - 1];
+      setSelectedStudent(prevStudent.id);
+      setSubjectResults(new Map());
+      setSaveSuccess(false);
+    }
+  };
+
   const canSave = selectedStudent && subjectResults.size > 0;
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.ctrlKey && e.key === 'Enter' && canSave) {
+      e.preventDefault();
+      handleSave(true);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onKeyDown={handleKeyPress}>
         <DialogHeader>
-          <DialogTitle>Bireysel Sonuç Girişi - {session.name}</DialogTitle>
-          <DialogDescription>
-            Öğrenci seçerek ders bazında sonuç girişi yapın
-          </DialogDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle>Bireysel Sonuç Girişi - {session.name}</DialogTitle>
+              <DialogDescription>
+                Öğrenci seçerek ders bazında sonuç girişi yapın
+              </DialogDescription>
+            </div>
+            {savedStudentsCount > 0 && (
+              <Badge variant="secondary" className="text-sm">
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                {savedStudentsCount} Kaydedildi
+              </Badge>
+            )}
+          </div>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="student-select">Öğrenci Seçin *</Label>
-            <Select value={selectedStudent} onValueChange={setSelectedStudent}>
-              <SelectTrigger id="student-select">
-                <SelectValue placeholder="Numara veya isim ile ara..." />
-              </SelectTrigger>
-              <SelectContent>
-                <div className="px-2 pb-2">
-                  <Input
-                    placeholder="Numara veya isim ile ara..."
-                    value={studentSearch}
-                    onChange={(e) => setStudentSearch(e.target.value)}
-                    className="h-8"
-                    onClick={(e) => e.stopPropagation()}
-                    onKeyDown={(e) => e.stopPropagation()}
-                  />
-                </div>
-                {filteredStudents.length === 0 ? (
-                  <div className="p-2 text-sm text-muted-foreground text-center">
-                    Öğrenci bulunamadı
+          <div className="flex items-center gap-2">
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="student-select">Öğrenci Seçin *</Label>
+              <Select value={selectedStudent} onValueChange={setSelectedStudent}>
+                <SelectTrigger id="student-select">
+                  <SelectValue placeholder="Numara veya isim ile ara..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="px-2 pb-2">
+                    <Input
+                      placeholder="Numara veya isim ile ara..."
+                      value={studentSearch}
+                      onChange={(e) => setStudentSearch(e.target.value)}
+                      className="h-8"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    />
                   </div>
-                ) : (
-                  filteredStudents.map((student) => (
-                    <SelectItem key={student.id} value={student.id}>
-                      {student.id} - {student.name || `${student.ad || ''} ${student.soyad || ''}`}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+                  {filteredStudents.length === 0 ? (
+                    <div className="p-2 text-sm text-muted-foreground text-center">
+                      Öğrenci bulunamadı
+                    </div>
+                  ) : (
+                    filteredStudents.map((student) => (
+                      <SelectItem key={student.id} value={student.id}>
+                        {student.id} - {student.name || `${student.ad || ''} ${student.soyad || ''}`}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-1 mt-7">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handlePrevious}
+                disabled={!hasPreviousStudent}
+                title="Önceki Öğrenci"
+              >
+                ←
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleNext}
+                disabled={!hasNextStudent}
+                title="Sonraki Öğrenci"
+              >
+                →
+              </Button>
+            </div>
           </div>
+
+          {lastSavedResults.size > 0 && (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription className="flex items-center justify-between">
+                <span className="text-sm">Son girdiğiniz değerleri kopyalayabilirsiniz</span>
+                <Button variant="outline" size="sm" onClick={copyLastResults}>
+                  <Copy className="h-3 w-3 mr-2" />
+                  Son Değerleri Kopyala
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
 
           {saveSuccess && (
             <Alert className="bg-green-50 border-green-200">
@@ -273,20 +380,37 @@ export function ExamResultDialog({
             </div>
           )}
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-between items-center">
             <Button
               variant="outline"
               onClick={() => {
                 setSubjectResults(new Map());
-                setSelectedStudent('');
               }}
             >
               Temizle
             </Button>
-            <Button onClick={handleSave} disabled={!canSave || isSaving}>
-              <Save className="h-4 w-4 mr-2" />
-              {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => handleSave(false)} disabled={!canSave || isSaving}>
+                <Save className="h-4 w-4 mr-2" />
+                {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
+              </Button>
+              {hasNextStudent && (
+                <Button
+                  onClick={() => handleSave(true)}
+                  disabled={!canSave || isSaving}
+                  variant="default"
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Kaydet ve Sonraki
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              )}
+            </div>
+          </div>
+
+          <div className="text-xs text-muted-foreground text-center">
+            Kısayol: Ctrl + Enter ile "Kaydet ve Sonraki"
           </div>
         </div>
       </DialogContent>

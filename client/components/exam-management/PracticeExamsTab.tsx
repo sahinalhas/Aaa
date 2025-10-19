@@ -19,11 +19,13 @@ import {
   User,
   FileSpreadsheet,
   BarChart3,
-  Plus,
+  Table as TableIcon,
+  Zap,
 } from 'lucide-react';
 import { QuickExamCreate } from './QuickExamCreate';
 import { ExamResultDialog } from './ExamResultDialog';
 import { ExcelImportDialog } from './ExcelImportDialog';
+import { BulkResultsEntry } from './BulkResultsEntry';
 import type {
   ExamType,
   ExamSession,
@@ -72,6 +74,7 @@ export function PracticeExamsTab({
   const [searchQuery, setSearchQuery] = useState('');
   const [resultDialogSession, setResultDialogSession] = useState<ExamSession | null>(null);
   const [excelDialogSession, setExcelDialogSession] = useState<ExamSession | null>(null);
+  const [bulkEntrySession, setBulkEntrySession] = useState<ExamSession | null>(null);
 
   const filteredSessions = sessions.filter((session) => {
     const matchesType = filterExamType === 'all' || session.exam_type_id === filterExamType;
@@ -88,7 +91,12 @@ export function PracticeExamsTab({
     setResultDialogSession(session);
   };
 
-  const handleBulkEntryClick = (session: ExamSession) => {
+  const handleBulkTableEntryClick = (session: ExamSession) => {
+    onResultSessionChange(session.id);
+    setBulkEntrySession(session);
+  };
+
+  const handleExcelEntryClick = (session: ExamSession) => {
     onResultSessionChange(session.id);
     setExcelDialogSession(session);
   };
@@ -177,37 +185,51 @@ export function PracticeExamsTab({
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-2 pt-0">
-                    <div className="grid grid-cols-3 gap-2">
-                      <Button
-                        onClick={() => handleIndividualEntryClick(session)}
-                        variant="outline"
-                        size="sm"
-                        className="flex-col h-auto py-3 gap-1"
-                        title="Bireysel Sonuç Girişi"
-                      >
-                        <User className="h-4 w-4" />
-                        <span className="text-xs">Bireysel</span>
-                      </Button>
-                      <Button
-                        onClick={() => handleBulkEntryClick(session)}
-                        variant="outline"
-                        size="sm"
-                        className="flex-col h-auto py-3 gap-1"
-                        title="Toplu Sonuç Girişi (Excel)"
-                      >
-                        <FileSpreadsheet className="h-4 w-4" />
-                        <span className="text-xs">Toplu</span>
-                      </Button>
-                      <Button
-                        onClick={() => handleStatisticsClick(session)}
-                        variant="outline"
-                        size="sm"
-                        className="flex-col h-auto py-3 gap-1"
-                        title="İstatistikleri Görüntüle"
-                      >
-                        <BarChart3 className="h-4 w-4" />
-                        <span className="text-xs">İstatistik</span>
-                      </Button>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleBulkTableEntryClick(session)}
+                          variant="default"
+                          size="sm"
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          title="Hızlı Toplu Giriş (Tablo)"
+                        >
+                          <Zap className="h-4 w-4 mr-2" />
+                          Hızlı Giriş
+                        </Button>
+                        <Button
+                          onClick={() => handleStatisticsClick(session)}
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          title="İstatistikleri Görüntüle"
+                        >
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          İstatistik
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          onClick={() => handleIndividualEntryClick(session)}
+                          variant="outline"
+                          size="sm"
+                          className="flex-col h-auto py-2 gap-1"
+                          title="Bireysel Sonuç Girişi"
+                        >
+                          <User className="h-3.5 w-3.5" />
+                          <span className="text-xs">Bireysel</span>
+                        </Button>
+                        <Button
+                          onClick={() => handleExcelEntryClick(session)}
+                          variant="outline"
+                          size="sm"
+                          className="flex-col h-auto py-2 gap-1"
+                          title="Excel İle Toplu Giriş"
+                        >
+                          <FileSpreadsheet className="h-3.5 w-3.5" />
+                          <span className="text-xs">Excel</span>
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -222,6 +244,17 @@ export function PracticeExamsTab({
           open={!!resultDialogSession}
           onOpenChange={(open) => !open && setResultDialogSession(null)}
           session={resultDialogSession}
+          subjects={subjects}
+          students={students}
+          onSave={onSaveResults}
+        />
+      )}
+
+      {bulkEntrySession && (
+        <BulkResultsEntry
+          open={!!bulkEntrySession}
+          onOpenChange={(open) => !open && setBulkEntrySession(null)}
+          session={bulkEntrySession}
           subjects={subjects}
           students={students}
           onSave={onSaveResults}
