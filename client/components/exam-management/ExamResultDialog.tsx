@@ -27,6 +27,8 @@ import type {
 interface Student {
   id: string;
   name: string;
+  ad?: string;
+  soyad?: string;
 }
 
 interface ExamResultDialogProps {
@@ -47,9 +49,23 @@ export function ExamResultDialog({
   onSave,
 }: ExamResultDialogProps) {
   const [selectedStudent, setSelectedStudent] = useState<string>('');
+  const [studentSearch, setStudentSearch] = useState<string>('');
   const [subjectResults, setSubjectResults] = useState<Map<string, SubjectResults>>(new Map());
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const filteredStudents = students.filter((student) => {
+    const searchLower = studentSearch.toLowerCase();
+    const studentName = student.name?.toLowerCase() || '';
+    const studentFullName = `${student.ad || ''} ${student.soyad || ''}`.toLowerCase();
+    const studentId = student.id.toLowerCase();
+    
+    return (
+      studentName.includes(searchLower) ||
+      studentFullName.includes(searchLower) ||
+      studentId.includes(searchLower)
+    );
+  });
 
   const handleSubjectChange = (
     subjectId: string,
@@ -130,14 +146,30 @@ export function ExamResultDialog({
             <Label htmlFor="student-select">Öğrenci Seçin *</Label>
             <Select value={selectedStudent} onValueChange={setSelectedStudent}>
               <SelectTrigger id="student-select">
-                <SelectValue placeholder="Öğrenci seçin" />
+                <SelectValue placeholder="Numara veya isim ile ara..." />
               </SelectTrigger>
               <SelectContent>
-                {students.map((student) => (
-                  <SelectItem key={student.id} value={student.id}>
-                    {student.name}
-                  </SelectItem>
-                ))}
+                <div className="px-2 pb-2">
+                  <Input
+                    placeholder="Numara veya isim ile ara..."
+                    value={studentSearch}
+                    onChange={(e) => setStudentSearch(e.target.value)}
+                    className="h-8"
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                </div>
+                {filteredStudents.length === 0 ? (
+                  <div className="p-2 text-sm text-muted-foreground text-center">
+                    Öğrenci bulunamadı
+                  </div>
+                ) : (
+                  filteredStudents.map((student) => (
+                    <SelectItem key={student.id} value={student.id}>
+                      {student.id} - {student.name || `${student.ad || ''} ${student.soyad || ''}`}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
