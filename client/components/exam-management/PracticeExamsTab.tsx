@@ -23,6 +23,7 @@ import {
   Pencil,
   Trash2,
   MoreHorizontal,
+  ArrowRight,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -31,10 +32,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { QuickExamCreate } from './QuickExamCreate';
 import { ExamResultDialog } from './ExamResultDialog';
-import { ExcelImportDialog } from './ExcelImportDialog';
-import { BulkResultsEntry } from './BulkResultsEntry';
+import { EnhancedExcelImport } from './EnhancedExcelImport';
+import { EnhancedBulkResultsEntry } from './EnhancedBulkResultsEntry';
+import { ResultEntryOptions } from './ResultEntryOptions';
 import { DeleteExamDialog } from './DeleteExamDialog';
 import type {
   ExamType,
@@ -90,6 +99,7 @@ export function PracticeExamsTab({
   const [excelDialogSession, setExcelDialogSession] = useState<ExamSession | null>(null);
   const [bulkEntrySession, setBulkEntrySession] = useState<ExamSession | null>(null);
   const [deleteDialogSession, setDeleteDialogSession] = useState<ExamSession | null>(null);
+  const [showEntryOptions, setShowEntryOptions] = useState<ExamSession | null>(null);
 
   const filteredSessions = sessions.filter((session) => {
     const matchesType = filterExamType === 'all' || session.exam_type_id === filterExamType;
@@ -133,6 +143,10 @@ export function PracticeExamsTab({
       await onDeleteSession(deleteDialogSession.id);
       setDeleteDialogSession(null);
     }
+  };
+
+  const handleShowEntryOptions = (session: ExamSession) => {
+    setShowEntryOptions(session);
   };
 
   return (
@@ -241,43 +255,16 @@ export function PracticeExamsTab({
                         </div>
                       </td>
                       <td className="p-3">
-                        <div className="flex items-center justify-center gap-1">
+                        <div className="flex items-center justify-center">
                           <Button
-                            onClick={() => handleBulkTableEntryClick(session)}
+                            onClick={() => handleShowEntryOptions(session)}
                             size="sm"
-                            className="h-8 px-3 bg-primary/90 hover:bg-primary"
+                            className="h-9 px-4 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-sm"
                           >
-                            <Zap className="h-3.5 w-3.5 md:mr-1.5" />
-                            <span className="hidden md:inline text-xs">Hızlı</span>
+                            <Zap className="h-4 w-4 mr-1.5" />
+                            <span className="text-xs font-medium">Sonuç Gir</span>
+                            <ArrowRight className="h-3.5 w-3.5 ml-1" />
                           </Button>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => handleIndividualEntryClick(session)}
-                              >
-                                <User className="h-4 w-4 mr-2" />
-                                Bireysel
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleExcelEntryClick(session)}
-                              >
-                                <FileSpreadsheet className="h-4 w-4 mr-2" />
-                                Excel
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => handleStatisticsClick(session)}
-                              >
-                                <BarChart3 className="h-4 w-4 mr-2" />
-                                İstatistik
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
                         </div>
                       </td>
                       <td className="p-3">
@@ -309,6 +296,40 @@ export function PracticeExamsTab({
         </CardContent>
       </Card>
 
+      {showEntryOptions && (
+        <Dialog open={!!showEntryOptions} onOpenChange={(open) => !open && setShowEntryOptions(null)}>
+          <DialogContent className="max-w-5xl">
+            <DialogHeader>
+              <DialogTitle>Sonuç Giriş Yöntemi Seçin</DialogTitle>
+              <DialogDescription>
+                Deneme sınavı sonuçlarını girmek için uygun yöntemi seçin
+              </DialogDescription>
+            </DialogHeader>
+            <ResultEntryOptions
+              session={showEntryOptions}
+              onBulkTableEntry={() => {
+                setBulkEntrySession(showEntryOptions);
+                setShowEntryOptions(null);
+              }}
+              onExcelEntry={() => {
+                setExcelDialogSession(showEntryOptions);
+                setShowEntryOptions(null);
+              }}
+              onIndividualEntry={() => {
+                setResultDialogSession(showEntryOptions);
+                setShowEntryOptions(null);
+              }}
+              onViewStatistics={() => {
+                handleStatisticsClick(showEntryOptions);
+                setShowEntryOptions(null);
+              }}
+              resultsCount={0}
+              totalStudents={students.length}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
       {resultDialogSession && (
         <ExamResultDialog
           open={!!resultDialogSession}
@@ -321,7 +342,7 @@ export function PracticeExamsTab({
       )}
 
       {bulkEntrySession && (
-        <BulkResultsEntry
+        <EnhancedBulkResultsEntry
           open={!!bulkEntrySession}
           onOpenChange={(open) => !open && setBulkEntrySession(null)}
           session={bulkEntrySession}
@@ -332,7 +353,7 @@ export function PracticeExamsTab({
       )}
 
       {excelDialogSession && (
-        <ExcelImportDialog
+        <EnhancedExcelImport
           open={!!excelDialogSession}
           onOpenChange={(open) => !open && setExcelDialogSession(null)}
           session={excelDialogSession}

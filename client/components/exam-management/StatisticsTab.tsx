@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BarChart3, TrendingUp, Filter } from 'lucide-react';
-import { ExamStatistics } from './ExamStatistics';
+import { ModernStatisticsDashboard } from './ModernStatisticsDashboard';
 import type {
   ExamType,
   ExamSession,
@@ -121,10 +121,9 @@ export function StatisticsTab({
               </AlertDescription>
             </Alert>
           ) : (
-            <ExamStatistics
+            <ModernStatisticsDashboard
               sessions={sessions}
               selectedSession={selectedSessionId}
-              onSessionChange={onSessionChange}
               statistics={statistics}
               isLoading={isLoading}
             />
