@@ -184,7 +184,7 @@ export function ExamResultDialog({
     }
   };
 
-  const canSave = selectedStudent && subjectResults.size > 0;
+  const canSave = !!selectedStudent;
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.ctrlKey && e.key === 'Enter' && canSave) {

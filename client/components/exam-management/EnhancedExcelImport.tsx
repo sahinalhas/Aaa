@@ -120,24 +120,56 @@ export function EnhancedExcelImport({
 
   const processFilePreview = async (file: File) => {
     try {
-      // Simulate preview parsing (in real implementation, parse Excel here)
+      const XLSX = await import('xlsx');
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: 'array', codepage: 65001 });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const data: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+      if (!data || data.length === 0) {
+        setUploadResult({
+          success: false,
+          message: 'Excel dosyası boş veya geçersiz',
+        });
+        return;
+      }
+
+      const parsedData: PreviewData[] = [];
+
+      data.forEach((row) => {
+        const studentId = row['Öğrenci No'] || row['Ogrenci No'] || row['Student ID'] || '';
+        const studentName = row['Öğrenci Adı'] || row['Ogrenci Adi'] || row['Student Name'] || '';
+
+        if (!studentId && !studentName) return;
+
+        const subjects: Record<string, { correct: number; wrong: number; empty: number }> = {};
+        
+        Object.keys(row).forEach((key) => {
+          if (key.includes(' - Doğru')) {
+            const subjectName = key.replace(' - Doğru', '');
+            const correct = parseInt(row[key]) || 0;
+            const wrong = parseInt(row[`${subjectName} - Yanlış`]) || 0;
+            const empty = parseInt(row[`${subjectName} - Boş`]) || 0;
+            
+            subjects[subjectName] = { correct, wrong, empty };
+          }
+        });
+
+        parsedData.push({
+          studentId: studentId.toString(),
+          studentName: studentName.toString(),
+          subjects,
+        });
+      });
+
+      setPreviewData(parsedData);
       setActiveTab('preview');
-      // Mock preview data
-      setPreviewData([
-        {
-          studentId: '12345',
-          studentName: 'Örnek Öğrenci 1',
-          subjects: {
-            'Matematik': { correct: 10, wrong: 5, empty: 5 },
-            'Türkçe': { correct: 15, wrong: 3, empty: 2 },
-          },
-        },
-      ]);
     } catch (error) {
       console.error('Preview error:', error);
       setUploadResult({
         success: false,
-        message: 'Dosya önizlemesi oluşturulamadı',
+        message: 'Dosya önizlemesi oluşturulamadı. Lütfen Excel formatını kontrol edin.',
       });
     }
   };
@@ -322,34 +354,48 @@ export function EnhancedExcelImport({
             )}
 
             {previewData.length > 0 && (
-              <div className="border rounded-lg overflow-hidden">
+              <div className="border rounded-lg overflow-auto max-h-96">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Öğrenci No</TableHead>
-                      <TableHead>Öğrenci Adı</TableHead>
+                      <TableHead className="sticky left-0 bg-muted/80 backdrop-blur z-10">Öğrenci No</TableHead>
+                      <TableHead className="sticky left-20 bg-muted/80 backdrop-blur z-10">Öğrenci Adı</TableHead>
                       <TableHead>Ders Sayısı</TableHead>
-                      <TableHead>Durum</TableHead>
+                      <TableHead>Toplam Soru</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {previewData.map((student, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell className="font-mono">{student.studentId}</TableCell>
-                        <TableCell className="font-medium">{student.studentName}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">
-                            {Object.keys(student.subjects).length} ders
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200">
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                            Hazır
-                          </Badge>
+                    {previewData.slice(0, 10).map((student, idx) => {
+                      const totalQuestions = Object.values(student.subjects).reduce(
+                        (sum, subject) => sum + subject.correct + subject.wrong + subject.empty,
+                        0
+                      );
+                      return (
+                        <TableRow key={idx}>
+                          <TableCell className="font-mono text-xs sticky left-0 bg-inherit">
+                            {student.studentId}
+                          </TableCell>
+                          <TableCell className="font-medium text-sm sticky left-20 bg-inherit">
+                            {student.studentName}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-xs">
+                              {Object.keys(student.subjects).length} ders
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {totalQuestions} soru
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                    {previewData.length > 10 && (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center text-sm text-muted-foreground italic">
+                          ... ve {previewData.length - 10} öğrenci daha
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
               </div>
@@ -430,17 +476,23 @@ export function EnhancedExcelImport({
                         <TableHeader>
                           <TableRow>
                             <TableHead className="w-20">Satır</TableHead>
-                            <TableHead>Öğrenci</TableHead>
-                            <TableHead>Hata</TableHead>
+                            <TableHead>Öğrenci No</TableHead>
+                            <TableHead>Öğrenci Adı</TableHead>
+                            <TableHead>Hata Detayı</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {uploadResult.errors.map((error, idx) => (
+                          {uploadResult.errors.map((error: any, idx) => (
                             <TableRow key={idx}>
                               <TableCell className="font-mono text-xs">{error.row}</TableCell>
-                              <TableCell className="text-sm">{error.student || '-'}</TableCell>
+                              <TableCell className="text-xs font-mono">
+                                {error.student_id || '-'}
+                              </TableCell>
+                              <TableCell className="text-sm">
+                                {error.student_name || error.student || '-'}
+                              </TableCell>
                               <TableCell className="text-sm text-destructive">
-                                {error.message}
+                                {error.error || error.message}
                               </TableCell>
                             </TableRow>
                           ))}
