@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Download, Upload, Link2, BarChart, Users } from "lucide-react";
+import { Plus, Download, Upload, Link2, BarChart, Users, Edit, Trash } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -16,15 +16,19 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { SurveyDistribution, DistributionStatus } from "@/lib/survey-types";
 import SurveyExcelUploadDialog from "./SurveyExcelUploadDialog";
 import { useToast } from "@/hooks/use-toast";
+import { surveyService } from "@/services/surveyService";
+import { useNavigate } from "react-router-dom";
 
 interface DistributionsListProps {
   distributions: SurveyDistribution[];
   onNewDistribution: () => void;
   onRefresh?: () => void;
+  onEdit?: (distribution: SurveyDistribution) => void;
 }
 
 const getStatusBadge = (status: DistributionStatus) => {
@@ -49,8 +53,9 @@ const getStatusBadge = (status: DistributionStatus) => {
   );
 };
 
-export default function DistributionsList({ distributions, onNewDistribution, onRefresh }: DistributionsListProps) {
+export default function DistributionsList({ distributions, onNewDistribution, onRefresh, onEdit }: DistributionsListProps) {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [selectedDistribution, setSelectedDistribution] = useState<SurveyDistribution | null>(null);
 
@@ -73,6 +78,102 @@ export default function DistributionsList({ distributions, onNewDistribution, on
       toast({
         title: "Link kopyalandı",
         description: "Anket linki panoya kopyalandı"
+      });
+    }
+  };
+
+  const handleDownloadExcel = async (distribution: SurveyDistribution) => {
+    try {
+      const questions = await surveyService.getTemplateQuestions(distribution.templateId);
+      const { loadStudents } = await import('@/lib/storage');
+      const { generateExcelTemplate } = await import('@/lib/excel-template-generator');
+      
+      const students = loadStudents().filter(s => 
+        !distribution.targetClasses || 
+        distribution.targetClasses.length === 0 || 
+        distribution.targetClasses.includes(s.sinif)
+      );
+
+      const base64Excel = generateExcelTemplate({
+        survey: { 
+          id: distribution.templateId,
+          title: distribution.title,
+          description: distribution.description || '',
+          type: 'OZEL',
+          mebCompliant: false,
+          estimatedDuration: 0,
+          targetGrades: [],
+          tags: [],
+          isActive: true,
+          created_at: distribution.created_at || new Date().toISOString(),
+          updated_at: distribution.updated_at || new Date().toISOString()
+        },
+        questions,
+        students,
+        config: (typeof distribution.excelTemplate === 'object' && distribution.excelTemplate !== null) 
+          ? distribution.excelTemplate 
+          : {
+            includeStudentInfo: true,
+            includeInstructions: true,
+            responseFormat: 'single_sheet' as const,
+            includeValidation: true
+          },
+        distributionTitle: distribution.title
+      });
+
+      const link = document.createElement('a');
+      link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${base64Excel}`;
+      link.download = `${distribution.title.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "Başarılı",
+        description: "Excel şablonu indirildi"
+      });
+    } catch (error) {
+      console.error('Excel download error:', error);
+      toast({
+        title: "Hata",
+        description: "Excel şablonu indirilemedi",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleViewResults = (distribution: SurveyDistribution) => {
+    navigate(`/surveys?tab=analytics&distributionId=${distribution.id}`);
+  };
+
+  const handleEdit = (distribution: SurveyDistribution) => {
+    if (onEdit) {
+      onEdit(distribution);
+    }
+  };
+
+  const handleDelete = async (distribution: SurveyDistribution) => {
+    if (!confirm(`"${distribution.title}" dağıtımını silmek istediğinizden emin misiniz?`)) {
+      return;
+    }
+
+    try {
+      await surveyService.deleteDistribution(distribution.id);
+      
+      toast({
+        title: "Başarılı",
+        description: "Anket dağıtımı silindi"
+      });
+      
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      console.error('Error deleting distribution:', error);
+      toast({
+        title: "Hata",
+        description: "Anket dağıtımı silinemedi",
+        variant: "destructive"
       });
     }
   };
@@ -141,7 +242,7 @@ export default function DistributionsList({ distributions, onNewDistribution, on
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDownloadExcel(distribution)}>
                           <Download className="mr-2 h-4 w-4" />
                           Excel İndir
                         </DropdownMenuItem>
@@ -153,9 +254,21 @@ export default function DistributionsList({ distributions, onNewDistribution, on
                           <Upload className="mr-2 h-4 w-4" />
                           Excel Yükle
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleViewResults(distribution)}>
                           <BarChart className="mr-2 h-4 w-4" />
                           Sonuçları Gör
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleEdit(distribution)}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Düzenle
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleDelete(distribution)}
+                          className="text-red-600"
+                        >
+                          <Trash className="mr-2 h-4 w-4" />
+                          Sil
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

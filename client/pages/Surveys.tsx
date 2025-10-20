@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { SurveyTemplate } from "@/lib/survey-types";
 import SurveyCreationDialog from "@/components/surveys/SurveyCreationDialog";
 import SurveyDistributionDialog from "@/components/surveys/SurveyDistributionDialog";
+import SurveyDistributionEditDialog from "@/components/surveys/SurveyDistributionEditDialog";
 import SurveyAnalyticsTab from "@/components/surveys/SurveyAnalyticsTab";
 import SurveyStats from "@/components/surveys/SurveyStats";
 import TemplatesList from "@/components/surveys/TemplatesList";
@@ -28,6 +29,7 @@ export default function Surveys() {
   const [selectedDistributionForAI, setSelectedDistributionForAI] = useState<any>(null);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<SurveyTemplate | null>(null);
+  const [editingDistribution, setEditingDistribution] = useState<any>(null);
 
   const loading = templatesLoading || distributionsLoading;
 
@@ -234,6 +236,7 @@ export default function Surveys() {
             distributions={distributions}
             onNewDistribution={handleNewDistribution}
             onRefresh={refreshAllData}
+            onEdit={(distribution) => setEditingDistribution(distribution)}
           />
         </TabsContent>
 
@@ -316,6 +319,15 @@ export default function Surveys() {
         >
           <div />
         </SurveyDistributionDialog>
+      )}
+
+      {editingDistribution && (
+        <SurveyDistributionEditDialog
+          open={!!editingDistribution}
+          onOpenChange={(open) => !open && setEditingDistribution(null)}
+          distribution={editingDistribution}
+          onEditComplete={refreshAllData}
+        />
       )}
     </div>
   );
