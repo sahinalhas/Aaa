@@ -163,6 +163,20 @@ export function useExamResultsByStudent(studentId: string | undefined) {
   });
 }
 
+export function useExamResultsBySessionAndStudent(sessionId: string | undefined, studentId: string | undefined) {
+  return useQuery<ExamResult[]>({
+    queryKey: [API_BASE, 'results', 'session', sessionId, 'student', studentId],
+    queryFn: async () => {
+      if (!sessionId || !studentId) return [];
+      const response = await fetch(`${API_BASE}/results/session/${sessionId}/student/${studentId}`);
+      if (!response.ok) throw new Error('Öğrenci sınav sonuçları yüklenemedi');
+      const data: ExamManagementApiResponse<ExamResult[]> = await response.json();
+      return data.data || [];
+    },
+    enabled: !!sessionId && !!studentId,
+  });
+}
+
 export function useUpsertExamResult() {
   const queryClient = useQueryClient();
   

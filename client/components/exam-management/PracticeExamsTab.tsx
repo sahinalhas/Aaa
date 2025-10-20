@@ -285,23 +285,41 @@ export function PracticeExamsTab({
                         </div>
                       </td>
                       <td className="p-3">
-                        <div className="flex items-center justify-center gap-0.5">
-                          <Button
-                            onClick={() => handleEditClick(session)}
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            onClick={() => handleDeleteClick(session)}
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
+                        <div className="flex items-center justify-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuItem onClick={() => handleIndividualEntryClick(session)}>
+                                <Pencil className="h-4 w-4 mr-2" />
+                                Sonuçları Düzenle
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleStatisticsClick(session)}>
+                                <BarChart3 className="h-4 w-4 mr-2" />
+                                İstatistikleri Gör
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleEditClick(session)}>
+                                <User className="h-4 w-4 mr-2" />
+                                Deneme Bilgilerini Düzenle
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => handleDeleteClick(session)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Sil
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </td>
                     </tr>
