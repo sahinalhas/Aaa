@@ -4,6 +4,12 @@
 Rehber360 is a comprehensive Turkish-language student guidance and management system for educational institutions. It provides tools for student tracking, counseling, risk assessment, behavioral monitoring, and academic performance analysis. A key feature is its AI-powered profile analysis, which generates standardized student profiles from diverse data sources. The system also includes an AI Assistant for local, AI-powered student counseling, supporting both OpenAI and Ollama (Llama 3.1) models. Built as a full-stack TypeScript application with React, Express.js, and SQLite, Rehber360 aims to drive data standardization and evidence-based interventions for student success.
 
 ## Recent Changes
+**October 20, 2025 - Exam Management UI Polish:**
+- Improved visual separation between QuickExamCreate and Deneme Sınavları cards
+- Increased spacing between cards from 20px to 32px for better mobile readability
+- Added stronger borders (border-2) and medium shadows (shadow-md) for clearer visual hierarchy
+- Enhanced professional appearance without affecting responsive behavior or functionality
+
 **October 20, 2025 - Exam Result Dialog React Query Fix:**
 - Fixed React Query refetch logic in ExamResultDialog to properly handle student switching
 - Consolidated useEffect hooks for cleaner state management when selectedStudent or existingResults change
