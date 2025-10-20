@@ -3,7 +3,36 @@ import multer from 'multer';
 import * as surveyService from '../../services/surveys.service.js';
 import { autoSyncHooks } from '../../../profile-sync/index.js';
 
-const upload = multer({ storage: multer.memoryStorage() });
+// File upload configuration with validation
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB max
+    files: 1
+  },
+  fileFilter: (req, file, cb) => {
+    // Validate MIME type
+    const allowedMimes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'application/vnd.ms-excel', // .xls
+      'application/octet-stream' // Sometimes Excel files are sent as binary
+    ];
+    
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      // Also check file extension as fallback
+      const allowedExtensions = ['.xlsx', '.xls'];
+      const fileExtension = file.originalname.substring(file.originalname.lastIndexOf('.')).toLowerCase();
+      
+      if (allowedExtensions.includes(fileExtension)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Sadece Excel dosyaları (.xlsx, .xls) yüklenebilir'));
+      }
+    }
+  }
+});
 
 export const getSurveyResponses: RequestHandler = (req, res) => {
   try {
@@ -108,6 +137,13 @@ export const importExcelResponsesHandler: RequestHandler = async (req, res) => {
   try {
     const { distributionId } = req.params;
     
+    if (!distributionId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Dağıtım ID gereklidir'
+      });
+    }
+    
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -115,10 +151,18 @@ export const importExcelResponsesHandler: RequestHandler = async (req, res) => {
       });
     }
 
-    if (!distributionId) {
+    // Additional file validation
+    if (req.file.size === 0) {
       return res.status(400).json({
         success: false,
-        error: 'Dağıtım ID gereklidir'
+        error: 'Dosya boş'
+      });
+    }
+
+    if (req.file.size > 10 * 1024 * 1024) {
+      return res.status(400).json({
+        success: false,
+        error: 'Dosya boyutu 10MB\'dan büyük olamaz'
       });
     }
 
