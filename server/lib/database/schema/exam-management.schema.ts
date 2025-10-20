@@ -11,6 +11,7 @@ export function createExamManagementTables(db: Database.Database): void {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL UNIQUE,
       description TEXT,
+      penalty_divisor INTEGER DEFAULT 4,
       is_active BOOLEAN DEFAULT TRUE,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -113,9 +114,9 @@ export function seedExamData(db: Database.Database): void {
 
   // TYT (Temel Yeterlilik Testi)
   db.prepare(`
-    INSERT INTO exam_types (id, name, description, is_active)
-    VALUES (?, ?, ?, ?)
-  `).run('tyt', 'TYT', 'Temel Yeterlilik Testi', 1);
+    INSERT INTO exam_types (id, name, description, penalty_divisor, is_active)
+    VALUES (?, ?, ?, ?, ?)
+  `).run('tyt', 'TYT', 'Temel Yeterlilik Testi', 4, 1);
 
   const tytSubjects = [
     { id: 'tyt_turk', name: 'Türkçe', count: 40, order: 1 },
@@ -133,9 +134,9 @@ export function seedExamData(db: Database.Database): void {
 
   // AYT (Alan Yeterlilik Testi)
   db.prepare(`
-    INSERT INTO exam_types (id, name, description, is_active)
-    VALUES (?, ?, ?, ?)
-  `).run('ayt', 'AYT', 'Alan Yeterlilik Testi', 1);
+    INSERT INTO exam_types (id, name, description, penalty_divisor, is_active)
+    VALUES (?, ?, ?, ?, ?)
+  `).run('ayt', 'AYT', 'Alan Yeterlilik Testi', 4, 1);
 
   const aytSubjects = [
     { id: 'ayt_mat', name: 'Matematik', count: 40, order: 1 },
@@ -160,9 +161,9 @@ export function seedExamData(db: Database.Database): void {
 
   // LGS (Liselere Geçiş Sınavı)
   db.prepare(`
-    INSERT INTO exam_types (id, name, description, is_active)
-    VALUES (?, ?, ?, ?)
-  `).run('lgs', 'LGS', 'Liselere Geçiş Sınavı', 1);
+    INSERT INTO exam_types (id, name, description, penalty_divisor, is_active)
+    VALUES (?, ?, ?, ?, ?)
+  `).run('lgs', 'LGS', 'Liselere Geçiş Sınavı', 3, 1);
 
   const lgsSubjects = [
     { id: 'lgs_turk', name: 'Türkçe', count: 20, order: 1 },
@@ -182,9 +183,9 @@ export function seedExamData(db: Database.Database): void {
 
   // YDT (Yabancı Dil Testi)
   db.prepare(`
-    INSERT INTO exam_types (id, name, description, is_active)
-    VALUES (?, ?, ?, ?)
-  `).run('ydt', 'YDT', 'Yabancı Dil Testi', 1);
+    INSERT INTO exam_types (id, name, description, penalty_divisor, is_active)
+    VALUES (?, ?, ?, ?, ?)
+  `).run('ydt', 'YDT', 'Yabancı Dil Testi', 4, 1);
 
   const ydtSubjects = [
     { id: 'ydt_ing', name: 'İngilizce', count: 80, order: 1 }
