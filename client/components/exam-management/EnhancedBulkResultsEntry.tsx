@@ -24,7 +24,7 @@ import {
   AlertCircle,
   Clock,
 } from 'lucide-react';
-import { useExamSubjects } from '@/hooks/useExamManagement';
+import { useExamSubjects, useExamResultsBySession } from '@/hooks/useExamManagement';
 import type {
   ExamSession,
   ExamSubject,
@@ -68,6 +68,7 @@ export function EnhancedBulkResultsEntry({
   onSave,
 }: EnhancedBulkResultsEntryProps) {
   const { data: subjects = [], isLoading: subjectsLoading } = useExamSubjects(session.exam_type_id);
+  const { data: existingResults = [] } = useExamResultsBySession(session.id);
   const [results, setResults] = useState<Map<string, StudentResult>>(new Map());
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -90,6 +91,59 @@ export function EnhancedBulkResultsEntry({
       return name.includes(query) || fullName.includes(query) || id.includes(query);
     });
   }, [students, searchQuery]);
+
+  const createEmptyStudentResult = useCallback((studentId: string): StudentResult => {
+    const student = students.find((s) => s.id === studentId);
+    return {
+      studentId,
+      studentName: student?.name || `${student?.ad || ''} ${student?.soyad || ''}`,
+      subjects: new Map(),
+      totalNet: 0,
+    };
+  }, [students]);
+
+  const calculateTotalNet = useCallback((subjectMap: Map<string, SubjectResults>): number => {
+    let total = 0;
+    subjectMap.forEach((result) => {
+      const net = Math.max(0, result.correct_count - result.wrong_count / 4);
+      total += net;
+    });
+    return total;
+  }, []);
+
+  useEffect(() => {
+    if (open && existingResults.length > 0) {
+      const newResults = new Map<string, StudentResult>();
+      
+      const studentResultsMap = new Map<string, Map<string, SubjectResults>>();
+      
+      existingResults.forEach((result) => {
+        if (!studentResultsMap.has(result.student_id)) {
+          studentResultsMap.set(result.student_id, new Map());
+        }
+        studentResultsMap.get(result.student_id)!.set(result.subject_id, {
+          subject_id: result.subject_id,
+          correct_count: result.correct_count,
+          wrong_count: result.wrong_count,
+          empty_count: result.empty_count,
+        });
+      });
+      
+      studentResultsMap.forEach((subjectsMap, studentId) => {
+        const student = students.find((s) => s.id === studentId);
+        if (student) {
+          newResults.set(studentId, {
+            studentId,
+            studentName: student.name || `${student.ad || ''} ${student.soyad || ''}`,
+            subjects: subjectsMap,
+            totalNet: calculateTotalNet(subjectsMap),
+          });
+        }
+      });
+      
+      setResults(newResults);
+    }
+  }, [open, existingResults, students, calculateTotalNet]);
 
   // Validation function
   const validateCell = useCallback(
@@ -172,27 +226,8 @@ export function EnhancedBulkResultsEntry({
         }, 30000); // 30 seconds
       }
     },
-    [results, validateCell, autoSaveEnabled]
+    [results, validateCell, autoSaveEnabled, createEmptyStudentResult, calculateTotalNet]
   );
-
-  const createEmptyStudentResult = (studentId: string): StudentResult => {
-    const student = students.find((s) => s.id === studentId);
-    return {
-      studentId,
-      studentName: student?.name || `${student?.ad || ''} ${student?.soyad || ''}`,
-      subjects: new Map(),
-      totalNet: 0,
-    };
-  };
-
-  const calculateTotalNet = (subjectMap: Map<string, SubjectResults>): number => {
-    let total = 0;
-    subjectMap.forEach((result) => {
-      const net = Math.max(0, result.correct_count - result.wrong_count / 4);
-      total += net;
-    });
-    return total;
-  };
 
   const calculateNet = (studentId: string, subjectId: string): number => {
     const result = results.get(studentId)?.subjects.get(subjectId);
