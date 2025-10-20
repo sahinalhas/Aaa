@@ -10,6 +10,7 @@ import { SurveyTemplate } from "@/lib/survey-types";
 import SurveyCreationDialog from "@/components/surveys/SurveyCreationDialog";
 import SurveyDistributionDialog from "@/components/surveys/SurveyDistributionDialog";
 import SurveyDistributionEditDialog from "@/components/surveys/SurveyDistributionEditDialog";
+import SurveyTemplateEditDialog from "@/components/surveys/SurveyTemplateEditDialog";
 import SurveyAnalyticsTab from "@/components/surveys/SurveyAnalyticsTab";
 import SurveyStats from "@/components/surveys/SurveyStats";
 import TemplatesList from "@/components/surveys/TemplatesList";
@@ -326,6 +327,15 @@ export default function Surveys() {
           open={!!editingDistribution}
           onOpenChange={(open) => !open && setEditingDistribution(null)}
           distribution={editingDistribution}
+          onEditComplete={refreshAllData}
+        />
+      )}
+
+      {editingTemplate && (
+        <SurveyTemplateEditDialog
+          open={!!editingTemplate}
+          onOpenChange={(open) => !open && setEditingTemplate(null)}
+          template={editingTemplate}
           onEditComplete={refreshAllData}
         />
       )}
