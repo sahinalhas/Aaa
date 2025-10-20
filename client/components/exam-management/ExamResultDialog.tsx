@@ -19,7 +19,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, Save, ArrowRight, Copy, Info, AlertCircle } from 'lucide-react';
-import { useExamSubjects } from '@/hooks/useExamManagement';
+import { useExamSubjects, useExamResultsBySessionAndStudent } from '@/hooks/useExamManagement';
 import type {
   ExamSession,
   ExamSubject,
@@ -56,6 +56,11 @@ export function ExamResultDialog({
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [lastSavedResults, setLastSavedResults] = useState<Map<string, SubjectResults>>(new Map());
   const [savedStudentsCount, setSavedStudentsCount] = useState(0);
+  
+  const { data: existingResults = [] } = useExamResultsBySessionAndStudent(
+    session.id,
+    selectedStudent || undefined
+  );
 
   const filteredStudents = students.filter((student) => {
     const searchLower = studentSearch.toLowerCase();
@@ -82,6 +87,25 @@ export function ExamResultDialog({
       setSavedStudentsCount(0);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (selectedStudent && existingResults.length > 0) {
+      const resultsMap = new Map<string, SubjectResults>();
+      existingResults.forEach((result) => {
+        resultsMap.set(result.subject_id, {
+          subject_id: result.subject_id,
+          correct_count: result.correct_count,
+          wrong_count: result.wrong_count,
+          empty_count: result.empty_count,
+        });
+      });
+      setSubjectResults(resultsMap);
+      setSaveSuccess(false);
+    } else if (selectedStudent && existingResults.length === 0) {
+      setSubjectResults(new Map());
+      setSaveSuccess(false);
+    }
+  }, [selectedStudent, existingResults]);
 
   const handleSubjectChange = (
     subjectId: string,
