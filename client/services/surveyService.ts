@@ -69,5 +69,65 @@ export const surveyService = {
         errorMessage: 'Anket şablonu silinemedi',
       }
     );
+  },
+
+  async updateDistribution(distributionId: string, distributionData: any): Promise<void> {
+    return await apiClient.put<void>(
+      SURVEY_ENDPOINTS.DISTRIBUTION_BY_ID(distributionId),
+      distributionData,
+      {
+        showSuccessToast: true,
+        successMessage: 'Anket dağıtımı güncellendi',
+        errorMessage: 'Anket dağıtımı güncellenemedi',
+      }
+    );
+  },
+
+  async deleteDistribution(distributionId: string): Promise<void> {
+    return await apiClient.delete<void>(
+      SURVEY_ENDPOINTS.DISTRIBUTION_BY_ID(distributionId),
+      {
+        showSuccessToast: true,
+        successMessage: 'Anket dağıtımı silindi',
+        errorMessage: 'Anket dağıtımı silinemedi',
+      }
+    );
+  },
+
+  async getResponses(params?: { distributionId?: string; studentId?: string }): Promise<any[]> {
+    const queryParams = new URLSearchParams();
+    if (params?.distributionId) queryParams.append('distributionId', params.distributionId);
+    if (params?.studentId) queryParams.append('studentId', params.studentId);
+    const queryString = queryParams.toString();
+    const url = queryString ? `${SURVEY_ENDPOINTS.RESPONSES}?${queryString}` : SURVEY_ENDPOINTS.RESPONSES;
+    
+    return await apiClient.get<any[]>(
+      url,
+      { errorMessage: 'Anket yanıtları yüklenemedi' }
+    );
+  },
+
+  async getAnalytics(distributionId: string): Promise<any> {
+    return await apiClient.get<any>(
+      SURVEY_ENDPOINTS.ANALYTICS(distributionId),
+      { errorMessage: 'Anket analizleri yüklenemedi' }
+    );
+  },
+
+  async getStatistics(distributionId: string): Promise<any> {
+    return await apiClient.get<any>(
+      SURVEY_ENDPOINTS.STATISTICS(distributionId),
+      { errorMessage: 'Dağıtım istatistikleri yüklenemedi' }
+    );
+  },
+
+  async downloadExcelTemplate(distributionId: string): Promise<Blob> {
+    return await apiClient.get<Blob>(
+      `${SURVEY_ENDPOINTS.DISTRIBUTION_BY_ID(distributionId)}/excel-template`,
+      { 
+        errorMessage: 'Excel şablonu indirilemedi',
+        showErrorToast: true 
+      }
+    );
   }
 };
