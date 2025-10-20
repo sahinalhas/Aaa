@@ -11,6 +11,7 @@ export interface ExamType {
   id: string;
   name: string;
   description?: string;
+  penalty_divisor: number;
   is_active: boolean;
   created_at: string;
 }
@@ -82,6 +83,7 @@ export interface ExamResultWithDetails extends ExamResult {
   session_name?: string;
   exam_type_id?: string;
   exam_date?: string;
+  penalty_divisor?: number;
 }
 
 export interface CreateExamResultInput {

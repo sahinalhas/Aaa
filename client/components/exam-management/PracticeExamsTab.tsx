@@ -371,6 +371,7 @@ export function PracticeExamsTab({
           onOpenChange={(open) => !open && setResultDialogSession(null)}
           session={resultDialogSession}
           students={students}
+          examTypes={examTypes}
           onSave={onSaveResults}
         />
       )}
@@ -381,6 +382,7 @@ export function PracticeExamsTab({
           onOpenChange={(open) => !open && setBulkEntrySession(null)}
           session={bulkEntrySession}
           students={students}
+          examTypes={examTypes}
           onSave={onSaveResults}
         />
       )}

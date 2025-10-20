@@ -25,6 +25,7 @@ import { calculateNetScore } from '@/lib/utils/exam-utils';
 import type {
   ExamSession,
   ExamSubject,
+  ExamType,
   SubjectResults,
 } from '../../../shared/types/exam-management.types';
 
@@ -40,6 +41,7 @@ interface ExamResultDialogProps {
   onOpenChange: (open: boolean) => void;
   session: ExamSession;
   students: Student[];
+  examTypes: ExamType[];
   onSave: (sessionId: string, studentId: string, results: SubjectResults[]) => Promise<void>;
 }
 
@@ -48,6 +50,7 @@ export function ExamResultDialog({
   onOpenChange,
   session,
   students,
+  examTypes,
   onSave,
 }: ExamResultDialogProps) {
   const { data: subjects = [], isLoading: subjectsLoading } = useExamSubjects(session.exam_type_id);
@@ -65,6 +68,11 @@ export function ExamResultDialog({
   );
 
   const filteredStudents = useStudentFilter(students, studentSearch);
+
+  const penaltyDivisor = useMemo(() => {
+    const examType = examTypes.find((et) => et.id === session.exam_type_id);
+    return examType?.penalty_divisor || 4;
+  }, [examTypes, session.exam_type_id]);
 
   const currentStudentIndex = useMemo(() => {
     return students.findIndex((s) => s.id === selectedStudent);
@@ -125,7 +133,7 @@ export function ExamResultDialog({
   const calculateNet = (subjectId: string): number => {
     const result = subjectResults.get(subjectId);
     if (!result) return 0;
-    return calculateNetScore(result.correct_count, result.wrong_count);
+    return calculateNetScore(result.correct_count, result.wrong_count, penaltyDivisor);
   };
 
   const getTotalNet = (): number => {

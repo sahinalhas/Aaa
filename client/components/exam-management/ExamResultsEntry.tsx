@@ -31,6 +31,7 @@ import { CheckCircle2, Save, Calculator } from 'lucide-react';
 import type {
   ExamSession,
   ExamSubject,
+  ExamType,
   SubjectResults,
 } from '../../../shared/types/exam-management.types';
 
@@ -43,6 +44,7 @@ interface ExamResultsEntryProps {
   sessions: ExamSession[];
   subjects: ExamSubject[];
   students: Student[];
+  examTypes: ExamType[];
   onSave: (sessionId: string, studentId: string, results: SubjectResults[]) => Promise<void>;
 }
 
@@ -50,6 +52,7 @@ export function ExamResultsEntry({
   sessions,
   subjects,
   students,
+  examTypes,
   onSave,
 }: ExamResultsEntryProps) {
   const [selectedSession, setSelectedSession] = useState<string>('');
@@ -62,6 +65,12 @@ export function ExamResultsEntry({
     () => sessions.find((s) => s.id === selectedSession),
     [sessions, selectedSession]
   );
+
+  const penaltyDivisor = useMemo(() => {
+    if (!activeSession) return 4;
+    const examType = examTypes.find((et) => et.id === activeSession.exam_type_id);
+    return examType?.penalty_divisor || 4;
+  }, [activeSession, examTypes]);
 
   const handleSubjectChange = (
     subjectId: string,
@@ -85,7 +94,7 @@ export function ExamResultsEntry({
   const calculateNet = (subjectId: string): number => {
     const result = subjectResults.get(subjectId);
     if (!result) return 0;
-    return Math.max(0, result.correct_count - result.wrong_count / 4);
+    return Math.max(0, result.correct_count - result.wrong_count / penaltyDivisor);
   };
 
   const getTotalNet = (): number => {

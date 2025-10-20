@@ -30,6 +30,7 @@ import { calculateNetScore } from '@/lib/utils/exam-utils';
 import type {
   ExamSession,
   ExamSubject,
+  ExamType,
   SubjectResults,
 } from '../../../shared/types/exam-management.types';
 
@@ -59,6 +60,7 @@ interface EnhancedBulkResultsEntryProps {
   onOpenChange: (open: boolean) => void;
   session: ExamSession;
   students: Student[];
+  examTypes: ExamType[];
   onSave: (sessionId: string, studentId: string, results: SubjectResults[]) => Promise<void>;
 }
 
@@ -67,6 +69,7 @@ export function EnhancedBulkResultsEntry({
   onOpenChange,
   session,
   students,
+  examTypes,
   onSave,
 }: EnhancedBulkResultsEntryProps) {
   const { data: subjects = [], isLoading: subjectsLoading } = useExamSubjects(session.exam_type_id);
@@ -85,6 +88,11 @@ export function EnhancedBulkResultsEntry({
 
   const filteredStudents = useStudentFilter(students, searchQuery);
 
+  const penaltyDivisor = useMemo(() => {
+    const examType = examTypes.find((et) => et.id === session.exam_type_id);
+    return examType?.penalty_divisor || 4;
+  }, [examTypes, session.exam_type_id]);
+
   const createEmptyStudentResult = useCallback((studentId: string): StudentResult => {
     const student = students.find((s) => s.id === studentId);
     return {
@@ -98,10 +106,10 @@ export function EnhancedBulkResultsEntry({
   const calculateTotalNet = useCallback((subjectMap: Map<string, SubjectResults>): number => {
     let total = 0;
     subjectMap.forEach((result) => {
-      total += calculateNetScore(result.correct_count, result.wrong_count);
+      total += calculateNetScore(result.correct_count, result.wrong_count, penaltyDivisor);
     });
     return total;
-  }, []);
+  }, [penaltyDivisor]);
 
   useEffect(() => {
     if (open && existingResults.length > 0) {
@@ -224,7 +232,7 @@ export function EnhancedBulkResultsEntry({
   const calculateNet = (studentId: string, subjectId: string): number => {
     const result = results.get(studentId)?.subjects.get(subjectId);
     if (!result) return 0;
-    return calculateNetScore(result.correct_count, result.wrong_count);
+    return calculateNetScore(result.correct_count, result.wrong_count, penaltyDivisor);
   };
 
   const handleKeyDown = (

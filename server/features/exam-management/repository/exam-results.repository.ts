@@ -17,17 +17,25 @@ function ensureInitialized(): void {
   
   statements = {
     getById: db.prepare('SELECT * FROM exam_session_results WHERE id = ?'),
+    getPenaltyDivisor: db.prepare(`
+      SELECT et.penalty_divisor
+      FROM exam_sessions sess
+      LEFT JOIN exam_types et ON sess.exam_type_id = et.id
+      WHERE sess.id = ?
+    `),
     getBySession: db.prepare(`
       SELECT 
         er.*,
         s.name as student_name,
         es.subject_name,
         sess.name as session_name,
-        sess.exam_type_id
+        sess.exam_type_id,
+        et.penalty_divisor
       FROM exam_session_results er
       LEFT JOIN students s ON er.student_id = s.id
       LEFT JOIN exam_subjects es ON er.subject_id = es.id
       LEFT JOIN exam_sessions sess ON er.session_id = sess.id
+      LEFT JOIN exam_types et ON sess.exam_type_id = et.id
       WHERE er.session_id = ?
       ORDER BY s.name, es.order_index
     `),
@@ -38,11 +46,13 @@ function ensureInitialized(): void {
         es.subject_name,
         sess.name as session_name,
         sess.exam_type_id,
-        sess.exam_date
+        sess.exam_date,
+        et.penalty_divisor
       FROM exam_session_results er
       LEFT JOIN students s ON er.student_id = s.id
       LEFT JOIN exam_subjects es ON er.subject_id = es.id
       LEFT JOIN exam_sessions sess ON er.session_id = sess.id
+      LEFT JOIN exam_types et ON sess.exam_type_id = et.id
       WHERE er.student_id = ?
       ORDER BY sess.exam_date DESC, es.order_index
     `),
@@ -88,8 +98,8 @@ function ensureInitialized(): void {
   isInitialized = true;
 }
 
-function calculateNetScore(correct: number, wrong: number): number {
-  return Math.max(0, correct - (wrong / 4));
+function calculateNetScore(correct: number, wrong: number, penaltyDivisor: number = 4): number {
+  return Math.max(0, correct - (wrong / penaltyDivisor));
 }
 
 export function getExamResultById(id: string): ExamResult | null {
@@ -147,8 +157,11 @@ export function createExamResult(input: CreateExamResultInput): ExamResult {
       throw new Error('Exam result already exists for this student and subject');
     }
     
+    const penaltyInfo = statements.getPenaltyDivisor.get(input.session_id) as { penalty_divisor: number } | undefined;
+    const penaltyDivisor = penaltyInfo?.penalty_divisor || 4;
+    
     const id = `exam_result_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const netScore = calculateNetScore(input.correct_count, input.wrong_count);
+    const netScore = calculateNetScore(input.correct_count, input.wrong_count, penaltyDivisor);
     
     statements.insert.run(
       id,
@@ -183,8 +196,11 @@ export function upsertExamResult(input: CreateExamResultInput): ExamResult {
       input.subject_id
     );
     
+    const penaltyInfo = statements.getPenaltyDivisor.get(input.session_id) as { penalty_divisor: number } | undefined;
+    const penaltyDivisor = penaltyInfo?.penalty_divisor || 4;
+    
     const id = existing?.id || `exam_result_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const netScore = calculateNetScore(input.correct_count, input.wrong_count);
+    const netScore = calculateNetScore(input.correct_count, input.wrong_count, penaltyDivisor);
     
     statements.upsert.run(
       id,
@@ -224,10 +240,13 @@ export function updateExamResult(id: string, input: UpdateExamResultInput): Exam
       throw new Error('Exam result not found');
     }
     
+    const penaltyInfo = statements.getPenaltyDivisor.get(existing.session_id) as { penalty_divisor: number } | undefined;
+    const penaltyDivisor = penaltyInfo?.penalty_divisor || 4;
+    
     const correctCount = input.correct_count ?? existing.correct_count;
     const wrongCount = input.wrong_count ?? existing.wrong_count;
     const emptyCount = input.empty_count ?? existing.empty_count;
-    const netScore = calculateNetScore(correctCount, wrongCount);
+    const netScore = calculateNetScore(correctCount, wrongCount, penaltyDivisor);
     
     statements.update.run(correctCount, wrongCount, emptyCount, netScore, id);
     
