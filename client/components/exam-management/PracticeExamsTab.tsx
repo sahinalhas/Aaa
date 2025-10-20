@@ -167,7 +167,7 @@ export function PracticeExamsTab({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       <QuickExamCreate
         examTypes={examTypes}
         onCreateExam={onCreateExam}
@@ -175,7 +175,7 @@ export function PracticeExamsTab({
         isLoading={isCreating}
       />
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden shadow-md border-2">
         <CardHeader className="bg-gradient-to-br from-primary/5 via-background to-accent/5 border-b">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-lg">
