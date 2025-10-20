@@ -20,6 +20,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, Save, ArrowRight, Copy, Info, AlertCircle } from 'lucide-react';
 import { useExamSubjects, useExamResultsBySessionAndStudent } from '@/hooks/useExamManagement';
+import { useStudentFilter } from '@/hooks/useStudentFilter';
 import { calculateNetScore } from '@/lib/utils/exam-utils';
 import type {
   ExamSession,
@@ -63,18 +64,7 @@ export function ExamResultDialog({
     selectedStudent || undefined
   );
 
-  const filteredStudents = students.filter((student) => {
-    const searchLower = studentSearch.toLowerCase();
-    const studentName = student.name?.toLowerCase() || '';
-    const studentFullName = `${student.ad || ''} ${student.soyad || ''}`.toLowerCase();
-    const studentId = student.id.toLowerCase();
-    
-    return (
-      studentName.includes(searchLower) ||
-      studentFullName.includes(searchLower) ||
-      studentId.includes(searchLower)
-    );
-  });
+  const filteredStudents = useStudentFilter(students, studentSearch);
 
   const currentStudentIndex = useMemo(() => {
     return students.findIndex((s) => s.id === selectedStudent);
