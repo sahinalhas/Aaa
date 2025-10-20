@@ -44,10 +44,19 @@ export const SURVEY_ENDPOINTS = {
   TEMPLATES: `${API_BASE}/survey-templates`,
   TEMPLATE_BY_ID: (id: string) => `${API_BASE}/survey-templates/${id}`,
   QUESTIONS: (templateId: string) => `${API_BASE}/survey-questions/${templateId}`,
+  QUESTION_BY_ID: (id: string) => `${API_BASE}/survey-questions/${id}`,
   DISTRIBUTIONS: `${API_BASE}/survey-distributions`,
+  DISTRIBUTION_BY_ID: (id: string) => `${API_BASE}/survey-distributions/${id}`,
   DISTRIBUTION_BY_LINK: (publicLink: string) => `${API_BASE}/survey-distributions/link/${publicLink}`,
   RESPONSES: `${API_BASE}/survey-responses`,
+  RESPONSE_BY_ID: (id: string) => `${API_BASE}/survey-responses/${id}`,
+  RESPONSE_IMPORT: (distributionId: string) => `${API_BASE}/survey-responses/import/${distributionId}`,
   ANALYTICS: (distributionId: string) => `${API_BASE}/survey-analytics/${distributionId}`,
+  QUESTION_ANALYTICS: (distributionId: string, questionId: string) => `${API_BASE}/survey-analytics/${distributionId}/question/${questionId}`,
+  STATISTICS: (distributionId: string) => `${API_BASE}/survey-statistics/${distributionId}`,
+  AI_ANALYSIS: (distributionId: string) => `${API_BASE}/surveys/ai-analysis/analyze/${distributionId}`,
+  AI_CLASS_COMPARISON: `${API_BASE}/surveys/ai-analysis/compare-classes`,
+  AI_TRENDS: (templateId: string) => `${API_BASE}/surveys/ai-analysis/trends/${templateId}`,
 } as const;
 
 /**
