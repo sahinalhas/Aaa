@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Settings, BarChart } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useSurveyTemplates, useSurveyDistributions, useTemplateQuestions } from "@/hooks/surveys";
 import { surveyService } from "@/services/surveyService";
 import { useToast } from "@/hooks/use-toast";
@@ -15,10 +15,10 @@ import SurveyAnalyticsTab from "@/components/surveys/SurveyAnalyticsTab";
 import SurveyStats from "@/components/surveys/SurveyStats";
 import TemplatesList from "@/components/surveys/TemplatesList";
 import DistributionsList from "@/components/surveys/DistributionsList";
+import SurveyResponsesList from "@/components/surveys/SurveyResponsesList";
 import TemplateSelector from "@/components/surveys/TemplateSelector";
 import SurveyAIAnalysis from "@/components/ai/SurveyAIAnalysis";
 import { MEB_SURVEY_TEMPLATES } from "@/lib/survey-types";
-import { getMebDefaultQuestions } from "@/components/surveys/templates/meb-templates";
 
 export default function Surveys() {
   const { toast } = useToast();
@@ -29,6 +29,7 @@ export default function Surveys() {
   const [selectedTemplate, setSelectedTemplate] = useState<SurveyTemplate | null>(null);
   const [selectedDistributionForAI, setSelectedDistributionForAI] = useState<any>(null);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [showDistributionDialog, setShowDistributionDialog] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<SurveyTemplate | null>(null);
   const [editingDistribution, setEditingDistribution] = useState<any>(null);
 
@@ -41,6 +42,7 @@ export default function Surveys() {
   const handleCreateDistribution = async (template: SurveyTemplate) => {
     await loadQuestions(template.id);
     setSelectedTemplate(template);
+    setShowDistributionDialog(true);
   };
 
   const handleDistributionCreated = async (distributionData: any) => {
@@ -58,7 +60,7 @@ export default function Surveys() {
       await refreshAllData();
       setSelectedTemplate(null);
       clearQuestions();
-      setShowTemplateSelector(false);
+      setShowDistributionDialog(false);
     } catch (error) {
       console.error("Error creating distribution:", error);
       toast({ 
@@ -74,9 +76,10 @@ export default function Surveys() {
   };
 
   const handleTemplateSelected = async (template: SurveyTemplate) => {
+    setShowTemplateSelector(false);
     await loadQuestions(template.id);
     setSelectedTemplate(template);
-    setShowTemplateSelector(false);
+    setShowDistributionDialog(true);
   };
 
   const handleEditTemplate = async (template: SurveyTemplate) => {
@@ -194,18 +197,12 @@ export default function Surveys() {
               Anket oluşturun, sınıflara dağıtın ve sonuçları analiz edin
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline">
-              <Settings className="mr-2 h-4 w-4" />
-              Ayarlar
+          <SurveyCreationDialog onSurveyCreated={refreshAllData}>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Yeni Anket
             </Button>
-            <SurveyCreationDialog onSurveyCreated={refreshAllData}>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Yeni Anket
-              </Button>
-            </SurveyCreationDialog>
-          </div>
+          </SurveyCreationDialog>
         </div>
       </div>
 
@@ -242,20 +239,7 @@ export default function Surveys() {
         </TabsContent>
 
         <TabsContent value="responses" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Anket Yanıtları</CardTitle>
-              <CardDescription>
-                Gelen yanıtları görüntüleyin ve yönetin
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                <BarChart className="mx-auto h-12 w-12 mb-4" />
-                <p>Yanıt verileri burada görüntülenecek</p>
-              </div>
-            </CardContent>
-          </Card>
+          <SurveyResponsesList distributions={distributions} />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
@@ -314,6 +298,14 @@ export default function Surveys() {
 
       {selectedTemplate && questions.length > 0 && (
         <SurveyDistributionDialog
+          open={showDistributionDialog}
+          onOpenChange={(open) => {
+            setShowDistributionDialog(open);
+            if (!open) {
+              setSelectedTemplate(null);
+              clearQuestions();
+            }
+          }}
           survey={selectedTemplate}
           questions={questions}
           onDistributionCreated={handleDistributionCreated}

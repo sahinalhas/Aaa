@@ -37,12 +37,13 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
-import { Student, loadStudents, upsertStudent } from '@/lib/storage';
+import { Student, upsertStudent } from '@/lib/storage';
 import { frontendToBackend } from '@/lib/types/student.types';
 import { apiClient } from '@/lib/api/api-client';
 import { STUDENT_ENDPOINTS } from '@/lib/constants/api-endpoints';
 import type { ApiResponse } from '@/lib/types/api-types';
 
+import { useStudents } from '@/hooks/useStudents';
 import { useStudentStats } from '@/hooks/useStudentStats';
 import { useStudentFilters } from '@/hooks/useStudentFilters';
 import { usePagination } from '@/hooks/usePagination';
@@ -59,8 +60,7 @@ import { EmptyState } from '@/components/students/EmptyState';
 import { TableSkeleton } from '@/components/students/TableSkeleton';
 
 export default function Students() {
-  const [students, setStudents] = useState<Student[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { students, isLoading, invalidate } = useStudents();
   const [isMobileView, setIsMobileView] = useState(false);
   
   const [open, setOpen] = useState(false);
@@ -111,19 +111,6 @@ export default function Students() {
   });
 
   useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      setStudents(loadStudents());
-      setIsLoading(false);
-    };
-    loadData();
-
-    const handleStudentsUpdated = () => {
-      setStudents(loadStudents());
-    };
-
-    window.addEventListener('studentsUpdated', handleStudentsUpdated);
-
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768);
     };
@@ -131,7 +118,6 @@ export default function Students() {
     window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('studentsUpdated', handleStudentsUpdated);
       window.removeEventListener('resize', handleResize);
     };
   }, []);
@@ -154,13 +140,12 @@ export default function Students() {
     const newStudent = { ...data, id, kayitTarihi: new Date().toISOString() };
 
     try {
-      setStudents((prev) => [newStudent, ...prev]);
       await upsertStudent(newStudent);
+      invalidate();
       reset();
       setOpen(false);
       toast.success('Öğrenci başarıyla eklendi.');
     } catch (error) {
-      setStudents((prev) => prev.filter((s) => s.id !== id));
       toast.error('Öğrenci kaydedilemedi. Lütfen tekrar deneyin.');
       console.error('Failed to save student:', error);
     }
@@ -197,19 +182,13 @@ export default function Students() {
     const updatedStudent = { ...studentToEdit, ...data, id };
 
     try {
-      setStudents((prev) =>
-        prev.map((s) => (s.id === studentToEdit.id ? updatedStudent : s))
-      );
       await upsertStudent(updatedStudent);
+      invalidate();
       reset();
       setEditOpen(false);
       setStudentToEdit(null);
       toast.success('Öğrenci başarıyla güncellendi.');
-      window.dispatchEvent(new CustomEvent('studentsUpdated'));
     } catch (error) {
-      setStudents((prev) =>
-        prev.map((s) => (s.id === updatedStudent.id ? studentToEdit : s))
-      );
       toast.error('Öğrenci güncellenemedi. Lütfen tekrar deneyin.');
       console.error('Failed to update student:', error);
     }
@@ -240,7 +219,7 @@ export default function Students() {
       const result = await response.json();
 
       if (result.success) {
-        setStudents((prev) => prev.filter((s) => s.id !== studentToDelete.id));
+        invalidate();
         setDeleteDialogOpen(false);
         setStudentToDelete(null);
         setConfirmationName('');
@@ -263,7 +242,7 @@ export default function Students() {
           headers: { 'Content-Type': 'application/json' },
         });
       }
-      setStudents((prev) => prev.filter((s) => !selectedStudentIds.has(s.id)));
+      invalidate();
       setSelectedStudentIds(new Set());
       toast.success(`${idsToDelete.length} öğrenci silindi.`);
     } catch (error) {
@@ -274,18 +253,15 @@ export default function Students() {
 
   const handleBulkUpdateRisk = async (risk: 'Düşük' | 'Orta' | 'Yüksek') => {
     const idsToUpdate = Array.from(selectedStudentIds);
-    const updatedStudents = students.map((s) =>
-      idsToUpdate.includes(s.id) ? { ...s, risk } : s
-    );
 
     try {
-      setStudents(updatedStudents);
       for (const id of idsToUpdate) {
-        const student = updatedStudents.find((s) => s.id === id);
+        const student = students.find((s) => s.id === id);
         if (student) {
-          await upsertStudent(student);
+          await upsertStudent({ ...student, risk });
         }
       }
+      invalidate();
       setSelectedStudentIds(new Set());
       toast.success(`${idsToUpdate.length} öğrencinin risk seviyesi güncellendi.`);
     } catch (error) {
@@ -396,7 +372,6 @@ export default function Students() {
       }
 
       const updatedStudents = mergeStudents(students, imported);
-      setStudents(updatedStudents);
 
       try {
         const backendStudents = updatedStudents.map((s) => frontendToBackend(s));
@@ -409,6 +384,7 @@ export default function Students() {
             showErrorToast: true,
           }
         );
+        invalidate();
       } catch (error) {
         console.error('Backend save error:', error);
       }

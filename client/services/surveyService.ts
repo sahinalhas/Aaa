@@ -129,5 +129,40 @@ export const surveyService = {
         showErrorToast: true 
       }
     );
+  },
+
+  async createQuestion(questionData: any): Promise<void> {
+    return await apiClient.post<void>(
+      SURVEY_ENDPOINTS.QUESTIONS(questionData.templateId),
+      questionData,
+      {
+        showSuccessToast: true,
+        successMessage: 'Soru eklendi',
+        errorMessage: 'Soru eklenemedi',
+      }
+    );
+  },
+
+  async updateQuestion(questionId: string, questionData: any): Promise<void> {
+    return await apiClient.put<void>(
+      SURVEY_ENDPOINTS.QUESTION_BY_ID(questionId),
+      questionData,
+      {
+        showSuccessToast: true,
+        successMessage: 'Soru güncellendi',
+        errorMessage: 'Soru güncellenemedi',
+      }
+    );
+  },
+
+  async deleteQuestion(questionId: string): Promise<void> {
+    return await apiClient.delete<void>(
+      SURVEY_ENDPOINTS.QUESTION_BY_ID(questionId),
+      {
+        showSuccessToast: true,
+        successMessage: 'Soru silindi',
+        errorMessage: 'Soru silinemedi',
+      }
+    );
   }
 };

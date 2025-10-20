@@ -60,7 +60,7 @@ export default function SurveyResponsesList({ distributions }: SurveyResponsesLi
   const loadResponses = async (distributionId: string) => {
     setLoading(true);
     try {
-      const data = await surveyService.getResponses(distributionId);
+      const data = await surveyService.getResponses({ distributionId });
       setResponses(data);
     } catch (error) {
       console.error("Error loading responses:", error);

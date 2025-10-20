@@ -51,8 +51,9 @@ import {
   DistributionType,
   ExcelTemplateConfig
 } from "@/lib/survey-types";
-import { Student, loadStudents } from "@/lib/storage";
+import { Student } from "@/lib/storage";
 import { generateExcelTemplate } from "@/lib/excel-template-generator";
+import { useStudents } from "@/hooks/useStudents";
 
 const distributionSchema = z.object({
   title: z.string().min(1, "Başlık gereklidir"),
@@ -79,16 +80,30 @@ interface SurveyDistributionDialogProps {
   survey: SurveyTemplate;
   questions: SurveyQuestion[];
   onDistributionCreated?: (distribution: DistributionForm) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export default function SurveyDistributionDialog({ 
   children, 
   survey,
   questions,
-  onDistributionCreated 
+  onDistributionCreated,
+  open: externalOpen,
+  onOpenChange 
 }: SurveyDistributionDialogProps) {
-  const [open, setOpen] = useState(false);
-  const [students, setStudents] = useState<Student[]>([]);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  
+  const handleOpenChange = (newOpen: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(newOpen);
+    } else {
+      setInternalOpen(newOpen);
+    }
+  };
+  
+  const { students: studentsFromHook, isLoading: studentsLoading } = useStudents();
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [currentStep, setCurrentStep] = useState<"basic" | "selection" | "config">("basic");
   const [filterOptions, setFilterOptions] = useState({
@@ -96,6 +111,8 @@ export default function SurveyDistributionDialog({
     riskLevel: "all", // "all", "low", "medium", "high"
     searchTerm: ""
   });
+  
+  const students = studentsFromHook || [];
 
   const form = useForm<DistributionForm>({
     resolver: zodResolver(distributionSchema),
@@ -117,9 +134,26 @@ export default function SurveyDistributionDialog({
 
   useEffect(() => {
     if (open) {
-      setStudents(loadStudents());
+      console.log('Loading students for distribution dialog:', students.length);
+      
+      // Dialog açıldığında form'u sıfırla
+      form.reset({
+        title: `${survey.title} - Dağıtım`,
+        description: "",
+        distributionType: "HYBRID",
+        targetClasses: [],
+        targetStudents: [],
+        allowAnonymous: false,
+        excelConfig: {
+          includeStudentInfo: true,
+          includeInstructions: true,
+          responseFormat: "single_sheet",
+          includeValidation: true,
+        },
+      });
+      setCurrentStep("basic");
     }
-  }, [open]);
+  }, [open, survey.title, form, students]);
 
   const watchedClasses = form.watch("targetClasses");
   const watchedDistributionType = form.watch("distributionType");
@@ -276,7 +310,7 @@ export default function SurveyDistributionDialog({
       };
 
       onDistributionCreated?.(distributionData);
-      setOpen(false);
+      handleOpenChange(false);
       form.reset();
       setCurrentStep("basic");
     } catch (error) {
@@ -285,7 +319,7 @@ export default function SurveyDistributionDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
@@ -528,10 +562,11 @@ export default function SurveyDistributionDialog({
                                         <Checkbox
                                           checked={field.value?.includes(className)}
                                           onCheckedChange={(checked) => {
+                                            const currentValue = field.value || [];
                                             return checked
-                                              ? field.onChange([...field.value, className])
+                                              ? field.onChange([...currentValue, className])
                                               : field.onChange(
-                                                  field.value?.filter(
+                                                  currentValue.filter(
                                                     (value) => value !== className
                                                   )
                                                 )
