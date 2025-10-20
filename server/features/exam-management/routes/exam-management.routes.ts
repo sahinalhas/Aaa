@@ -530,3 +530,268 @@ export const generateStudentReportData: RequestHandler = (req, res) => {
     res.status(500).json({ success: false, error: 'Rapor oluşturulamadı' });
   }
 };
+
+// ============================================================================
+// Advanced Features Endpoints
+// ============================================================================
+
+import * as goalsRepo from '../repository/goals.repository.js';
+import * as alertsRepo from '../repository/alerts.repository.js';
+import * as benchmarkRepo from '../repository/benchmarks.repository.js';
+import * as dashboardMetrics from '../services/dashboard-metrics.service.js';
+import * as questionAnalysis from '../services/question-analysis.service.js';
+import * as heatmapService from '../services/heatmap.service.js';
+import * as benchmarkService from '../services/benchmark.service.js';
+import * as timeAnalysisService from '../services/time-analysis.service.js';
+import * as predictionService from '../services/prediction.service.js';
+
+// Dashboard Metrics
+export const getDashboardMetrics: RequestHandler = (req, res) => {
+  try {
+    const metrics = dashboardMetrics.getRealTimeDashboardMetrics();
+    res.json({ success: true, data: metrics });
+  } catch (error) {
+    console.error('Error fetching dashboard metrics:', error);
+    res.status(500).json({ success: false, error: 'Dashboard metrikleri yüklenemedi' });
+  }
+};
+
+// Student Goals
+export const getStudentGoals: RequestHandler = (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const goals = goalsRepo.getGoalsByStudent(studentId);
+    res.json({ success: true, data: goals });
+  } catch (error) {
+    console.error('Error fetching student goals:', error);
+    res.status(500).json({ success: false, error: 'Hedefler yüklenemedi' });
+  }
+};
+
+export const createStudentGoal: RequestHandler = (req, res) => {
+  try {
+    const input = req.body;
+    
+    if (!input.student_id || !input.exam_type_id || !input.target_net) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Öğrenci, sınav türü ve hedef net zorunludur' 
+      });
+    }
+    
+    const goal = goalsRepo.createGoal(input);
+    res.json({ success: true, data: goal, message: 'Hedef oluşturuldu' });
+  } catch (error) {
+    console.error('Error creating goal:', error);
+    res.status(500).json({ success: false, error: 'Hedef oluşturulamadı' });
+  }
+};
+
+export const updateGoalProgress: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+    const { currentNet, status } = req.body;
+    
+    const success = goalsRepo.updateGoalProgress(id, currentNet, status);
+    if (!success) {
+      return res.status(404).json({ success: false, error: 'Hedef bulunamadı' });
+    }
+    
+    res.json({ success: true, message: 'Hedef güncellendi' });
+  } catch (error) {
+    console.error('Error updating goal:', error);
+    res.status(500).json({ success: false, error: 'Hedef güncellenemedi' });
+  }
+};
+
+export const deleteGoal: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+    const success = goalsRepo.deleteGoal(id);
+    
+    if (!success) {
+      return res.status(404).json({ success: false, error: 'Hedef bulunamadı' });
+    }
+    
+    res.json({ success: true, message: 'Hedef silindi' });
+  } catch (error) {
+    console.error('Error deleting goal:', error);
+    res.status(500).json({ success: false, error: 'Hedef silinemedi' });
+  }
+};
+
+// Question Analysis
+export const analyzeSessionQuestions: RequestHandler = (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const analysis = questionAnalysis.analyzeQuestions(sessionId);
+    res.json({ success: true, data: analysis });
+  } catch (error) {
+    console.error('Error analyzing questions:', error);
+    res.status(500).json({ success: false, error: 'Soru analizi yapılamadı' });
+  }
+};
+
+export const getQuestionAnalysis: RequestHandler = (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const analysis = questionAnalysis.getQuestionAnalysis(sessionId);
+    res.json({ success: true, data: analysis });
+  } catch (error) {
+    console.error('Error fetching question analysis:', error);
+    res.status(500).json({ success: false, error: 'Soru analizi yüklenemedi' });
+  }
+};
+
+// Heatmap
+export const getHeatmapData: RequestHandler = (req, res) => {
+  try {
+    const { studentId, examTypeId } = req.params;
+    const heatmap = heatmapService.getHeatmapData(studentId, examTypeId);
+    res.json({ success: true, data: heatmap });
+  } catch (error) {
+    console.error('Error fetching heatmap:', error);
+    res.status(500).json({ success: false, error: 'Isı haritası yüklenemedi' });
+  }
+};
+
+export const calculateHeatmap: RequestHandler = (req, res) => {
+  try {
+    const { studentId, examTypeId } = req.params;
+    const heatmap = heatmapService.calculateHeatmap(studentId, examTypeId);
+    res.json({ success: true, data: heatmap, message: 'Isı haritası hesaplandı' });
+  } catch (error) {
+    console.error('Error calculating heatmap:', error);
+    res.status(500).json({ success: false, error: 'Isı haritası hesaplanamadı' });
+  }
+};
+
+// Benchmarks
+export const calculateSessionBenchmarks: RequestHandler = (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const result = benchmarkService.calculateBenchmarks(sessionId);
+    res.json({ success: true, data: result, message: 'Benchmark hesaplandı' });
+  } catch (error) {
+    console.error('Error calculating benchmarks:', error);
+    res.status(500).json({ success: false, error: 'Benchmark hesaplanamadı' });
+  }
+};
+
+export const getBenchmarkComparison: RequestHandler = (req, res) => {
+  try {
+    const { sessionId, studentId } = req.params;
+    const comparison = benchmarkService.getBenchmarkComparison(sessionId, studentId);
+    
+    if (!comparison) {
+      return res.status(404).json({ success: false, error: 'Benchmark bulunamadı' });
+    }
+    
+    res.json({ success: true, data: comparison });
+  } catch (error) {
+    console.error('Error fetching benchmark:', error);
+    res.status(500).json({ success: false, error: 'Benchmark yüklenemedi' });
+  }
+};
+
+export const getStudentBenchmarks: RequestHandler = (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const benchmarks = benchmarkRepo.getBenchmarksByStudent(studentId);
+    res.json({ success: true, data: benchmarks });
+  } catch (error) {
+    console.error('Error fetching benchmarks:', error);
+    res.status(500).json({ success: false, error: 'Benchmark\'lar yüklenemedi' });
+  }
+};
+
+// Time Analysis
+export const getTimeAnalysis: RequestHandler = (req, res) => {
+  try {
+    const { studentId, examTypeId } = req.params;
+    const analysis = timeAnalysisService.calculateTimeAnalysis(studentId, examTypeId);
+    res.json({ success: true, data: analysis });
+  } catch (error) {
+    console.error('Error calculating time analysis:', error);
+    res.status(500).json({ success: false, error: 'Zaman analizi yapılamadı' });
+  }
+};
+
+// Predictions
+export const getPredictiveAnalysis: RequestHandler = (req, res) => {
+  try {
+    const { studentId, examTypeId } = req.params;
+    const prediction = predictionService.predictPerformance(studentId, examTypeId);
+    res.json({ success: true, data: prediction });
+  } catch (error) {
+    console.error('Error generating prediction:', error);
+    res.status(500).json({ success: false, error: 'Tahmin oluşturulamadı' });
+  }
+};
+
+// Alerts
+export const getStudentAlerts: RequestHandler = (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const alerts = alertsRepo.getAlertsByStudent(studentId);
+    res.json({ success: true, data: alerts });
+  } catch (error) {
+    console.error('Error fetching alerts:', error);
+    res.status(500).json({ success: false, error: 'Uyarılar yüklenemedi' });
+  }
+};
+
+export const getAllUnreadAlerts: RequestHandler = (req, res) => {
+  try {
+    const alerts = alertsRepo.getUnreadAlerts();
+    res.json({ success: true, data: alerts });
+  } catch (error) {
+    console.error('Error fetching unread alerts:', error);
+    res.status(500).json({ success: false, error: 'Okunmamış uyarılar yüklenemedi' });
+  }
+};
+
+export const markAlertRead: RequestHandler = (req, res) => {
+  try {
+    const { id } = req.params;
+    const success = alertsRepo.markAlertAsRead(id);
+    
+    if (!success) {
+      return res.status(404).json({ success: false, error: 'Uyarı bulunamadı' });
+    }
+    
+    res.json({ success: true, message: 'Uyarı okundu olarak işaretlendi' });
+  } catch (error) {
+    console.error('Error marking alert as read:', error);
+    res.status(500).json({ success: false, error: 'Uyarı güncellenemedi' });
+  }
+};
+
+// PDF Reports
+export const generateDetailedPDFReport: RequestHandler = (req, res) => {
+  try {
+    const { studentId, examTypeId } = req.params;
+    
+    const report = pdfReportService.generateStudentDetailedReport(studentId, examTypeId);
+    const pdfBuffer = pdfReportService.generatePDF(report);
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="rapor-${studentId}.pdf"`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Error generating PDF report:', error);
+    res.status(500).json({ success: false, error: 'PDF rapor oluşturulamadı' });
+  }
+};
+
+export const getDetailedReportData: RequestHandler = (req, res) => {
+  try {
+    const { studentId, examTypeId } = req.params;
+    
+    const report = pdfReportService.generateStudentDetailedReport(studentId, examTypeId);
+    res.json({ success: true, data: report });
+  } catch (error) {
+    console.error('Error generating detailed report:', error);
+    res.status(500).json({ success: false, error: 'Detaylı rapor oluşturulamadı' });
+  }
+};

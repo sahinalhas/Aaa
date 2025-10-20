@@ -199,3 +199,197 @@ export function seedExamData(db: Database.Database): void {
 
   console.log('✅ Exam types and subjects seeded successfully');
 }
+
+/**
+ * Extended Exam Management Tables for Advanced Features
+ * Gelişmiş özellikler için ek tablolar
+ */
+export function createAdvancedExamTables(db: Database.Database): void {
+  // Öğrenci Hedefleri (Student Exam Goals)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS student_exam_goals (
+      id TEXT PRIMARY KEY,
+      student_id TEXT NOT NULL,
+      exam_type_id TEXT NOT NULL,
+      subject_id TEXT,
+      target_net REAL NOT NULL,
+      current_net REAL DEFAULT 0,
+      deadline TEXT,
+      status TEXT DEFAULT 'active' CHECK (status IN ('active', 'achieved', 'cancelled')),
+      priority TEXT DEFAULT 'medium' CHECK (priority IN ('high', 'medium', 'low')),
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE,
+      FOREIGN KEY (exam_type_id) REFERENCES exam_types (id) ON DELETE CASCADE,
+      FOREIGN KEY (subject_id) REFERENCES exam_subjects (id) ON DELETE SET NULL
+    );
+    
+    CREATE INDEX IF NOT EXISTS idx_exam_goals_student ON student_exam_goals(student_id);
+    CREATE INDEX IF NOT EXISTS idx_exam_goals_status ON student_exam_goals(status);
+  `);
+
+  // Soru Analizi (Question Level Analysis)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS question_analysis (
+      id TEXT PRIMARY KEY,
+      session_id TEXT NOT NULL,
+      subject_id TEXT NOT NULL,
+      question_number INTEGER NOT NULL,
+      correct_count INTEGER DEFAULT 0,
+      wrong_count INTEGER DEFAULT 0,
+      empty_count INTEGER DEFAULT 0,
+      difficulty_score REAL DEFAULT 0,
+      discrimination_index REAL DEFAULT 0,
+      avg_response_time INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (session_id) REFERENCES exam_sessions (id) ON DELETE CASCADE,
+      FOREIGN KEY (subject_id) REFERENCES exam_subjects (id) ON DELETE CASCADE,
+      UNIQUE(session_id, subject_id, question_number)
+    );
+    
+    CREATE INDEX IF NOT EXISTS idx_question_analysis_session ON question_analysis(session_id);
+    CREATE INDEX IF NOT EXISTS idx_question_analysis_difficulty ON question_analysis(difficulty_score);
+  `);
+
+  // Konu Performans Isı Haritası (Subject Performance Heatmap)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS subject_performance_heatmap (
+      id TEXT PRIMARY KEY,
+      student_id TEXT NOT NULL,
+      subject_id TEXT NOT NULL,
+      exam_type_id TEXT NOT NULL,
+      performance_score REAL DEFAULT 0,
+      trend TEXT DEFAULT 'stable' CHECK (trend IN ('improving', 'stable', 'declining')),
+      last_6_avg REAL DEFAULT 0,
+      last_12_avg REAL DEFAULT 0,
+      total_sessions INTEGER DEFAULT 0,
+      strength_level TEXT DEFAULT 'moderate' CHECK (strength_level IN ('weak', 'moderate', 'strong')),
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE,
+      FOREIGN KEY (subject_id) REFERENCES exam_subjects (id) ON DELETE CASCADE,
+      FOREIGN KEY (exam_type_id) REFERENCES exam_types (id) ON DELETE CASCADE,
+      UNIQUE(student_id, subject_id, exam_type_id)
+    );
+    
+    CREATE INDEX IF NOT EXISTS idx_heatmap_student ON subject_performance_heatmap(student_id);
+    CREATE INDEX IF NOT EXISTS idx_heatmap_strength ON subject_performance_heatmap(strength_level);
+  `);
+
+  // Benchmark Verileri (Benchmarking Data)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS exam_benchmarks (
+      id TEXT PRIMARY KEY,
+      session_id TEXT NOT NULL,
+      student_id TEXT NOT NULL,
+      total_net REAL DEFAULT 0,
+      class_avg REAL DEFAULT 0,
+      school_avg REAL DEFAULT 0,
+      percentile REAL DEFAULT 0,
+      rank INTEGER,
+      total_participants INTEGER,
+      deviation_from_avg REAL DEFAULT 0,
+      performance_category TEXT CHECK (performance_category IN ('excellent', 'good', 'average', 'needs_improvement')),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (session_id) REFERENCES exam_sessions (id) ON DELETE CASCADE,
+      FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE,
+      UNIQUE(session_id, student_id)
+    );
+    
+    CREATE INDEX IF NOT EXISTS idx_benchmarks_session ON exam_benchmarks(session_id);
+    CREATE INDEX IF NOT EXISTS idx_benchmarks_student ON exam_benchmarks(student_id);
+    CREATE INDEX IF NOT EXISTS idx_benchmarks_percentile ON exam_benchmarks(percentile);
+  `);
+
+  // Zaman Analizi (Time Analysis)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS exam_time_analysis (
+      id TEXT PRIMARY KEY,
+      student_id TEXT NOT NULL,
+      exam_type_id TEXT NOT NULL,
+      total_exams INTEGER DEFAULT 0,
+      avg_days_between_exams REAL DEFAULT 0,
+      study_frequency TEXT CHECK (study_frequency IN ('high', 'medium', 'low')),
+      optimal_interval_days INTEGER,
+      last_exam_date TEXT,
+      performance_time_correlation REAL DEFAULT 0,
+      improvement_velocity REAL DEFAULT 0,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE,
+      FOREIGN KEY (exam_type_id) REFERENCES exam_types (id) ON DELETE CASCADE,
+      UNIQUE(student_id, exam_type_id)
+    );
+    
+    CREATE INDEX IF NOT EXISTS idx_time_analysis_student ON exam_time_analysis(student_id);
+  `);
+
+  // Tahminsel Analitik (Predictive Analytics)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS exam_predictions (
+      id TEXT PRIMARY KEY,
+      student_id TEXT NOT NULL,
+      exam_type_id TEXT NOT NULL,
+      predicted_net REAL DEFAULT 0,
+      confidence_level REAL DEFAULT 0,
+      prediction_date TEXT NOT NULL,
+      target_exam_date TEXT,
+      risk_level TEXT CHECK (risk_level IN ('high', 'medium', 'low')),
+      success_probability REAL DEFAULT 0,
+      improvement_needed REAL DEFAULT 0,
+      ai_insights TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE,
+      FOREIGN KEY (exam_type_id) REFERENCES exam_types (id) ON DELETE CASCADE
+    );
+    
+    CREATE INDEX IF NOT EXISTS idx_predictions_student ON exam_predictions(student_id);
+    CREATE INDEX IF NOT EXISTS idx_predictions_risk ON exam_predictions(risk_level);
+  `);
+
+  // Otomatik Uyarılar (Automated Alerts)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS exam_alerts (
+      id TEXT PRIMARY KEY,
+      student_id TEXT NOT NULL,
+      alert_type TEXT NOT NULL CHECK (alert_type IN ('performance_drop', 'goal_achieved', 'at_risk', 'improvement_needed', 'milestone')),
+      severity TEXT DEFAULT 'medium' CHECK (severity IN ('high', 'medium', 'low')),
+      title TEXT NOT NULL,
+      message TEXT NOT NULL,
+      data TEXT,
+      is_read BOOLEAN DEFAULT FALSE,
+      action_taken BOOLEAN DEFAULT FALSE,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
+    );
+    
+    CREATE INDEX IF NOT EXISTS idx_alerts_student ON exam_alerts(student_id);
+    CREATE INDEX IF NOT EXISTS idx_alerts_type ON exam_alerts(alert_type);
+    CREATE INDEX IF NOT EXISTS idx_alerts_read ON exam_alerts(is_read);
+  `);
+
+  // Gelişim Planları (Development Plans)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS student_development_plans (
+      id TEXT PRIMARY KEY,
+      student_id TEXT NOT NULL,
+      exam_type_id TEXT NOT NULL,
+      weak_subjects TEXT NOT NULL,
+      strong_subjects TEXT NOT NULL,
+      priority_topics TEXT,
+      recommended_study_hours INTEGER DEFAULT 0,
+      improvement_suggestions TEXT,
+      action_items TEXT,
+      status TEXT DEFAULT 'active' CHECK (status IN ('active', 'completed', 'archived')),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE,
+      FOREIGN KEY (exam_type_id) REFERENCES exam_types (id) ON DELETE CASCADE
+    );
+    
+    CREATE INDEX IF NOT EXISTS idx_dev_plans_student ON student_development_plans(student_id);
+    CREATE INDEX IF NOT EXISTS idx_dev_plans_status ON student_development_plans(status);
+  `);
+
+  console.log('✅ Advanced exam management tables created successfully');
+}

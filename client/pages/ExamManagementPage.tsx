@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ClipboardList, FileText, GraduationCap, BarChart3, LayoutDashboard, GitCompare, TrendingUp } from 'lucide-react';
+import { ClipboardList, FileText, GraduationCap, BarChart3, LayoutDashboard, GitCompare, TrendingUp, Brain, User } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -27,6 +27,8 @@ import { StatisticsTab } from '@/components/exam-management/StatisticsTab';
 import { DashboardOverviewTab } from '@/components/exam-management/DashboardOverviewTab';
 import { ComparisonAnalysisTab } from '@/components/exam-management/ComparisonAnalysisTab';
 import { TrendAnalysisTab } from '@/components/exam-management/TrendAnalysisTab';
+import { AdvancedAnalyticsTab } from '@/components/exam-management/AdvancedAnalyticsTab';
+import { StudentSelfServiceDashboard } from '@/components/exam-management/StudentSelfServiceDashboard';
 import type {
   ExamSession,
   SubjectResults,
@@ -55,6 +57,7 @@ export default function ExamManagementPage() {
   const [editingSession, setEditingSession] = useState<ExamSession | null>(null);
   const [statsSessionId, setStatsSessionId] = useState<string>('');
   const [resultEntrySessionId, setResultEntrySessionId] = useState<string>('');
+  const [selectedStudentForDashboard, setSelectedStudentForDashboard] = useState<string>('');
 
   const { data: examTypes, isLoading: typesLoading, error: typesError } = useExamTypes();
   const { data: allSessions = [], refetch: refetchSessions } = useExamSessions();
@@ -233,7 +236,7 @@ export default function ExamManagementPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-1">
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-1">
           <TabsTrigger value="overview" className="flex items-center gap-2 text-sm">
             <LayoutDashboard className="h-4 w-4" />
             Genel Bakış
@@ -257,6 +260,14 @@ export default function ExamManagementPage() {
           <TabsTrigger value="trend" className="flex items-center gap-2 text-sm">
             <TrendingUp className="h-4 w-4" />
             Trend Analizi
+          </TabsTrigger>
+          <TabsTrigger value="advanced" className="flex items-center gap-2 text-sm">
+            <Brain className="h-4 w-4" />
+            Gelişmiş Analitik
+          </TabsTrigger>
+          <TabsTrigger value="student-dashboard" className="flex items-center gap-2 text-sm">
+            <User className="h-4 w-4" />
+            Öğrenci Panosu
           </TabsTrigger>
         </TabsList>
 
@@ -318,6 +329,39 @@ export default function ExamManagementPage() {
           <TrendAnalysisTab
             examTypes={examTypes || []}
           />
+        </TabsContent>
+
+        <TabsContent value="advanced" className="mt-6">
+          <AdvancedAnalyticsTab examTypes={examTypes || []} />
+        </TabsContent>
+
+        <TabsContent value="student-dashboard" className="mt-6">
+          {selectedStudentForDashboard ? (
+            <StudentSelfServiceDashboard
+              studentId={selectedStudentForDashboard}
+              studentName={students.find((s) => s.id === selectedStudentForDashboard)?.name || ''}
+            />
+          ) : (
+            <div className="bg-card border rounded-lg p-12 text-center">
+              <User className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <h3 className="text-lg font-medium mb-2">Öğrenci Seçin</h3>
+              <p className="text-muted-foreground mb-6">
+                Öğrenci panosu görüntülemek için bir öğrenci seçin
+              </p>
+              <select
+                className="border rounded px-4 py-2 min-w-[300px]"
+                value={selectedStudentForDashboard}
+                onChange={(e) => setSelectedStudentForDashboard(e.target.value)}
+              >
+                <option value="">Öğrenci seçin...</option>
+                {students.map((student: any) => (
+                  <option key={student.id} value={student.id}>
+                    {student.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
 
