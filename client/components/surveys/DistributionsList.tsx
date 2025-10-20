@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,10 +18,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SurveyDistribution, DistributionStatus } from "@/lib/survey-types";
+import SurveyExcelUploadDialog from "./SurveyExcelUploadDialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface DistributionsListProps {
   distributions: SurveyDistribution[];
   onNewDistribution: () => void;
+  onRefresh?: () => void;
 }
 
 const getStatusBadge = (status: DistributionStatus) => {
@@ -45,8 +49,36 @@ const getStatusBadge = (status: DistributionStatus) => {
   );
 };
 
-export default function DistributionsList({ distributions, onNewDistribution }: DistributionsListProps) {
+export default function DistributionsList({ distributions, onNewDistribution, onRefresh }: DistributionsListProps) {
+  const { toast } = useToast();
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [selectedDistribution, setSelectedDistribution] = useState<SurveyDistribution | null>(null);
+
+  const handleExcelUpload = (distribution: SurveyDistribution) => {
+    setSelectedDistribution(distribution);
+    setUploadDialogOpen(true);
+  };
+
+  const handleUploadComplete = () => {
+    setUploadDialogOpen(false);
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
+
+  const handleCopyLink = (distribution: SurveyDistribution) => {
+    if (distribution.publicLink) {
+      const link = `${window.location.origin}/survey/${distribution.publicLink}`;
+      navigator.clipboard.writeText(link);
+      toast({
+        title: "Link kopyalandı",
+        description: "Anket linki panoya kopyalandı"
+      });
+    }
+  };
+
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -113,11 +145,11 @@ export default function DistributionsList({ distributions, onNewDistribution }: 
                           <Download className="mr-2 h-4 w-4" />
                           Excel İndir
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleCopyLink(distribution)}>
                           <Link2 className="mr-2 h-4 w-4" />
                           Link Kopyala
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleExcelUpload(distribution)}>
                           <Upload className="mr-2 h-4 w-4" />
                           Excel Yükle
                         </DropdownMenuItem>
@@ -135,5 +167,16 @@ export default function DistributionsList({ distributions, onNewDistribution }: 
         </Table>
       </CardContent>
     </Card>
+
+    {/* Excel Upload Dialog */}
+    {selectedDistribution && (
+      <SurveyExcelUploadDialog
+        open={uploadDialogOpen}
+        onOpenChange={setUploadDialogOpen}
+        distribution={selectedDistribution}
+        onUploadComplete={handleUploadComplete}
+      />
+    )}
+    </>
   );
 }

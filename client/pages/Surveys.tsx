@@ -233,6 +233,7 @@ export default function Surveys() {
           <DistributionsList 
             distributions={distributions}
             onNewDistribution={handleNewDistribution}
+            onRefresh={refreshAllData}
           />
         </TabsContent>
 
