@@ -48,17 +48,25 @@ export async function importSurveyResponsesFromExcel(
     const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '', raw: false });
 
     // Find header row (skip instructions if present)
-    let headerRowIndex = 0;
+    let headerRowIndex = -1;
     for (let i = 0; i < rawData.length; i++) {
       const row = rawData[i] as any[];
-      if (row && row[0] && typeof row[0] === 'string' && row[0].includes('Öğrenci No')) {
-        headerRowIndex = i;
-        break;
+      if (row && row.length > 0) {
+        // Check if this row contains the student info header
+        const firstCell = String(row[0] || '').trim();
+        if (firstCell === 'Öğrenci No' || firstCell.includes('Öğrenci No')) {
+          headerRowIndex = i;
+          break;
+        }
       }
     }
 
-    if (headerRowIndex === -1 || headerRowIndex >= rawData.length - 1) {
-      throw new Error('Excel dosyasında başlık satırı bulunamadı');
+    if (headerRowIndex === -1) {
+      throw new Error('Excel dosyasında başlık satırı bulunamadı. "Öğrenci No" içeren bir satır olmalıdır.');
+    }
+
+    if (headerRowIndex >= rawData.length - 1) {
+      throw new Error('Excel dosyasında veri satırı bulunamadı');
     }
 
     const headers = rawData[headerRowIndex] as string[];
