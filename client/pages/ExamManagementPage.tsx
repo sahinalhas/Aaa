@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ClipboardList, FileText, GraduationCap, BarChart3, LayoutDashboard, GitCompare, TrendingUp, Brain, User } from 'lucide-react';
+import { ClipboardList, FileText, GraduationCap, BarChart3, LayoutDashboard, Brain, User } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -23,10 +23,8 @@ import {
 import { ExamSessionDialog } from '@/components/exam-management/ExamSessionDialog';
 import { PracticeExamsTab } from '@/components/exam-management/PracticeExamsTab';
 import { SchoolExamsTab } from '@/components/exam-management/SchoolExamsTab';
-import { StatisticsTab } from '@/components/exam-management/StatisticsTab';
 import { DashboardOverviewTab } from '@/components/exam-management/DashboardOverviewTab';
-import { ComparisonAnalysisTab } from '@/components/exam-management/ComparisonAnalysisTab';
-import { TrendAnalysisTab } from '@/components/exam-management/TrendAnalysisTab';
+import { UnifiedAnalysisTab } from '@/components/exam-management/UnifiedAnalysisTab';
 import { AdvancedAnalyticsTab } from '@/components/exam-management/AdvancedAnalyticsTab';
 import { StudentSelfServiceDashboard } from '@/components/exam-management/StudentSelfServiceDashboard';
 import type {
@@ -137,7 +135,7 @@ export default function ExamManagementPage() {
 
   const handleViewStatistics = (session: ExamSession) => {
     setStatsSessionId(session.id);
-    setActiveTab('statistics');
+    setActiveTab('analysis');
   };
 
   const handleSaveResults = async (
@@ -236,7 +234,7 @@ export default function ExamManagementPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-1">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-1">
           <TabsTrigger value="overview" className="flex items-center gap-2 text-sm">
             <LayoutDashboard className="h-4 w-4" />
             Genel Bakış
@@ -249,17 +247,9 @@ export default function ExamManagementPage() {
             <GraduationCap className="h-4 w-4" />
             Okul Sınavları
           </TabsTrigger>
-          <TabsTrigger value="statistics" className="flex items-center gap-2 text-sm">
+          <TabsTrigger value="analysis" className="flex items-center gap-2 text-sm">
             <BarChart3 className="h-4 w-4" />
-            İstatistikler
-          </TabsTrigger>
-          <TabsTrigger value="comparison" className="flex items-center gap-2 text-sm">
-            <GitCompare className="h-4 w-4" />
-            Karşılaştırma
-          </TabsTrigger>
-          <TabsTrigger value="trend" className="flex items-center gap-2 text-sm">
-            <TrendingUp className="h-4 w-4" />
-            Trend Analizi
+            Analizler
           </TabsTrigger>
           <TabsTrigger value="advanced" className="flex items-center gap-2 text-sm">
             <Brain className="h-4 w-4" />
@@ -273,6 +263,7 @@ export default function ExamManagementPage() {
 
         <TabsContent value="overview" className="mt-6">
           <DashboardOverviewTab
+            examTypes={examTypes || []}
             onNavigateToTab={setActiveTab}
             onCreateSession={() => {
               setActiveTab('practice-exams');
@@ -307,27 +298,14 @@ export default function ExamManagementPage() {
           />
         </TabsContent>
 
-        <TabsContent value="statistics" className="mt-6">
-          <StatisticsTab
+        <TabsContent value="analysis" className="mt-6">
+          <UnifiedAnalysisTab
             examTypes={examTypes || []}
             sessions={allSessions}
             statistics={statistics || null}
             isLoading={statsLoading}
             onSessionChange={setStatsSessionId}
             selectedSessionId={statsSessionId}
-          />
-        </TabsContent>
-
-        <TabsContent value="comparison" className="mt-6">
-          <ComparisonAnalysisTab
-            examTypes={examTypes || []}
-            sessions={allSessions}
-          />
-        </TabsContent>
-
-        <TabsContent value="trend" className="mt-6">
-          <TrendAnalysisTab
-            examTypes={examTypes || []}
           />
         </TabsContent>
 

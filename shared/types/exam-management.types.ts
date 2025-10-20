@@ -897,14 +897,6 @@ export interface TimeAnalysisData {
 }
 
 export interface PredictionSummary {
-  total_exams: number;
-  avg_interval_days: number;
-  study_frequency: 'high' | 'medium' | 'low';
-  consistency_score: number;
-  recommended_pattern: string;
-}
-
-export interface PredictionSummary {
   predicted_performance: number;
   confidence: number;
   risk_level: 'high' | 'medium' | 'low';

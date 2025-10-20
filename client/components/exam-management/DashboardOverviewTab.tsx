@@ -20,10 +20,7 @@ import {
   Award,
   Target,
   ArrowRight,
-  BarChart3,
-  Edit,
   Activity,
-  Zap,
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -40,14 +37,16 @@ import {
   Cell,
 } from 'recharts';
 import { useDashboardOverview } from '@/hooks/useExamManagement';
+import { QuickActionsPanel } from './QuickActionsPanel';
 import type { DashboardOverview } from '../../../shared/types/exam-management.types';
 
 interface DashboardOverviewTabProps {
+  examTypes: any[];
   onNavigateToTab?: (tab: string) => void;
   onCreateSession?: () => void;
 }
 
-export function DashboardOverviewTab({ onNavigateToTab, onCreateSession }: DashboardOverviewTabProps) {
+export function DashboardOverviewTab({ examTypes, onNavigateToTab, onCreateSession }: DashboardOverviewTabProps) {
   const { data: overview, isLoading, error } = useDashboardOverview();
 
   const performanceChartData = useMemo(() => {
@@ -352,37 +351,11 @@ export function DashboardOverviewTab({ onNavigateToTab, onCreateSession }: Dashb
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Zap className="h-5 w-5 text-primary" />
-            Hızlı İşlemler
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {quick_actions.map(action => (
-              <Button
-                key={action.id}
-                variant="outline"
-                className="h-auto flex-col items-start p-4 hover:bg-primary/5 hover:border-primary"
-                onClick={() => {
-                  if (action.type === 'create_session' && onCreateSession) {
-                    onCreateSession();
-                  } else if (action.type === 'enter_results') {
-                    onNavigateToTab?.('practice-exams');
-                  } else if (action.type === 'view_statistics') {
-                    onNavigateToTab?.('statistics');
-                  }
-                }}
-              >
-                <div className="text-sm font-semibold">{action.title}</div>
-                <div className="text-xs text-muted-foreground mt-1">{action.description}</div>
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <QuickActionsPanel 
+        examTypes={examTypes}
+        onNavigateToTab={onNavigateToTab}
+        onCreateSession={onCreateSession}
+      />
     </div>
   );
 }

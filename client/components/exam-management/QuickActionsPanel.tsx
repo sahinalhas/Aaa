@@ -1,124 +1,233 @@
+import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  Plus, 
-  Upload, 
-  Download, 
-  BarChart3, 
-  Users, 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import {
+  Zap,
+  FileDown,
+  FilePlus,
   FileSpreadsheet,
   TrendingUp,
+  Download,
+  Loader2,
+  FileText,
+  BarChart3,
   GitCompare,
-  Zap
+  Upload,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
-interface QuickActionsPanelProps {
-  onCreateSession?: () => void;
-  onBulkImport?: () => void;
-  onViewStatistics?: () => void;
-  onViewTrends?: () => void;
-  onCompare?: () => void;
-  onExportReport?: () => void;
+async function fetchStudents() {
+  const response = await fetch('/api/students');
+  if (!response.ok) throw new Error('Öğrenciler yüklenemedi');
+  const data = await response.json();
+  return data.data || [];
 }
 
-export function QuickActionsPanel({
-  onCreateSession,
-  onBulkImport,
-  onViewStatistics,
-  onViewTrends,
-  onCompare,
-  onExportReport
-}: QuickActionsPanelProps) {
-  const actions = [
-    {
-      icon: Plus,
-      label: 'Yeni Deneme',
-      description: 'Deneme sınavı oluştur',
-      onClick: onCreateSession,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50 hover:bg-blue-100',
-      borderColor: 'border-blue-200'
+async function downloadPDFReport(studentId: string, examTypeId: string) {
+  const response = await fetch(`/api/exam-management/reports/detailed/${studentId}/${examTypeId}/pdf`);
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Rapor indirilemedi');
+  }
+  
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `rapor-${studentId}-${new Date().toISOString().split('T')[0]}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+  
+  return true;
+}
+
+interface QuickActionsPanelProps {
+  examTypes: any[];
+  onNavigateToTab?: (tab: string) => void;
+  onCreateSession?: () => void;
+}
+
+export function QuickActionsPanel({ examTypes, onNavigateToTab, onCreateSession }: QuickActionsPanelProps) {
+  const [selectedStudent, setSelectedStudent] = useState('');
+  const [selectedExamType, setSelectedExamType] = useState('');
+
+  const { data: students = [] } = useQuery({
+    queryKey: ['students'],
+    queryFn: fetchStudents,
+  });
+
+  const downloadMutation = useMutation({
+    mutationFn: ({ studentId, examTypeId }: { studentId: string; examTypeId: string }) =>
+      downloadPDFReport(studentId, examTypeId),
+    onSuccess: () => {
+      toast.success('PDF rapor başarıyla indirildi');
     },
-    {
-      icon: Upload,
-      label: 'Toplu Aktar',
-      description: 'Excel ile sonuç yükle',
-      onClick: onBulkImport,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50 hover:bg-green-100',
-      borderColor: 'border-green-200'
+    onError: (error: any) => {
+      toast.error(error.message || 'Rapor indirilemedi');
     },
-    {
-      icon: BarChart3,
-      label: 'İstatistikler',
-      description: 'Performans analizi',
-      onClick: onViewStatistics,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50 hover:bg-purple-100',
-      borderColor: 'border-purple-200'
-    },
-    {
-      icon: TrendingUp,
-      label: 'Trendler',
-      description: 'Gelişim grafikleri',
-      onClick: onViewTrends,
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-50 hover:bg-amber-100',
-      borderColor: 'border-amber-200'
-    },
-    {
-      icon: GitCompare,
-      label: 'Karşılaştır',
-      description: 'Deneme analizi',
-      onClick: onCompare,
-      color: 'text-cyan-600',
-      bgColor: 'bg-cyan-50 hover:bg-cyan-100',
-      borderColor: 'border-cyan-200'
-    },
-    {
-      icon: Download,
-      label: 'Rapor Al',
-      description: 'PDF/Excel indir',
-      onClick: onExportReport,
-      color: 'text-rose-600',
-      bgColor: 'bg-rose-50 hover:bg-rose-100',
-      borderColor: 'border-rose-200'
+  });
+
+  const handleDownloadPDF = () => {
+    if (!selectedStudent || !selectedExamType) {
+      toast.error('Lütfen öğrenci ve sınav türü seçin');
+      return;
     }
-  ];
+    downloadMutation.mutate({ studentId: selectedStudent, examTypeId: selectedExamType });
+  };
 
   return (
-    <Card className="overflow-hidden border-2">
-      <CardHeader className="bg-gradient-to-br from-primary/5 via-background to-accent/5 border-b">
-        <div className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-primary" />
-          <div>
-            <CardTitle className="text-lg">Hızlı İşlemler</CardTitle>
-            <CardDescription className="mt-0.5">
-              Sık kullanılan işlemlere hızlı erişim
-            </CardDescription>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Card className="border-2 border-primary/20 shadow-md hover:shadow-lg transition-shadow">
+        <CardHeader className="bg-gradient-to-br from-primary/10 to-primary/5 border-b">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <FileDown className="h-5 w-5 text-primary" />
+            PDF Rapor İndirme
+          </CardTitle>
+          <CardDescription>
+            Öğrenci performans raporu oluşturun ve indirin
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="quick-student">Öğrenci</Label>
+              <Select value={selectedStudent} onValueChange={setSelectedStudent}>
+                <SelectTrigger id="quick-student">
+                  <SelectValue placeholder="Öğrenci seçin" />
+                </SelectTrigger>
+                <SelectContent>
+                  {students.map((student: any) => (
+                    <SelectItem key={student.id} value={student.id}>
+                      {student.fullName || student.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="quick-exam-type">Sınav Türü</Label>
+              <Select value={selectedExamType} onValueChange={setSelectedExamType}>
+                <SelectTrigger id="quick-exam-type">
+                  <SelectValue placeholder="Sınav türü seçin" />
+                </SelectTrigger>
+                <SelectContent>
+                  {examTypes.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent className="p-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {actions.map((action) => (
+
+          {selectedStudent && selectedExamType && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <FileText className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-blue-800 space-y-1">
+                  <p className="font-medium">Rapor İçeriği:</p>
+                  <ul className="list-disc list-inside space-y-0.5 ml-2">
+                    <li>Detaylı performans analizi</li>
+                    <li>Ders bazında değerlendirme</li>
+                    <li>Hedef ilerleme durumu</li>
+                    <li>Tahminsel analiz ve öneriler</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <Button
+            onClick={handleDownloadPDF}
+            disabled={downloadMutation.isPending || !selectedStudent || !selectedExamType}
+            className="w-full"
+            size="lg"
+          >
+            {downloadMutation.isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                İndiriliyor...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4 mr-2" />
+                PDF Rapor İndir
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="border-2 border-accent/20 shadow-md">
+        <CardHeader className="bg-gradient-to-br from-accent/10 to-accent/5 border-b">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Zap className="h-5 w-5 text-accent-foreground" />
+            Hızlı Aksiyonlar
+          </CardTitle>
+          <CardDescription>
+            Sık kullanılan işlemlere hızlı erişim
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 gap-3">
             <Button
-              key={action.label}
               variant="outline"
-              className={`h-auto flex-col gap-2 p-4 ${action.bgColor} ${action.borderColor} border-2 transition-all hover:scale-105 hover:shadow-md`}
-              onClick={action.onClick}
+              className="h-auto flex items-start gap-3 p-4 hover:bg-primary/5 hover:border-primary justify-start border-2"
+              onClick={onCreateSession}
             >
-              <action.icon className={`h-6 w-6 ${action.color}`} />
-              <div className="text-center">
-                <div className="font-semibold text-sm">{action.label}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">
-                  {action.description}
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <FilePlus className="h-5 w-5 text-primary" />
+              </div>
+              <div className="text-left flex-1">
+                <div className="font-semibold text-sm">Yeni Deneme Oluştur</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Hızlıca yeni bir deneme sınavı ekleyin
                 </div>
               </div>
             </Button>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+
+            <Button
+              variant="outline"
+              className="h-auto flex items-start gap-3 p-4 hover:bg-green-500/5 hover:border-green-500 justify-start border-2"
+              onClick={() => onNavigateToTab?.('practice-exams')}
+            >
+              <div className="p-2 bg-green-500/10 rounded-lg">
+                <FileSpreadsheet className="h-5 w-5 text-green-600" />
+              </div>
+              <div className="text-left flex-1">
+                <div className="font-semibold text-sm">Sonuç Girişi</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Deneme sonuçlarını girin veya Excel ile yükleyin
+                </div>
+              </div>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="h-auto flex items-start gap-3 p-4 hover:bg-blue-500/5 hover:border-blue-500 justify-start border-2"
+              onClick={() => onNavigateToTab?.('analysis')}
+            >
+              <div className="p-2 bg-blue-500/10 rounded-lg">
+                <BarChart3 className="h-5 w-5 text-blue-600" />
+              </div>
+              <div className="text-left flex-1">
+                <div className="font-semibold text-sm">Analiz Merkezi</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  İstatistikler ve performans trendleri
+                </div>
+              </div>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
