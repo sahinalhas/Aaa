@@ -80,7 +80,11 @@ export function ExamResultDialog({
   }, [open]);
 
   useEffect(() => {
-    if (selectedStudent && existingResults.length > 0) {
+    if (!selectedStudent) {
+      return;
+    }
+
+    if (existingResults.length > 0) {
       const resultsMap = new Map<string, SubjectResults>();
       existingResults.forEach((result) => {
         resultsMap.set(result.subject_id, {
@@ -91,11 +95,10 @@ export function ExamResultDialog({
         });
       });
       setSubjectResults(resultsMap);
-      setSaveSuccess(false);
-    } else if (selectedStudent && existingResults.length === 0) {
+    } else {
       setSubjectResults(new Map());
-      setSaveSuccess(false);
     }
+    setSaveSuccess(false);
   }, [selectedStudent, existingResults]);
 
   const handleSubjectChange = (
