@@ -98,3 +98,36 @@ export function deleteSurveyResponse(id: string): void {
     throw error;
   }
 }
+
+export function bulkSaveSurveyResponses(responses: any[]): void {
+  if (!responses || responses.length === 0) {
+    return;
+  }
+
+  try {
+    ensureInitialized();
+    const db = getDatabase();
+    
+    const transaction = db.transaction(() => {
+      for (const response of responses) {
+        statements.insertSurveyResponse.run(
+          response.id,
+          response.distributionId,
+          response.studentId || null,
+          response.studentInfo ? JSON.stringify(response.studentInfo) : null,
+          response.responseData ? JSON.stringify(response.responseData) : '{}',
+          response.submissionType || 'ONLINE',
+          (response.isComplete || false) ? 1 : 0,
+          response.submittedAt || null,
+          response.ipAddress || null,
+          response.userAgent || null
+        );
+      }
+    });
+    
+    transaction();
+  } catch (error) {
+    console.error('Error bulk saving survey responses:', error);
+    throw error;
+  }
+}

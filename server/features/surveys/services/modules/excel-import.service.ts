@@ -25,7 +25,7 @@ export async function importSurveyResponsesFromExcel(
   fileBuffer: Buffer
 ): Promise<ExcelImportResult> {
   const errors: ExcelImportError[] = [];
-  const importedResponses: any[] = [];
+  const validResponses: any[] = [];
   let data: any[] = [];
 
   try {
@@ -75,7 +75,7 @@ export async function importSurveyResponsesFromExcel(
     // Build question map from headers
     const questionMap = buildQuestionMap(headers, questions);
 
-    // Process each student row
+    // First pass: validate all rows and collect valid responses
     for (let rowIndex = 0; rowIndex < dataRows.length; rowIndex++) {
       const row = dataRows[rowIndex] as any[];
       const excelRow = headerRowIndex + rowIndex + 2;
@@ -107,9 +107,9 @@ export async function importSurveyResponsesFromExcel(
           continue;
         }
 
-        // Save response
+        // Prepare response for bulk save
         const response: any = {
-          id: `response_${distributionId}_${responseData.studentInfo.number}_${Date.now()}`,
+          id: `response_${distributionId}_${responseData.studentInfo.number}_${Date.now()}_${rowIndex}`,
           distributionId,
           studentId: responseData.studentInfo.number,
           studentInfo: responseData.studentInfo,
@@ -119,8 +119,7 @@ export async function importSurveyResponsesFromExcel(
           isComplete: true,
         };
 
-        responsesRepo.saveSurveyResponse(response);
-        importedResponses.push(response);
+        validResponses.push(response);
 
       } catch (rowError: any) {
         errors.push({
@@ -130,13 +129,22 @@ export async function importSurveyResponsesFromExcel(
       }
     }
 
+    // Second pass: save all valid responses in a single transaction
+    if (validResponses.length > 0) {
+      try {
+        responsesRepo.bulkSaveSurveyResponses(validResponses);
+      } catch (saveError: any) {
+        throw new Error(`Yanıtlar kaydedilirken hata oluştu: ${saveError.message}`);
+      }
+    }
+
     return {
       success: errors.length === 0,
       totalRows: dataRows.length,
-      successCount: importedResponses.length,
+      successCount: validResponses.length,
       errorCount: errors.length,
       errors,
-      importedResponses
+      importedResponses: validResponses
     };
 
   } catch (error: any) {
