@@ -20,6 +20,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, Save, ArrowRight, Copy, Info, AlertCircle } from 'lucide-react';
 import { useExamSubjects, useExamResultsBySessionAndStudent } from '@/hooks/useExamManagement';
+import { calculateNetScore } from '@/lib/utils/exam-utils';
 import type {
   ExamSession,
   ExamSubject,
@@ -129,7 +130,7 @@ export function ExamResultDialog({
   const calculateNet = (subjectId: string): number => {
     const result = subjectResults.get(subjectId);
     if (!result) return 0;
-    return Math.max(0, result.correct_count - result.wrong_count / 4);
+    return calculateNetScore(result.correct_count, result.wrong_count);
   };
 
   const getTotalNet = (): number => {

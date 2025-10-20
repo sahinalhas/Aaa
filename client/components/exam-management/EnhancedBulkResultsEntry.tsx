@@ -25,6 +25,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { useExamSubjects, useExamResultsBySession } from '@/hooks/useExamManagement';
+import { calculateNetScore } from '@/lib/utils/exam-utils';
 import type {
   ExamSession,
   ExamSubject,
@@ -105,8 +106,7 @@ export function EnhancedBulkResultsEntry({
   const calculateTotalNet = useCallback((subjectMap: Map<string, SubjectResults>): number => {
     let total = 0;
     subjectMap.forEach((result) => {
-      const net = Math.max(0, result.correct_count - result.wrong_count / 4);
-      total += net;
+      total += calculateNetScore(result.correct_count, result.wrong_count);
     });
     return total;
   }, []);
@@ -232,7 +232,7 @@ export function EnhancedBulkResultsEntry({
   const calculateNet = (studentId: string, subjectId: string): number => {
     const result = results.get(studentId)?.subjects.get(subjectId);
     if (!result) return 0;
-    return Math.max(0, result.correct_count - result.wrong_count / 4);
+    return calculateNetScore(result.correct_count, result.wrong_count);
   };
 
   const handleKeyDown = (
