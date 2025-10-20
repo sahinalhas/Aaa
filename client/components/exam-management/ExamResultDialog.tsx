@@ -81,6 +81,8 @@ export function ExamResultDialog({
 
   useEffect(() => {
     if (!selectedStudent) {
+      setSubjectResults(new Map());
+      setSaveSuccess(false);
       return;
     }
 
