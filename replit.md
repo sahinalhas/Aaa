@@ -4,6 +4,19 @@
 Rehber360 is a comprehensive Turkish-language student guidance and management system for educational institutions. It provides tools for student tracking, counseling, risk assessment, behavioral monitoring, and academic performance analysis. A key feature is its AI-powered profile analysis, which generates standardized student profiles from diverse data sources. The system also includes an AI Assistant for local, AI-powered student counseling, supporting both OpenAI and Ollama (Llama 3.1) models. Built as a full-stack TypeScript application with React, Express.js, and SQLite, Rehber360 aims to drive data standardization and evidence-based interventions for student success.
 
 ## Recent Changes
+**October 20, 2025 - Excel Bulk Upload for Survey Responses:**
+- Implemented comprehensive Excel bulk upload feature for survey responses
+- Created `SurveyExcelUploadDialog` component with drag-and-drop file upload, validation preview, and detailed result display
+- Built server-side import service with robust Excel parsing, header detection, and row-by-row validation
+- Added `bulkSaveSurveyResponses` repository function with transaction support for atomic batch inserts
+- Implemented file validation: MIME type checking, file extension validation, and 10MB size limit
+- Enhanced error handling with detailed row-level error reporting for teachers
+- Integrated upload dialog into DistributionsList with "Excel Yükle" action button
+- Security improvements: fileFilter in multer config blocks non-Excel files and prevents DoS attacks
+- Data integrity: Two-pass import (validate all → save valid in transaction) ensures consistency
+- Fixed critical header detection bug: changed initialization from 0 to -1 to properly skip instruction rows
+- Teachers can now bulk import completed survey responses for entire classes via Excel
+
 **October 20, 2025 - Student Management System Modernization (2025 Standards):**
 - Completely rebuilt Students.tsx page with modern component architecture
 - Created 9 new specialized components: StatsCards, AdvancedFilters, BulkActions, EnhancedStudentTable, TableControls, StudentDrawer, StudentCard, EmptyState, TableSkeleton
@@ -50,9 +63,9 @@ Preferred communication style: Simple, everyday language.
 - **Error Handling:** Standardized system using `client/lib/utils/error-utils.ts` and `client/lib/constants/messages.constants.ts` for consistent error messages and handling. Defensive programming with optional chaining and null/undefined checks.
 
 ### Backend
-- **Technology Stack:** Express.js v5, SQLite with `better-sqlite3`, TypeScript, Zod.
-- **Key Decisions:** Modular architecture, Repository Pattern for data access, Service Layer for business logic, shared type safety, robust security measures (input sanitization, prepared statements, CORS, rate limiting), and centralized error handling.
-- **Core Features:** Students, Surveys, Academic Data, Student Support, Administrative Functions, and AI features (holistic-profile, standardized-profile, student-profile-ai, ai-assistant, profile-sync).
+- **Technology Stack:** Express.js v5, SQLite with `better-sqlite3`, TypeScript, Zod, Multer.
+- **Key Decisions:** Modular architecture, Repository Pattern for data access, Service Layer for business logic, shared type safety, robust security measures (input sanitization, prepared statements, CORS, rate limiting), file upload validation (MIME type, size limits), and centralized error handling with transaction support for bulk operations.
+- **Core Features:** Students, Surveys (with Excel bulk upload), Academic Data, Student Support, Administrative Functions, and AI features (holistic-profile, standardized-profile, student-profile-ai, ai-assistant, profile-sync).
 
 ### Data Architecture
 - **Database:** Normalized relational schema in `database.db` for student profiles, behavior, attendance, surveys, counseling, and interventions.
