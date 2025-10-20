@@ -36,6 +36,7 @@ router.get("/survey-responses", simpleRateLimit(200, 15 * 60 * 1000), responsesR
 router.post("/survey-responses", simpleRateLimit(100, 15 * 60 * 1000), responsesRoutes.createSurveyResponse);
 router.put("/survey-responses/:id", simpleRateLimit(50, 15 * 60 * 1000), responsesRoutes.updateSurveyResponseHandler);
 router.delete("/survey-responses/:id", simpleRateLimit(30, 15 * 60 * 1000), responsesRoutes.deleteSurveyResponseHandler);
+router.post("/survey-responses/import/:distributionId", simpleRateLimit(20, 15 * 60 * 1000), responsesRoutes.uploadMiddleware, responsesRoutes.importExcelResponsesHandler);
 
 // ============= ANALYTICS ROUTES =============
 router.get("/survey-analytics/:distributionId", simpleRateLimit(150, 15 * 60 * 1000), analyticsRoutes.getSurveyAnalytics);

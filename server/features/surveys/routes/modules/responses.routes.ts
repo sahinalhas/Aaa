@@ -1,6 +1,9 @@
 import { RequestHandler } from "express";
+import multer from 'multer';
 import * as surveyService from '../../services/surveys.service.js';
 import { autoSyncHooks } from '../../../profile-sync/index.js';
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 export const getSurveyResponses: RequestHandler = (req, res) => {
   try {
@@ -100,3 +103,48 @@ export const deleteSurveyResponseHandler: RequestHandler = (req, res) => {
     res.status(500).json({ success: false, error: 'Anket yanıtı silinemedi' });
   }
 };
+
+export const importExcelResponsesHandler: RequestHandler = async (req, res) => {
+  try {
+    const { distributionId } = req.params;
+    
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'Excel dosyası yüklenmedi'
+      });
+    }
+
+    if (!distributionId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Dağıtım ID gereklidir'
+      });
+    }
+
+    const fileBuffer = req.file.buffer;
+    const result = await surveyService.importSurveyResponsesFromExcel(distributionId, fileBuffer);
+
+    if (result.success) {
+      res.json({
+        success: true,
+        message: `${result.successCount} yanıt başarıyla yüklendi`,
+        ...result
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: `${result.successCount} yanıt yüklendi, ${result.errorCount} hata oluştu`,
+        ...result
+      });
+    }
+  } catch (error: any) {
+    console.error('Error importing Excel responses:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Excel yükleme işlemi başarısız oldu'
+    });
+  }
+};
+
+export const uploadMiddleware = upload.single('file');
