@@ -132,6 +132,17 @@ export const getResultsByStudent: RequestHandler = (req, res) => {
   }
 };
 
+export const getResultsBySessionAndStudent: RequestHandler = (req, res) => {
+  try {
+    const { sessionId, studentId } = req.params;
+    const results = examResultsRepo.getExamResultsBySessionAndStudent(sessionId, studentId);
+    res.json({ success: true, data: results });
+  } catch (error) {
+    console.error('Error fetching results by session and student:', error);
+    res.status(500).json({ success: false, error: 'Öğrenci sınav sonuçları yüklenemedi' });
+  }
+};
+
 export const createExamResult: RequestHandler = (req, res) => {
   try {
     const input = req.body;

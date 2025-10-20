@@ -15,6 +15,7 @@ router.delete('/sessions/:id', simpleRateLimit(20, 60 * 60 * 1000), routes.delet
 
 router.get('/results/session/:sessionId', routes.getResultsBySession);
 router.get('/results/student/:studentId', routes.getResultsByStudent);
+router.get('/results/session/:sessionId/student/:studentId', routes.getResultsBySessionAndStudent);
 router.post('/results', simpleRateLimit(100, 60 * 60 * 1000), routes.createExamResult);
 router.post('/results/upsert', simpleRateLimit(100, 60 * 60 * 1000), routes.upsertExamResult);
 router.post('/results/batch', simpleRateLimit(20, 60 * 60 * 1000), routes.batchUpsertResults);
