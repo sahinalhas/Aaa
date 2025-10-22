@@ -76,10 +76,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth-context";
 import AIStatusIndicator from "@/components/AIStatusIndicator";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 function Brand() {
   const { state } = useSidebar();
-  
+
   return (
     <Link
       to="/"
@@ -134,7 +135,7 @@ function useMediaQuery(query: string) {
   useEffect(() => {
     const media = window.matchMedia(query);
     setMatches(media.matches);
-    
+
     const listener = () => setMatches(media.matches);
     media.addEventListener("change", listener);
     return () => media.removeEventListener("change", listener);
@@ -149,13 +150,14 @@ export default function Rehber360Layout() {
   const [dark, setDark] = useState(false);
   const [account, setAccount] = useState<AppSettings["account"] | undefined>(undefined);
   const [open, setOpen] = useState<boolean | undefined>(undefined);
-  
+
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isMobile = useIsMobile();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  
+
   const initials = useMemo(() => {
     const n = account?.displayName || "";
     const parts = n.trim().split(/\s+/).filter(Boolean);
@@ -163,20 +165,20 @@ export default function Rehber360Layout() {
     const second = parts[1]?.[0] || "";
     return (first + second).toUpperCase();
   }, [account]);
-  
+
   useEffect(() => {
     loadSettings().then(settings => {
       setDark(settings.theme === "dark");
       setAccount(settings.account);
     });
   }, []);
-  
+
   useEffect(() => {
     const root = document.documentElement;
     if (dark) root.classList.add("dark");
     else root.classList.remove("dark");
   }, [dark]);
-  
+
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (e.key === SETTINGS_KEY) {
@@ -202,7 +204,7 @@ export default function Rehber360Layout() {
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // Evrensel arama için API çağrısı
   const { data: searchResults, refetch: refetchSearch } = useQuery<{
     students: any[];
@@ -290,7 +292,7 @@ export default function Rehber360Layout() {
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                
+
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Ölçme Değerlendirme">
                     <NavLink to="/olcme-degerlendirme">
@@ -298,7 +300,7 @@ export default function Rehber360Layout() {
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                
+
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="AI Araçları">
                     <NavLink to="/ai-araclari">
@@ -398,9 +400,9 @@ export default function Rehber360Layout() {
                     </Button>
                   </div>
                   {searchQuery && searchQuery.length >= 2 && searchResults && (
-                    searchResults.students.length > 0 || 
-                    searchResults.counselingSessions.length > 0 || 
-                    searchResults.surveys.length > 0 || 
+                    searchResults.students.length > 0 ||
+                    searchResults.counselingSessions.length > 0 ||
+                    searchResults.surveys.length > 0 ||
                     searchResults.pages.length > 0
                   ) && (
                     <Card className="search-results absolute top-12 w-full max-h-[60vh] sm:max-h-[400px] overflow-hidden shadow-lg border-primary/20">
@@ -507,9 +509,9 @@ export default function Rehber360Layout() {
                     </Card>
                   )}
                   {searchQuery && searchQuery.length >= 2 && searchResults && (
-                    searchResults.students.length === 0 && 
-                    searchResults.counselingSessions.length === 0 && 
-                    searchResults.surveys.length === 0 && 
+                    searchResults.students.length === 0 &&
+                    searchResults.counselingSessions.length === 0 &&
+                    searchResults.surveys.length === 0 &&
                     searchResults.pages.length === 0
                   ) && (
                     <Card className="search-results absolute top-12 w-full p-4 text-sm text-muted-foreground text-center">
@@ -565,8 +567,10 @@ export default function Rehber360Layout() {
             </div>
           </div>
         </header>
-        <div className="p-3 sm:p-4 md:p-6 lg:p-8">
-          <Outlet />
+        <div className={`p-3 sm:p-4 md:p-6 lg:p-8 ${isMobile ? 'pb-20' : ''}`}>
+          <div className="max-w-full overflow-x-hidden">
+            <Outlet />
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

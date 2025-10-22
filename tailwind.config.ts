@@ -195,6 +195,25 @@ export default {
         '.touch-manipulation': {
           'touch-action': 'manipulation',
         },
+        '.scrollbar-hide': {
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+        },
+        '.safe-area-inset-top': {
+          'padding-top': 'env(safe-area-inset-top)',
+        },
+        '.safe-area-inset-bottom': {
+          'padding-bottom': 'env(safe-area-inset-bottom)',
+        },
+        '.safe-area-inset-left': {
+          'padding-left': 'env(safe-area-inset-left)',
+        },
+        '.safe-area-inset-right': {
+          'padding-right': 'env(safe-area-inset-right)',
+        },
       });
     }
   ],
