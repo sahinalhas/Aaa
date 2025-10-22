@@ -176,6 +176,20 @@
     animation: gradient-shift 25s ease-in-out infinite;
   }
 
+  /* Sidebar için gradient efektini kaldır */
+  [data-sidebar="sidebar"] {
+    position: relative;
+    z-index: 1;
+  }
+
+  [data-sidebar="sidebar"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: hsl(var(--sidebar-background));
+    z-index: -1;
+  }
+
   @keyframes gradient-shift {
     0%, 100% {
       opacity: 1;
