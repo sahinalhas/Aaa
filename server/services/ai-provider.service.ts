@@ -262,6 +262,10 @@ export class AIProviderService {
         },
         false
       );
+      // AI servisi kullanılamadığında daha kullanıcı dostu bir hata mesajı göster
+      if (error instanceof Error && error.message.includes('is not available')) {
+        throw new Error(`AI servisi şu an kullanılamıyor. Lütfen internet bağlantınızı kontrol edin veya ayarlardan farklı bir AI sağlayıcı seçin.`);
+      }
       throw error;
     }
   }
@@ -287,6 +291,10 @@ export class AIProviderService {
         },
         false
       );
+      // AI servisi kullanılamadığında daha kullanıcı dostu bir hata mesajı göster
+      if (error instanceof Error && error.message.includes('is not available')) {
+        throw new Error(`AI servisi şu an kullanılamıyor. Lütfen internet bağlantınızı kontrol edin veya ayarlardan farklı bir AI sağlayıcı seçin.`);
+      }
       throw error;
     }
   }

@@ -130,6 +130,7 @@ export default function AIAssistant() {
   const [input, setInput] = useState('');
   const [selectedStudent, setSelectedStudent] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
