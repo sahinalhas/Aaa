@@ -385,6 +385,16 @@
     .peer.hidden.md\\:block {
       display: none !important;
     }
+    
+    /* Completely hide sidebar peer spacer on mobile */
+    .group.peer[data-state] {
+      display: none !important;
+    }
+    
+    /* Ensure no sidebar gap on mobile */
+    .peer ~ main {
+      margin-left: 0 !important;
+    }
 
     /* Larger touch targets for mobile */
     button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
