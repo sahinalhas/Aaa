@@ -150,7 +150,6 @@ export default function Rehber360Layout() {
   const { isAuthenticated } = useAuth();
   const [dark, setDark] = useState(false);
   const [account, setAccount] = useState<AppSettings["account"] | undefined>(undefined);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const isMobile = useIsMobile();
@@ -242,7 +241,7 @@ export default function Rehber360Layout() {
   }, [searchOpen]);
 
   return (
-    <SidebarProvider defaultOpen={isDesktop} open={sidebarOpen} onOpenChange={setSidebarOpen}>
+    <SidebarProvider defaultOpen={isDesktop}>
       <Sidebar className="border-r" collapsible="icon">
         <SidebarHeader className="p-3 md:p-4">
           <Brand />
