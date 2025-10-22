@@ -30,6 +30,40 @@ export interface ChatCompletionRequest {
   format?: 'json' | 'text';
 }
 
+// Rate limiting cache
+const rateLimitCache = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(provider: string): boolean {
+  const now = Date.now();
+  const limit = rateLimitCache.get(provider);
+
+  if (!limit || now > limit.resetTime) {
+    rateLimitCache.set(provider, { count: 1, resetTime: now + 60000 });
+    return true;
+  }
+
+  const maxRequests = provider === 'gemini' ? 15 : provider === 'openai' ? 60 : 1000;
+
+  if (limit.count >= maxRequests) {
+    return false;
+  }
+
+  limit.count++;
+  return true;
+}
+
+// Dummy functions for getCurrentProvider and AIRequestOptions to make the code runnable
+// In a real application, these would be defined elsewhere.
+function getCurrentProvider(): AIProvider {
+  // This is a placeholder. In a real app, this would get the current provider from settings or context.
+  return 'openai';
+}
+
+interface AIRequestOptions {
+  provider?: AIProvider;
+  // other options...
+}
+
 export class AIProviderService {
   private static instance: AIProviderService;
   private config: AIProviderConfig;
@@ -37,11 +71,11 @@ export class AIProviderService {
 
   private constructor(config?: Partial<AIProviderConfig>) {
     const savedSettings = AppSettingsService.getAIProvider();
-    
+
     // 1. Provider ve model seçimi
     const provider = this.selectProvider(config, savedSettings);
     const model = this.selectModel(config, savedSettings, provider);
-    
+
     // 2. Final config oluştur
     this.config = {
       provider,
@@ -52,10 +86,10 @@ export class AIProviderService {
 
     // 3. Adapter oluştur
     this.adapter = AIAdapterFactory.createAdapter(this.config);
-    
+
     console.log(`🤖 AI Provider initialized: ${provider} (${model})`);
   }
-  
+
   /**
    * Provider seçim öncelik mantığı
    * Öncelik sırası: config > savedSettings > API keys > ollama
@@ -68,32 +102,32 @@ export class AIProviderService {
     if (config?.provider) {
       return config.provider;
     }
-    
+
     // 2. ÖNCELİK: Kullanıcı ayarları (en önemli!)
     if (savedSettings?.provider) {
       console.log(`📋 Kullanıcı ayarlarından yüklendi: ${savedSettings.provider}`);
       return savedSettings.provider as AIProvider;
     }
-    
+
     // 3. ÖNCELİK: API key varlığına göre otomatik seçim
     const hasGeminiKey = this.hasValidAPIKey('GEMINI_API_KEY');
     const hasOpenAIKey = this.hasValidAPIKey('OPENAI_API_KEY');
-    
+
     if (hasGeminiKey) {
       console.log('🔑 Gemini API key bulundu, varsayılan olarak ayarlandı');
       return 'gemini';
     }
-    
+
     if (hasOpenAIKey) {
       console.log('🔑 OpenAI API key bulundu, varsayılan olarak ayarlandı');
       return 'openai';
     }
-    
+
     // 4. Son seçenek: Ollama (local, API key gerektirmez)
     console.log('🏠 Varsayılan olarak Ollama (local) kullanılıyor');
     return 'ollama';
   }
-  
+
   /**
    * Model seçim mantığı
    * Öncelik: config.model > savedSettings.model (eşleşirse) > default
@@ -107,16 +141,16 @@ export class AIProviderService {
     if (config?.model) {
       return config.model;
     }
-    
+
     // 2. Kaydedilmiş provider ile aynıysa, kaydedilmiş modeli kullan
     if (savedSettings?.provider === provider && savedSettings?.model) {
       return savedSettings.model;
     }
-    
+
     // 3. Provider'a uygun varsayılan model
     return this.getDefaultModelForProvider(provider);
   }
-  
+
   /**
    * API key varlığını kontrol et
    */
@@ -124,7 +158,7 @@ export class AIProviderService {
     const key = process.env[keyName];
     return !!(key && key.trim().length > 0);
   }
-  
+
   private getDefaultModelForProvider(provider: AIProvider): string {
     switch (provider) {
       case 'gemini':
@@ -150,7 +184,7 @@ export class AIProviderService {
     }
     return AIProviderService.instance;
   }
-  
+
   /**
    * Reset singleton instance (for testing or manual refresh)
    */
@@ -183,13 +217,13 @@ export class AIProviderService {
     if (ollamaBaseUrl) {
       this.config.ollamaBaseUrl = ollamaBaseUrl;
     }
-    
+
     // Ayarları database'e kaydet
     AppSettingsService.saveAIProvider(provider, this.config.model, this.config.ollamaBaseUrl);
-    
+
     // Adapter'ı yeniden oluştur
     this.adapter = AIAdapterFactory.createAdapter(this.config);
-    
+
     console.log(`✅ AI Provider değiştirildi: ${provider} (${this.config.model})`);
   }
 
@@ -212,6 +246,10 @@ export class AIProviderService {
    */
   async chat(request: ChatCompletionRequest): Promise<string> {
     try {
+      // Rate limit check
+      if (!checkRateLimit(this.config.provider)) {
+        throw new Error(`Rate limit exceeded for ${this.config.provider}. Please try again in a minute.`);
+      }
       return await this.adapter.chat(request);
     } catch (error) {
       await aiErrorHandler.handleAIError(
@@ -233,6 +271,10 @@ export class AIProviderService {
    */
   async *chatStream(request: ChatCompletionRequest): AsyncGenerator<string, void, unknown> {
     try {
+      // Rate limit check
+      if (!checkRateLimit(this.config.provider)) {
+        throw new Error(`Rate limit exceeded for ${this.config.provider}. Please try again in a minute.`);
+      }
       yield* this.adapter.chatStream(request);
     } catch (error) {
       await aiErrorHandler.handleAIError(

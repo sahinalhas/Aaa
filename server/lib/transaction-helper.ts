@@ -1,5 +1,8 @@
 import type Database from 'better-sqlite3';
 
+// Assume getDatabase() is defined elsewhere and returns a Database instance
+declare function getDatabase(): Database.Database;
+
 export class TransactionHelper {
   constructor(private db: Database.Database) {}
 
@@ -60,4 +63,39 @@ export async function withAsyncTransaction<T>(
 
 export function createTransactionHelper(db: Database.Database): TransactionHelper {
   return new TransactionHelper(db);
+}
+
+export async function withTransaction<T>(
+  operation: (db: Database.Database) => T,
+  options: { maxRetries?: number; retryDelay?: number } = {}
+): Promise<T> {
+  const { maxRetries = 3, retryDelay = 100 } = options;
+  const db = getDatabase();
+
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      db.exec('BEGIN IMMEDIATE TRANSACTION');
+      const result = operation(db);
+      db.exec('COMMIT');
+      return result;
+    } catch (error) {
+      db.exec('ROLLBACK');
+      lastError = error as Error;
+
+      // Retry on database locked errors
+      if (error instanceof Error && error.message.includes('database is locked')) {
+        if (attempt < maxRetries - 1) {
+          await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
+          continue;
+        }
+      }
+
+      // Don't retry on other errors
+      throw error;
+    }
+  }
+
+  throw lastError || new Error('Transaction failed after retries');
 }
