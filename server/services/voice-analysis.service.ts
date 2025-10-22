@@ -4,6 +4,7 @@
  */
 
 import { AIProviderService } from './ai-provider.service.js';
+import { safeJsonParse } from '../utils/json-helpers.js';
 
 export interface VoiceAnalysisResult {
   summary: string;
@@ -67,11 +68,23 @@ JSON formatı:
         format: 'json'
       });
 
-      const result = JSON.parse(response) as VoiceAnalysisResult;
+      const fallbackResult = this.fallbackAnalysis(transcriptionText);
+      const result = safeJsonParse<VoiceAnalysisResult>(
+        response, 
+        fallbackResult,
+        'voice analysis AI response'
+      );
       
-      // Validasyon
+      // Validasyon - eksik alanları fallback ile doldur
       if (!result.summary || !result.keywords || !result.category) {
-        throw new Error('AI analizi eksik döndü');
+        console.warn('AI analysis returned incomplete data, using fallback values');
+        return {
+          ...fallbackResult,
+          ...result,
+          summary: result.summary || fallbackResult.summary,
+          keywords: result.keywords || fallbackResult.keywords,
+          category: result.category || fallbackResult.category
+        };
       }
 
       return result;

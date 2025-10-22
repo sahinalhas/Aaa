@@ -83,10 +83,9 @@ router.post('/transcribe', async (req, res) => {
     });
 
   } catch (error: any) {
-    console.error('Transcription hatası:', error);
-    
-    // USE_BROWSER_API hatası özel olarak handle et
+    // USE_BROWSER_API hatası özel olarak handle et - bu beklenen bir davranış
     if (error.message === 'USE_BROWSER_API') {
+      console.log('Using browser-based transcription for Ollama provider');
       return res.json({
         success: true,
         data: {
@@ -96,6 +95,7 @@ router.post('/transcribe', async (req, res) => {
       });
     }
 
+    console.error('Transcription hatası:', error);
     res.status(500).json({
       success: false,
       error: error.message

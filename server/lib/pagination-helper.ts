@@ -19,8 +19,11 @@ export interface PaginatedResponse<T> {
 }
 
 export function extractPaginationParams(req: Request): PaginationParams {
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+  const rawPage = parseInt(req.query.page as string);
+  const rawLimit = parseInt(req.query.limit as string);
+  
+  const page = Math.max(1, isNaN(rawPage) ? 1 : rawPage);
+  const limit = Math.min(Math.max(1, isNaN(rawLimit) ? 20 : rawLimit), 100);
   const offset = (page - 1) * limit;
 
   return { page, limit, offset };

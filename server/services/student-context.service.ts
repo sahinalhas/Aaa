@@ -13,6 +13,7 @@ import { getLatestSocioeconomicByStudent } from '../features/holistic-profile/re
 import { getLatestInterestByStudent } from '../features/holistic-profile/repository/interests.repository.js';
 import { getLatestFutureVisionByStudent } from '../features/holistic-profile/repository/future-vision.repository.js';
 import { getLatestStrengthByStudent } from '../features/holistic-profile/repository/strengths.repository.js';
+import { safeJsonParseArray } from '../utils/json-helpers.js';
 
 export interface StudentContext {
   // Temel Bilgiler
@@ -226,8 +227,8 @@ export class StudentContextService {
         score: exam.totalScore || exam.score || exam.grade,
         date: exam.examDate
       })),
-      strengths: academic?.strongSubjects ? JSON.parse(academic.strongSubjects) : [],
-      weaknesses: academic?.weakSubjects ? JSON.parse(academic.weakSubjects) : [],
+      strengths: safeJsonParseArray(academic?.strongSubjects, [], 'academic strengths'),
+      weaknesses: safeJsonParseArray(academic?.weakSubjects, [], 'academic weaknesses'),
       performanceTrend: this.calculatePerformanceTrend(exams)
     };
   }
@@ -254,8 +255,8 @@ export class StudentContextService {
         'Takım Çalışması': sel.teamworkLevel || 0,
         'İletişim': sel.communicationLevel || 0
       },
-      strengths: sel.strongSocialSkills ? JSON.parse(sel.strongSocialSkills) : [],
-      challenges: sel.developingSocialSkills ? JSON.parse(sel.developingSocialSkills) : [],
+      strengths: safeJsonParseArray(sel.strongSocialSkills, [], 'social skills strengths'),
+      challenges: safeJsonParseArray(sel.developingSocialSkills, [], 'social skills challenges'),
       relationships: sel.socialRole
     };
   }
@@ -352,7 +353,7 @@ export class StudentContextService {
     return {
       level: riskProfile?.dropoutRisk || 'DÜŞÜK',
       factors: riskFactors,
-      protectiveFactors: riskProfile?.activeProtectiveFactors ? JSON.parse(riskProfile.activeProtectiveFactors) : [],
+      protectiveFactors: safeJsonParseArray(riskProfile?.activeProtectiveFactors, [], 'protective factors'),
       alerts: alerts.map(alert => ({
         type: alert.alertType,
         level: alert.alertLevel,
@@ -409,18 +410,18 @@ export class StudentContextService {
     }
 
     const talents: string[] = [];
-    if (profile.creativeTalents) talents.push(...JSON.parse(profile.creativeTalents));
-    if (profile.physicalTalents) talents.push(...JSON.parse(profile.physicalTalents));
+    if (profile.creativeTalents) talents.push(...safeJsonParseArray(profile.creativeTalents, [], 'creative talents'));
+    if (profile.physicalTalents) talents.push(...safeJsonParseArray(profile.physicalTalents, [], 'physical talents'));
 
     const interests: string[] = [];
-    if (profile.primaryInterests) interests.push(...JSON.parse(profile.primaryInterests));
-    if (profile.exploratoryInterests) interests.push(...JSON.parse(profile.exploratoryInterests));
+    if (profile.primaryInterests) interests.push(...safeJsonParseArray(profile.primaryInterests, [], 'primary interests'));
+    if (profile.exploratoryInterests) interests.push(...safeJsonParseArray(profile.exploratoryInterests, [], 'exploratory interests'));
 
     return {
       talents,
       interests,
-      hobbies: profile.clubMemberships ? JSON.parse(profile.clubMemberships) : [],
-      careerGoals: profile.careerAspirations ? JSON.parse(profile.careerAspirations) : []
+      hobbies: safeJsonParseArray(profile.clubMemberships, [], 'club memberships'),
+      careerGoals: safeJsonParseArray(profile.careerAspirations, [], 'career aspirations')
     };
   }
 
@@ -437,8 +438,8 @@ export class StudentContextService {
     }
 
     return {
-      conditions: health.chronicDiseases ? JSON.parse(health.chronicDiseases) : [],
-      medications: health.currentMedications ? JSON.parse(health.currentMedications) : [],
+      conditions: safeJsonParseArray(health.chronicDiseases, [], 'chronic diseases'),
+      medications: safeJsonParseArray(health.currentMedications, [], 'current medications'),
       notes: health.additionalNotes
     };
   }

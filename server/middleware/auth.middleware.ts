@@ -4,7 +4,8 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { getUserSession } from '../features/auth/repository/auth.repository.js';
+import { getUserSession, deleteUserSession } from '../features/auth/repository/auth.repository.js';
+import { safeJsonParseObject } from '../utils/json-helpers.js';
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -41,7 +42,20 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
       });
     }
 
-    const userData = JSON.parse(session.userData);
+    const userData = safeJsonParseObject(
+      session.userData,
+      { name: '', email: '', role: '', permissions: [], institution: '' },
+      'user session'
+    );
+    
+    if (!userData.name || !userData.email || !userData.role) {
+      console.error('Corrupted session data detected, clearing session for user:', userId);
+      deleteUserSession(userId);
+      return res.status(401).json({ 
+        error: 'Invalid session',
+        message: 'Session data corrupted, please log in again'
+      });
+    }
     
     (req as AuthenticatedRequest).user = {
       id: userId,
