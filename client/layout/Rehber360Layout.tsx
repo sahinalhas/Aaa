@@ -78,6 +78,7 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth-context";
 import AIStatusIndicator from "@/components/AIStatusIndicator";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 function Brand() {
   const { state } = useSidebar();
@@ -85,19 +86,21 @@ function Brand() {
   return (
     <Link
       to="/"
-      className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-sidebar-accent"
+      className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-sidebar-accent transition-all duration-200"
+      title={state === "collapsed" ? "Rehber360 - Ana Sayfa" : ""}
     >
-      <div className="size-8 rounded-md bg-primary text-primary-foreground grid place-items-center font-extrabold">
+      <div className="size-8 rounded-md bg-primary text-primary-foreground grid place-items-center font-extrabold shrink-0">
         R
       </div>
-      {state === "expanded" && (
-        <div className="leading-tight">
-          <div className="text-sm font-bold">Rehber360</div>
-          <div className="text-[10px] text-muted-foreground">
-            Dijital Rehberlik Sistemi
-          </div>
+      <div className={cn(
+        "leading-tight overflow-hidden transition-all duration-200",
+        state === "collapsed" ? "w-0 opacity-0" : "w-auto opacity-100"
+      )}>
+        <div className="text-sm font-bold whitespace-nowrap">Rehber360</div>
+        <div className="text-[10px] text-muted-foreground whitespace-nowrap">
+          Dijital Rehberlik Sistemi
         </div>
-      )}
+      </div>
     </Link>
   );
 }
@@ -242,7 +245,7 @@ export default function Rehber360Layout() {
 
   return (
     <SidebarProvider defaultOpen={isDesktop}>
-      <Sidebar className="border-r" collapsible="icon">
+      <Sidebar collapsible="icon" variant="sidebar">
         <SidebarHeader className="p-3 md:p-4">
           <Brand />
         </SidebarHeader>
