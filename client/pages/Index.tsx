@@ -127,13 +127,13 @@ export default function Index() {
       setIsLoading(true);
       try {
         const [studentsResponse, distributions, sessions] = await Promise.all([
-          apiClient.get<{ data: Student[] }>(STUDENT_ENDPOINTS.BASE, { showErrorToast: false }),
+          apiClient.get<Student[]>(STUDENT_ENDPOINTS.BASE, { showErrorToast: false }),
           apiClient.get<any[]>(SURVEY_ENDPOINTS.DISTRIBUTIONS, { showErrorToast: false }),
           apiClient.get<CounselingSession[]>(COUNSELING_ENDPOINTS.BASE, { showErrorToast: false }),
         ]);
 
-        const studentsData = studentsResponse?.data || [];
-        if (studentsData) {
+        const studentsData = Array.isArray(studentsResponse) ? studentsResponse : [];
+        if (studentsData.length > 0) {
           setStudents(studentsData);
           setStats(prev => ({ ...prev, studentCount: studentsData.length }));
 

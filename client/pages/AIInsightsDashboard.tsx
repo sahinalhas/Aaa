@@ -39,12 +39,14 @@ export default function AIInsightsDashboard() {
 
   const loadInsights = async () => {
     try {
-      const data = await apiClient.get<{ data: DailyInsightsSummary }>(
+      const response = await apiClient.get<any>(
         AI_ENDPOINTS.DAILY_INSIGHTS,
         { showErrorToast: false }
       );
-      if (data?.data) {
-        setInsights(data.data);
+      // Backend'den { data: ... } formatında geliyor
+      const data = response?.data || response;
+      if (data) {
+        setInsights(data);
       }
     } catch (error) {
       console.error('Failed to load insights:', error);

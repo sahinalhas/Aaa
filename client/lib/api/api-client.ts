@@ -137,7 +137,12 @@ class ApiClient {
     endpoint: string,
     config: Omit<ApiRequestConfig, 'method' | 'body'> = {}
   ): Promise<TResponse> {
-    return this.request<TResponse>(endpoint, { ...config, method: 'GET' });
+    const response = await this.request<TResponse>(endpoint, { ...config, method: 'GET' });
+    // Eğer response { data: ... } formatındaysa, data'yı döndür
+    if (response && typeof response === 'object' && 'data' in response && !Array.isArray(response)) {
+      return (response as any).data as TResponse;
+    }
+    return response;
   }
 
   async post<TResponse = unknown, TBody = unknown>(

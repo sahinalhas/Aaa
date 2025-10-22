@@ -8,7 +8,8 @@ import { toast } from 'sonner';
 const STUDENTS_QUERY_KEY = ['students'] as const;
 
 async function fetchStudentsFromAPI(): Promise<BackendStudent[]> {
-  return await apiClient.get<BackendStudent[]>('/api/students', { showErrorToast: false });
+  const response = await apiClient.get<BackendStudent[]>('/api/students', { showErrorToast: false });
+  return Array.isArray(response) ? response : [];
 }
 
 async function saveStudentToAPI(student: BackendStudent): Promise<void> {

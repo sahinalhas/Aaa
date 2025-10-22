@@ -8,8 +8,9 @@ let studentsCache: Student[] | null = null;
 
 async function fetchStudentsFromAPI(): Promise<BackendStudent[]> {
   try {
-    const response = await apiClient.get<{ data: BackendStudent[] }>('/api/students', { showErrorToast: false });
-    return response.data;
+    const response = await apiClient.get<BackendStudent[]>('/api/students', { showErrorToast: false });
+    // Backend'den gelen veri zaten array formatında
+    return Array.isArray(response) ? response : [];
   } catch (error) {
     handleApiError(error, {
       title: API_ERROR_MESSAGES.STUDENT.LOAD_ERROR,

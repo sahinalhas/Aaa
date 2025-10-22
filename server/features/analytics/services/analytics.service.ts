@@ -72,7 +72,7 @@ export async function getReportsOverview(): Promise<ReportsOverview> {
       const parsed = JSON.parse(cached.data);
       // Validate structure
       if (parsed && typeof parsed === 'object') {
-        return parsed as AnalyticsData;
+        return parsed as ReportsOverview;
       }
     } catch (error) {
       console.error('Failed to parse cached analytics data:', error);
