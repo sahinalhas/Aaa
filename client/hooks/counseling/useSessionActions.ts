@@ -90,14 +90,52 @@ export function useSessionActions(classHours: ClassHour[]) {
         throw new Error(error.error || 'Görüşme tamamlanamadı');
       }
 
-      return response.json();
+      return { result: await response.json(), completionData: data };
     },
-    onSuccess: () => {
+    onSuccess: async (responseData, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions'] });
-      toast({
-        title: "✅ Görüşme tamamlandı",
-        description: "Görüşme Defteri'nde tamamlanan görüşmeyi görüntüleyebilirsiniz.",
-      });
+      
+      // Takip gerekli ise otomatik hatırlatıcı oluştur
+      if (responseData.completionData.followUpNeeded && 
+          responseData.completionData.followUpDate && 
+          responseData.completionData.followUpTime) {
+        
+        const session = await fetch(`/api/counseling-sessions/${variables.id}`).then(r => r.json());
+        
+        const reminderData = {
+          id: `reminder_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          sessionId: variables.id,
+          reminderType: 'follow_up',
+          reminderDate: format(responseData.completionData.followUpDate, 'yyyy-MM-dd'),
+          reminderTime: responseData.completionData.followUpTime,
+          title: `Takip Görüşmesi: ${session.student?.name || session.groupName || 'Görüşme'}`,
+          description: responseData.completionData.followUpPlan || 'Takip görüşmesi planlandı',
+          studentIds: JSON.stringify(session.sessionType === 'individual' 
+            ? [session.student?.id] 
+            : session.students?.map((s: any) => s.id) || []
+          ),
+          status: 'pending',
+          notificationSent: 0
+        };
+
+        await fetch('/api/counseling-sessions/reminders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(reminderData),
+        });
+
+        queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions/reminders'] });
+        
+        toast({
+          title: "✅ Görüşme tamamlandı ve randevu oluşturuldu",
+          description: `Takip görüşmesi ${format(responseData.completionData.followUpDate, 'd MMMM yyyy', { locale: tr })} - ${responseData.completionData.followUpTime} için planlandı.`,
+        });
+      } else {
+        toast({
+          title: "✅ Görüşme tamamlandı",
+          description: "Görüşme Defteri'nde tamamlanan görüşmeyi görüntüleyebilirsiniz.",
+        });
+      }
     },
     onError: (error: Error) => {
       toast({

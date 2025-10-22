@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Star, MessageSquare, Activity, Brain, Target, ArrowRight, FileText, ClipboardCheck, Tag, CheckCircle2, Mic } from "lucide-react";
+import { Loader2, Star, MessageSquare, Activity, Brain, Target, ArrowRight, FileText, ClipboardCheck, CheckCircle2, Mic, Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -14,11 +16,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import { completeSessionSchema, type CompleteSessionFormValues, type CounselingSession } from "../types";
-import SessionTagSelector from "./SessionTagSelector";
 import ActionItemsManager from "./ActionItemsManager";
 import { VoiceRecorder } from "../../voice/VoiceRecorder";
+import { cn } from "@/lib/utils";
 
 interface EnhancedCompleteSessionDialogProps {
   open: boolean;
@@ -37,6 +41,8 @@ export default function EnhancedCompleteSessionDialog({
 }: EnhancedCompleteSessionDialogProps) {
   const [activeTab, setActiveTab] = useState("summary");
   const [isAutoFilling, setIsAutoFilling] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [timePickerOpen, setTimePickerOpen] = useState(false);
 
   const form = useForm<CompleteSessionFormValues>({
     resolver: zodResolver(completeSessionSchema),
@@ -47,10 +53,19 @@ export default function EnhancedCompleteSessionDialog({
       actionItems: [],
       followUpNeeded: false,
       cooperationLevel: 3,
+      followUpDate: undefined,
+      followUpTime: undefined,
     },
   });
 
   const followUpNeeded = form.watch("followUpNeeded");
+  
+  // Takip gerekli seçildiğinde otomatik takvim aç
+  useEffect(() => {
+    if (followUpNeeded && !form.getValues("followUpDate")) {
+      setDatePickerOpen(true);
+    }
+  }, [followUpNeeded]);
 
   const handleSubmit = (data: CompleteSessionFormValues) => {
     onSubmit(data);
@@ -94,7 +109,7 @@ export default function EnhancedCompleteSessionDialog({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4 h-auto p-1 bg-muted/50">
+              <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50">
                 <TabsTrigger 
                   value="summary" 
                   className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white py-2.5"
@@ -110,18 +125,11 @@ export default function EnhancedCompleteSessionDialog({
                   Değerlendirme
                 </TabsTrigger>
                 <TabsTrigger 
-                  value="tags"
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-rose-600 data-[state=active]:text-white py-2.5"
-                >
-                  <Tag className="h-4 w-4 mr-2" />
-                  Etiketler
-                </TabsTrigger>
-                <TabsTrigger 
                   value="actions"
                   className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-600 data-[state=active]:text-white py-2.5"
                 >
                   <Target className="h-4 w-4 mr-2" />
-                  Aksiyon
+                  Takip & Aksiyon
                 </TabsTrigger>
               </TabsList>
 
@@ -252,7 +260,7 @@ export default function EnhancedCompleteSessionDialog({
                               if (formData.emotionalState) form.setValue("emotionalState", formData.emotionalState);
                               if (formData.physicalState) form.setValue("physicalState", formData.physicalState);
                               if (formData.communicationQuality) form.setValue("communicationQuality", formData.communicationQuality);
-                              if (formData.sessionTags && formData.sessionTags.length > 0) form.setValue("sessionTags", formData.sessionTags);
+                              // sessionTags artık kullanılmıyor
                               if (formData.actionItems && formData.actionItems.length > 0) {
                                 const validActionItems = formData.actionItems
                                   .filter(item => item.id && item.description)
@@ -461,42 +469,7 @@ export default function EnhancedCompleteSessionDialog({
                 />
               </TabsContent>
 
-              <TabsContent value="tags" className="space-y-5 mt-6">
-                <div className="relative pb-4 mb-2">
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl blur-sm opacity-30" />
-                      <div className="relative p-2 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600">
-                        <Tag className="h-5 w-5 text-white" />
-                      </div>
-                    </div>
-                    <h3 className="font-bold text-lg bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
-                      Görüşme Etiketleri
-                    </h3>
-                  </div>
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="sessionTags"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-base font-semibold text-pink-700 dark:text-pink-400">Etiketler</FormLabel>
-                      <FormControl>
-                        <SessionTagSelector
-                          selectedTags={field.value || []}
-                          onTagsChange={field.onChange}
-                          topicPath={session?.topic}
-                        />
-                      </FormControl>
-                      <FormDescription className="text-sm">
-                        Görüşmeyi etiketleyerek raporlamayı kolaylaştırın
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </TabsContent>
+              
 
               <TabsContent value="actions" className="space-y-5 mt-6">
                 <div className="relative pb-4 mb-2">
@@ -508,7 +481,7 @@ export default function EnhancedCompleteSessionDialog({
                       </div>
                     </div>
                     <h3 className="font-bold text-lg bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-                      Aksiyon Planı
+                      Takip & Aksiyon Planı
                     </h3>
                   </div>
                 </div>
@@ -519,9 +492,9 @@ export default function EnhancedCompleteSessionDialog({
                   render={({ field }) => (
                     <FormItem className="flex items-center justify-between rounded-xl border-2 border-orange-200 dark:border-orange-800 bg-orange-50/50 dark:bg-orange-950/20 p-4">
                       <div className="space-y-0.5">
-                        <FormLabel className="text-base font-semibold">Takip Gerekli mi?</FormLabel>
+                        <FormLabel className="text-base font-semibold">Takip Görüşmesi Planla</FormLabel>
                         <FormDescription className="text-sm">
-                          Gelecekte takip görüşmesi planlanacak
+                          Takip gerekiyorsa açın, otomatik randevu oluşturulacak
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -535,27 +508,102 @@ export default function EnhancedCompleteSessionDialog({
                 />
 
                 {followUpNeeded && (
-                  <FormField
-                    control={form.control}
-                    name="followUpPlan"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-base font-semibold text-orange-700 dark:text-orange-400 flex items-center gap-2">
-                          <CheckCircle2 className="h-4 w-4" />
-                          Takip Planı
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            {...field} 
-                            placeholder="Takip görüşmesinde neler yapılacak..."
-                            rows={3}
-                            className="border-2 focus:border-orange-400 resize-none"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="space-y-4 rounded-xl border-2 border-orange-200 dark:border-orange-800 bg-gradient-to-br from-orange-50/50 to-amber-50/50 dark:from-orange-950/20 dark:to-amber-950/20 p-4">
+                    <div className="flex items-center gap-2 text-orange-700 dark:text-orange-400 font-semibold">
+                      <CalendarIcon className="h-5 w-5" />
+                      <span>Takip Randevusu</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="followUpDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Takip Tarihi *</FormLabel>
+                            <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      "justify-start text-left font-normal h-11",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value ? (
+                                      format(field.value, "d MMMM yyyy, EEEE", { locale: tr })
+                                    ) : (
+                                      <span>Tarih seçin</span>
+                                    )}
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={(date) => {
+                                    field.onChange(date);
+                                    setDatePickerOpen(false);
+                                    setTimePickerOpen(true);
+                                  }}
+                                  locale={tr}
+                                  disabled={(date) => date < new Date()}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="followUpTime"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Takip Saati *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="time" 
+                                {...field} 
+                                className="h-11"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="followUpPlan"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-base font-semibold flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4" />
+                            Takip Planı
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              {...field} 
+                              placeholder="Takip görüşmesinde neler yapılacak, hangi konular konuşulacak..."
+                              rows={3}
+                              className="border-2 focus:border-orange-400 resize-none"
+                            />
+                          </FormControl>
+                          <FormDescription className="text-sm">
+                            Bu plan, takip randevusu oluştururken not olarak eklenecek
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 )}
 
                 <FormField

@@ -98,6 +98,8 @@ export const completeSessionSchema = z.object({
   achievedOutcomes: z.string().optional(),
   followUpNeeded: z.boolean().default(false),
   followUpPlan: z.string().optional(),
+  followUpDate: z.date().optional(),
+  followUpTime: z.string().optional(),
   actionItems: z.array(z.object({
     id: z.string(),
     description: z.string(),
@@ -105,6 +107,14 @@ export const completeSessionSchema = z.object({
     dueDate: z.string().optional(),
     priority: z.enum(['low', 'medium', 'high']).optional(),
   })).default([]),
+}).refine((data) => {
+  if (data.followUpNeeded) {
+    return data.followUpDate && data.followUpTime;
+  }
+  return true;
+}, {
+  message: "Takip gerekli ise tarih ve saat seçilmelidir",
+  path: ["followUpDate"],
 });
 
 export const reminderSchema = z.object({
