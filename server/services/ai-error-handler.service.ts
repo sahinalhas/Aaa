@@ -38,7 +38,7 @@ class AIErrorHandlerService {
   private static instance: AIErrorHandlerService;
   private notificationEngine: NotificationEngineService;
   private errorLog: AIErrorDetails[] = [];
-  private readonly MAX_LOG_SIZE = 1000;
+  private readonly MAX_LOG_SIZE = 100; // 100 ile sınırlandırılmış
   
   // Hata sayaçları (son 1 saat için)
   private errorCounts: Map<string, { count: number; lastReset: number }> = new Map();
@@ -129,12 +129,12 @@ class AIErrorHandlerService {
   }
 
   /**
-   * Hatayı memory log'a ekle
+   * Hatayı memory log'a ekle (max 100 kayıt)
    */
   private logError(errorDetails: AIErrorDetails): void {
     this.errorLog.push(errorDetails);
     
-    // Log boyutunu sınırla
+    // Log boyutunu 100 ile sınırla
     if (this.errorLog.length > this.MAX_LOG_SIZE) {
       this.errorLog.shift();
     }
