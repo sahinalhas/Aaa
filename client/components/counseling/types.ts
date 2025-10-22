@@ -156,6 +156,7 @@ export interface Student {
   id: string;
   name: string;
   className: string;
+  sinif: string;
 }
 
 export interface ClassHour {
@@ -198,6 +199,10 @@ export interface CounselingSession {
   sessionDetails?: string;
   detailedNotes?: string;
   sessionTags?: string[];
+  achievedOutcomes?: string;
+  followUpNeeded?: boolean;
+  followUpPlan?: string;
+  actionItems?: string;
   autoCompleted: boolean;
   extensionGranted: boolean;
   completed: boolean;

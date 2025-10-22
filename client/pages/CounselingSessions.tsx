@@ -1,17 +1,27 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Clock, CheckCircle2, FileText, Bell, BarChart3, Download } from "lucide-react";
-import { format } from "date-fns";
-import { SESSION_MODE_LABELS } from "@shared/constants/common.constants";
-
+import { Plus, Download, Search as SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+import {
+  SessionCalendar,
+  SessionSearch,
+  SessionCardView,
+  SessionDrawer,
+  SessionStatsCards,
+  EnhancedSessionsTable,
+  EnhancedSessionAnalytics,
+  StatsCardSkeleton,
+  CalendarSkeleton,
+  TableSkeleton,
+  SessionGridSkeleton,
+} from "@/components/counseling/modern";
 
 import ActiveSessionsGrid from "@/components/counseling/ActiveSessionsGrid";
-import SessionsTable from "@/components/counseling/SessionsTable";
-import SessionFiltersComponent from "@/components/counseling/SessionFilters";
 import NewSessionDialog from "@/components/counseling/NewSessionDialog";
 import EnhancedCompleteSessionDialog from "@/components/counseling/enhanced/EnhancedCompleteSessionDialog";
 import ReminderDialog from "@/components/counseling/ReminderDialog";
@@ -19,12 +29,16 @@ import FollowUpDialog from "@/components/counseling/FollowUpDialog";
 import SessionOutcomeDialog from "@/components/counseling/SessionOutcomeDialog";
 import RemindersTab from "@/components/counseling/RemindersTab";
 import OutcomesTab from "@/components/counseling/OutcomesTab";
-import SessionAnalytics from "@/components/counseling/SessionAnalytics";
+import ReportGenerationDialog, { type ReportOptions } from "@/components/counseling/ReportGenerationDialog";
 
-import { getCurrentClassHour, getElapsedTime, getSessionName } from "@/components/counseling/utils/sessionHelpers";
+import { useSessionStats } from "@/hooks/counseling/useSessionStats";
+import { useSessionFilters } from "@/hooks/counseling/useSessionFilters";
+import { useSessionActions } from "@/hooks/counseling/useSessionActions";
+
+import { getElapsedTime, getSessionName } from "@/components/counseling/utils/sessionHelpers";
 import { exportSessionsToExcel } from "@/components/counseling/utils/sessionExport";
 import { generateSessionsPDF, generateOutcomesPDF, generateComprehensiveReport } from "@/components/counseling/utils/sessionReports";
-import ReportGenerationDialog, { type ReportOptions } from "@/components/counseling/ReportGenerationDialog";
+
 import type {
   CounselingSession,
   Student,
@@ -39,19 +53,21 @@ import type {
   ReminderFormValues,
   FollowUpFormValues,
   OutcomeFormValues,
-  SessionFilters,
 } from "@/components/counseling/types";
+
 import { apiClient } from "@/lib/api/api-client";
 import { COUNSELING_ENDPOINTS, STUDENT_ENDPOINTS } from "@/lib/constants/api-endpoints";
-import { buildUrl } from "@/lib/constants/api-endpoints";
 
 export default function CounselingSessions() {
-  const [activeTab, setActiveTab] = useState("active");
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [viewMode, setViewMode] = useState<'calendar' | 'table' | 'cards'>('calendar');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [sessionType, setSessionType] = useState<'individual' | 'group'>('individual');
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState<CounselingSession | null>(null);
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [remindedSessions, setRemindedSessions] = useState<Set<string>>(new Set());
   const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
   const [followUpDialogOpen, setFollowUpDialogOpen] = useState(false);
@@ -59,19 +75,15 @@ export default function CounselingSessions() {
   const [selectedReminder, setSelectedReminder] = useState<CounselingReminder | null>(null);
   const [selectedFollowUp, setSelectedFollowUp] = useState<CounselingFollowUp | null>(null);
   const [selectedOutcome, setSelectedOutcome] = useState<(CounselingOutcome & { session?: CounselingSession }) | null>(null);
-  const [filters, setFilters] = useState<SessionFilters>({ status: 'all', sessionType: 'all' });
-  const [appliedFilters, setAppliedFilters] = useState<SessionFilters>({});
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
-  
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
 
   const { data: sessions = [], isLoading: sessionsLoading } = useQuery<CounselingSession[]>({
-    queryKey: [COUNSELING_ENDPOINTS.BASE, appliedFilters],
-    queryFn: () => apiClient.get<CounselingSession[]>(
-      buildUrl(COUNSELING_ENDPOINTS.BASE, appliedFilters as any),
-      { showErrorToast: false }
-    ),
+    queryKey: [COUNSELING_ENDPOINTS.BASE],
+    queryFn: () => apiClient.get<CounselingSession[]>(COUNSELING_ENDPOINTS.BASE, { showErrorToast: false }),
   });
 
   const { data: students = [] } = useQuery<Student[]>({
@@ -116,481 +128,12 @@ export default function CounselingSessions() {
     },
   });
 
+  const stats = useSessionStats(sessions);
+  const { filteredSessions } = useSessionFilters(sessions);
+  const actions = useSessionActions(classHours);
+
   const activeSessions = sessions.filter(s => !s.completed);
-
-  const createSessionMutation = useMutation({
-    mutationFn: async (data: IndividualSessionFormValues | GroupSessionFormValues) => {
-      const currentClassHour = getCurrentClassHour(classHours);
-      
-      const sessionDate = data.sessionDate instanceof Date 
-        ? format(data.sessionDate, 'yyyy-MM-dd')
-        : data.sessionDate;
-      
-      const { sessionDate: _, sessionTime: __, ...restData } = data;
-      
-      const payload = {
-        id: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        sessionType,
-        counselorId: "user_1",
-        sessionDate,
-        entryTime: data.sessionTime,
-        entryClassHourId: currentClassHour?.id,
-        ...restData,
-        studentIds: sessionType === 'individual' 
-          ? [(data as IndividualSessionFormValues).studentId]
-          : (data as GroupSessionFormValues).studentIds,
-      };
-
-      const response = await fetch('/api/counseling-sessions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Görüşme oluşturulamadı');
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions'] });
-      toast({
-        title: "✅ Görüşme başlatıldı",
-        description: "Rehberlik görüşmesi başarıyla kaydedildi.",
-      });
-      setDialogOpen(false);
-      setSelectedStudents([]);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const completeSessionMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: CompleteSessionFormValues }) => {
-      const currentClassHour = getCurrentClassHour(classHours);
-      const payload = {
-        ...data,
-        exitClassHourId: currentClassHour?.id,
-      };
-
-      const response = await fetch(`/api/counseling-sessions/${id}/complete`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Görüşme tamamlanamadı');
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions'] });
-      toast({
-        title: "✅ Görüşme tamamlandı",
-        description: "Görüşme Defteri'nde tamamlanan görüşmeyi görüntüleyebilirsiniz.",
-      });
-      setCompleteDialogOpen(false);
-      setSelectedSession(null);
-      setActiveTab("journal");
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const extendSessionMutation = useMutation({
-    mutationFn: async (sessionId: string) => {
-      const response = await fetch(`/api/counseling-sessions/${sessionId}/extend`, {
-        method: 'PUT',
-      });
-      if (!response.ok) throw new Error('Görüşme uzatılamadı');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions'] });
-      toast({
-        title: "✅ Görüşme uzatıldı",
-        description: "15 dakika ek süre tanındı.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const createReminderMutation = useMutation({
-    mutationFn: async (data: ReminderFormValues) => {
-      const reminderDate = data.reminderDate instanceof Date 
-        ? format(data.reminderDate, 'yyyy-MM-dd')
-        : data.reminderDate;
-      
-      const payload = {
-        ...data,
-        reminderDate,
-        studentIds: JSON.stringify(data.studentIds),
-      };
-
-      const response = await fetch('/api/counseling-sessions/reminders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Hatırlatma oluşturulamadı');
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions/reminders'] });
-      toast({
-        title: "✅ Hatırlatma oluşturuldu",
-        description: "Hatırlatma başarıyla kaydedildi.",
-      });
-      setReminderDialogOpen(false);
-      setSelectedReminder(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const updateReminderMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: ReminderFormValues }) => {
-      const reminderDate = data.reminderDate instanceof Date 
-        ? format(data.reminderDate, 'yyyy-MM-dd')
-        : data.reminderDate;
-      
-      const payload = {
-        ...data,
-        reminderDate,
-        studentIds: JSON.stringify(data.studentIds),
-      };
-
-      const response = await fetch(`/api/counseling-sessions/reminders/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Hatırlatma güncellenemedi');
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions/reminders'] });
-      toast({
-        title: "✅ Hatırlatma güncellendi",
-        description: "Hatırlatma başarıyla güncellendi.",
-      });
-      setReminderDialogOpen(false);
-      setSelectedReminder(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const updateReminderStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: 'pending' | 'completed' | 'cancelled' }) => {
-      const response = await fetch(`/api/counseling-sessions/reminders/${id}/status`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Hatırlatma durumu güncellenemedi');
-      }
-
-      return response.json();
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions/reminders'] });
-      const statusLabels = {
-        completed: 'tamamlandı',
-        cancelled: 'iptal edildi',
-        pending: 'beklemede',
-      };
-      toast({
-        title: "✅ Durum güncellendi",
-        description: `Hatırlatma ${statusLabels[variables.status]} olarak işaretlendi.`,
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const createFollowUpMutation = useMutation({
-    mutationFn: async (data: FollowUpFormValues) => {
-      const followUpDate = data.followUpDate instanceof Date 
-        ? format(data.followUpDate, 'yyyy-MM-dd')
-        : data.followUpDate;
-      
-      const payload = {
-        ...data,
-        followUpDate,
-      };
-
-      const response = await fetch('/api/counseling-sessions/follow-ups', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Takip oluşturulamadı');
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions/follow-ups'] });
-      toast({
-        title: "✅ Takip oluşturuldu",
-        description: "Takip görevi başarıyla kaydedildi.",
-      });
-      setFollowUpDialogOpen(false);
-      setSelectedFollowUp(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const updateFollowUpMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: FollowUpFormValues }) => {
-      const followUpDate = data.followUpDate instanceof Date 
-        ? format(data.followUpDate, 'yyyy-MM-dd')
-        : data.followUpDate;
-      
-      const payload = {
-        ...data,
-        followUpDate,
-      };
-
-      const response = await fetch(`/api/counseling-sessions/follow-ups/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Takip güncellenemedi');
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions/follow-ups'] });
-      toast({
-        title: "✅ Takip güncellendi",
-        description: "Takip görevi başarıyla güncellendi.",
-      });
-      setFollowUpDialogOpen(false);
-      setSelectedFollowUp(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const updateFollowUpStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: 'pending' | 'in_progress' | 'completed' }) => {
-      const response = await fetch(`/api/counseling-sessions/follow-ups/${id}/status`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Takip durumu güncellenemedi');
-      }
-
-      return response.json();
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions/follow-ups'] });
-      const statusLabels = {
-        pending: 'beklemede',
-        in_progress: 'devam ediyor',
-        completed: 'tamamlandı',
-      };
-      toast({
-        title: "✅ Durum güncellendi",
-        description: `Takip ${statusLabels[variables.status]} olarak işaretlendi.`,
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const createOutcomeMutation = useMutation({
-    mutationFn: async (data: OutcomeFormValues) => {
-      const followUpDate = data.followUpDate instanceof Date 
-        ? format(data.followUpDate, 'yyyy-MM-dd')
-        : data.followUpDate;
-      
-      const payload = {
-        id: `outcome_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        ...data,
-        followUpDate,
-      };
-
-      const response = await fetch('/api/counseling-sessions/outcomes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Sonuç kaydedilemedi');
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions/outcomes'] });
-      toast({
-        title: "✅ Sonuç kaydedildi",
-        description: "Görüşme sonucu başarıyla kaydedildi.",
-      });
-      setOutcomeDialogOpen(false);
-      setSelectedOutcome(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const updateOutcomeMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: OutcomeFormValues }) => {
-      const followUpDate = data.followUpDate instanceof Date 
-        ? format(data.followUpDate, 'yyyy-MM-dd')
-        : data.followUpDate;
-      
-      const payload = {
-        ...data,
-        followUpDate,
-      };
-
-      const response = await fetch(`/api/counseling-sessions/outcomes/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Sonuç güncellenemedi');
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions/outcomes'] });
-      toast({
-        title: "✅ Sonuç güncellendi",
-        description: "Görüşme sonucu başarıyla güncellendi.",
-      });
-      setOutcomeDialogOpen(false);
-      setSelectedOutcome(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const deleteOutcomeMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`/api/counseling-sessions/outcomes/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Sonuç silinemedi');
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/counseling-sessions/outcomes'] });
-      toast({
-        title: "✅ Sonuç silindi",
-        description: "Görüşme sonucu başarıyla silindi.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ Hata",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  const completedSessions = sessions.filter(s => s.completed);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -614,7 +157,6 @@ export default function CounselingSessions() {
           toast({
             title: "⚠️ 45 Dakika Geçti",
             description: `${sessionName} - ${limit - elapsed} dakika sonra otomatik tamamlanacak`,
-            variant: "default",
           });
           setRemindedSessions(prev => new Set(prev).add(`${sessionKey}-45`));
         }
@@ -627,113 +169,54 @@ export default function CounselingSessions() {
           });
           setRemindedSessions(prev => new Set(prev).add(`${sessionKey}-55`));
         }
-
-        if (session.extensionGranted && elapsed === 70 && !remindedSessions.has(`${sessionKey}-70`)) {
-          toast({
-            title: "🚨 70 Dakika Geçti (Uzatılmış)",
-            description: `${sessionName} - 5 dakika sonra otomatik tamamlanacak`,
-            variant: "destructive",
-          });
-          setRemindedSessions(prev => new Set(prev).add(`${sessionKey}-70`));
-        }
       });
     }, 30000);
 
     return () => clearInterval(interval);
   }, [activeSessions, remindedSessions, toast, queryClient]);
 
+  const handleSelectSession = (session: CounselingSession) => {
+    setSelectedSession(session);
+    setDrawerOpen(true);
+  };
+
+  const handleCompleteSession = (session: CounselingSession) => {
+    setSelectedSession(session);
+    setDrawerOpen(false);
+    setCompleteDialogOpen(true);
+  };
+
+  const handleCreateSession = (data: IndividualSessionFormValues | GroupSessionFormValues) => {
+    actions.createSessionMutation.mutate(
+      { sessionType, formData: data },
+      {
+        onSuccess: () => {
+          setDialogOpen(false);
+          queryClient.invalidateQueries({ queryKey: [COUNSELING_ENDPOINTS.BASE] });
+        },
+      }
+    );
+  };
+
+  const handleCompleteSubmit = (data: CompleteSessionFormValues) => {
+    if (!selectedSession) return;
+    actions.completeSessionMutation.mutate(
+      { id: selectedSession.id, data },
+      {
+        onSuccess: () => {
+          setCompleteDialogOpen(false);
+          setSelectedSession(null);
+          setActiveTab("journal");
+        },
+      }
+    );
+  };
+
   const handleExport = () => {
     const count = exportSessionsToExcel(sessions);
     toast({
       title: "✅ Excel dosyası oluşturuldu",
       description: `${count} görüşme kaydı başarıyla dışa aktarıldı.`,
-    });
-  };
-
-  const handleCompleteSession = (session: CounselingSession) => {
-    setSelectedSession(session);
-    setCompleteDialogOpen(true);
-  };
-
-  const handleCompleteSubmit = (data: CompleteSessionFormValues) => {
-    if (!selectedSession) return;
-    completeSessionMutation.mutate({ id: selectedSession.id, data });
-  };
-
-  const handleCreateReminder = () => {
-    setSelectedReminder(null);
-    setReminderDialogOpen(true);
-  };
-
-  const handleEditReminder = (reminder: CounselingReminder) => {
-    setSelectedReminder(reminder);
-    setReminderDialogOpen(true);
-  };
-
-  const handleReminderSubmit = (data: ReminderFormValues) => {
-    if (selectedReminder) {
-      updateReminderMutation.mutate({ id: selectedReminder.id, data });
-    } else {
-      createReminderMutation.mutate(data);
-    }
-  };
-
-  const handleCreateFollowUp = () => {
-    setSelectedFollowUp(null);
-    setFollowUpDialogOpen(true);
-  };
-
-  const handleEditFollowUp = (followUp: CounselingFollowUp) => {
-    setSelectedFollowUp(followUp);
-    setFollowUpDialogOpen(true);
-  };
-
-  const handleFollowUpSubmit = (data: FollowUpFormValues) => {
-    if (selectedFollowUp) {
-      updateFollowUpMutation.mutate({ id: selectedFollowUp.id, data });
-    } else {
-      createFollowUpMutation.mutate(data);
-    }
-  };
-
-  const handleCreateOutcome = () => {
-    setSelectedOutcome(null);
-    setOutcomeDialogOpen(true);
-  };
-
-  const handleEditOutcome = (outcome: CounselingOutcome & { session?: CounselingSession }) => {
-    setSelectedOutcome(outcome);
-    setOutcomeDialogOpen(true);
-  };
-
-  const handleOutcomeSubmit = (data: OutcomeFormValues) => {
-    if (selectedOutcome) {
-      updateOutcomeMutation.mutate({ id: selectedOutcome.id, data });
-    } else {
-      createOutcomeMutation.mutate(data);
-    }
-  };
-
-  const handleDeleteOutcome = (id: string) => {
-    if (confirm('Bu sonucu silmek istediğinizden emin misiniz?')) {
-      deleteOutcomeMutation.mutate(id);
-    }
-  };
-
-  const handleApplyFilters = () => {
-    setAppliedFilters(filters);
-    toast({ 
-      title: "Filtreler uygulandı",
-      description: "Görüşmeler filtrelendi.",
-    });
-  };
-
-  const handleClearFilters = () => {
-    setFilters({ status: 'all', sessionType: 'all' });
-    setAppliedFilters({});
-    toast({ 
-      title: "Filtreler temizlendi",
-      description: "Tüm filtreler kaldırıldı.",
     });
   };
 
@@ -785,14 +268,23 @@ export default function CounselingSessions() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Rehberlik Görüşmeleri</h1>
           <p className="text-muted-foreground mt-1">
-            Öğrenci görüşmelerini yönetin ve takip edin
+            Modern görüşme yönetimi ve analiz sistemi
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <Button 
+            onClick={() => setSearchOpen(true)}
+            size="lg"
+            variant="outline"
+            className="gap-2"
+          >
+            <SearchIcon className="h-5 w-5" />
+            Ara (⌘K)
+          </Button>
           <Button 
             onClick={() => setReportDialogOpen(true)}
             size="lg"
@@ -800,7 +292,7 @@ export default function CounselingSessions() {
             className="gap-2"
           >
             <Download className="h-5 w-5" />
-            Rapor Oluştur
+            Rapor
           </Button>
           <Button 
             onClick={() => setDialogOpen(true)}
@@ -814,85 +306,145 @@ export default function CounselingSessions() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5 min-h-[2.5rem]">
-          <TabsTrigger value="active" className="flex items-center gap-2 justify-center">
-            <Clock className="h-4 w-4" />
-            Aktif Görüşmeler
+        <TabsList className="grid w-full grid-cols-5 lg:grid-cols-5">
+          <TabsTrigger value="dashboard">
+            Dashboard
+          </TabsTrigger>
+          <TabsTrigger value="active">
+            Aktif
             {activeSessions.length > 0 && (
               <Badge variant="secondary" className="ml-2">{activeSessions.length}</Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="reminders" className="flex items-center gap-2 justify-center">
-            <Bell className="h-4 w-4" />
+          <TabsTrigger value="journal">
+            Defter
+          </TabsTrigger>
+          <TabsTrigger value="reminders">
             Hatırlatmalar
           </TabsTrigger>
-          <TabsTrigger value="outcomes" className="flex items-center gap-2 justify-center">
-            <CheckCircle2 className="h-4 w-4" />
-            Sonuçlar
-            {outcomes.length > 0 && (
-              <Badge variant="secondary" className="ml-2">{outcomes.length}</Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2 justify-center">
-            <BarChart3 className="h-4 w-4" />
-            İstatistikler
-          </TabsTrigger>
-          <TabsTrigger value="journal" className="flex items-center gap-2 justify-center">
-            <FileText className="h-4 w-4" />
-            Görüşme Defteri
+          <TabsTrigger value="analytics">
+            Analitik
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="active" className="space-y-4 min-h-[400px]">
+        <TabsContent value="dashboard" className="space-y-6">
+          <SessionStatsCards stats={stats} isLoading={sessionsLoading} />
+          
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Görüşme Takvimi</h2>
+            <div className="flex gap-2">
+              <Button
+                variant={viewMode === 'calendar' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('calendar')}
+              >
+                Takvim
+              </Button>
+              <Button
+                variant={viewMode === 'table' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('table')}
+              >
+                Tablo
+              </Button>
+              {isMobile && (
+                <Button
+                  variant={viewMode === 'cards' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('cards')}
+                >
+                  Kartlar
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {sessionsLoading ? (
+            viewMode === 'calendar' ? <CalendarSkeleton /> :
+            viewMode === 'table' ? <TableSkeleton /> :
+            <SessionGridSkeleton />
+          ) : (
+            <>
+              {viewMode === 'calendar' && (
+                <SessionCalendar
+                  sessions={filteredSessions}
+                  onSelectSession={handleSelectSession}
+                  onSelectSlot={() => setDialogOpen(true)}
+                />
+              )}
+              {viewMode === 'table' && (
+                <EnhancedSessionsTable
+                  sessions={filteredSessions}
+                  onExport={handleExport}
+                  onSelectSession={handleSelectSession}
+                />
+              )}
+              {viewMode === 'cards' && (
+                <SessionCardView
+                  sessions={filteredSessions}
+                  onSelectSession={handleSelectSession}
+                  onCompleteSession={handleCompleteSession}
+                />
+              )}
+            </>
+          )}
+        </TabsContent>
+
+        <TabsContent value="active" className="space-y-4">
           <ActiveSessionsGrid
             sessions={activeSessions}
             isLoading={sessionsLoading}
             onCompleteSession={handleCompleteSession}
-            onExtendSession={(id) => extendSessionMutation.mutate(id)}
-            extendingSessionId={extendSessionMutation.variables as string | undefined}
+            onExtendSession={(id) => actions.extendSessionMutation.mutate(id)}
+            extendingSessionId={actions.extendSessionMutation.variables as string | undefined}
           />
         </TabsContent>
 
-        <TabsContent value="reminders" className="space-y-4 min-h-[400px]">
+        <TabsContent value="journal" className="space-y-4">
+          {sessionsLoading ? (
+            <TableSkeleton />
+          ) : (
+            <EnhancedSessionsTable
+              sessions={completedSessions}
+              onExport={handleExport}
+              onSelectSession={handleSelectSession}
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent value="reminders" className="space-y-4">
           <RemindersTab
             reminders={reminders}
             followUps={followUps}
-            onCreateReminder={handleCreateReminder}
-            onCreateFollowUp={handleCreateFollowUp}
-            onEditReminder={handleEditReminder}
-            onEditFollowUp={handleEditFollowUp}
-            onCompleteReminder={(id) => updateReminderStatusMutation.mutate({ id, status: 'completed' })}
-            onCancelReminder={(id) => updateReminderStatusMutation.mutate({ id, status: 'cancelled' })}
-            onCompleteFollowUp={(id) => updateFollowUpStatusMutation.mutate({ id, status: 'completed' })}
-            onProgressFollowUp={(id) => updateFollowUpStatusMutation.mutate({ id, status: 'in_progress' })}
+            onCreateReminder={() => setReminderDialogOpen(true)}
+            onCreateFollowUp={() => setFollowUpDialogOpen(true)}
+            onEditReminder={(r) => { setSelectedReminder(r); setReminderDialogOpen(true); }}
+            onEditFollowUp={(f) => { setSelectedFollowUp(f); setFollowUpDialogOpen(true); }}
+            onCompleteReminder={(id) => actions.updateReminderStatusMutation.mutate({ id, status: 'completed' })}
+            onCancelReminder={(id) => actions.updateReminderStatusMutation.mutate({ id, status: 'cancelled' })}
+            onCompleteFollowUp={(id) => actions.updateFollowUpStatusMutation.mutate({ id, status: 'completed' })}
+            onProgressFollowUp={(id) => actions.updateFollowUpStatusMutation.mutate({ id, status: 'in_progress' })}
           />
         </TabsContent>
 
-        <TabsContent value="outcomes" className="space-y-4 min-h-[400px]">
-          <OutcomesTab
-            outcomes={outcomes}
-            onCreateOutcome={handleCreateOutcome}
-            onEditOutcome={handleEditOutcome}
-            onDeleteOutcome={handleDeleteOutcome}
-          />
-        </TabsContent>
-
-        <TabsContent value="analytics" className="space-y-4 min-h-[400px]">
-          <SessionAnalytics />
-        </TabsContent>
-
-        <TabsContent value="journal" className="space-y-4 min-h-[400px]">
-          <SessionFiltersComponent
-            filters={filters}
-            onFiltersChange={setFilters}
-            onApplyFilters={handleApplyFilters}
-            onClearFilters={handleClearFilters}
-            topics={topics}
-            isApplying={sessionsLoading}
-          />
-          <SessionsTable sessions={sessions} onExport={handleExport} />
+        <TabsContent value="analytics" className="space-y-6">
+          <EnhancedSessionAnalytics stats={stats} />
         </TabsContent>
       </Tabs>
+
+      <SessionSearch
+        sessions={sessions}
+        open={searchOpen}
+        onOpenChange={setSearchOpen}
+        onSelectSession={handleSelectSession}
+      />
+
+      <SessionDrawer
+        session={selectedSession}
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        onComplete={handleCompleteSession}
+      />
 
       <NewSessionDialog
         open={dialogOpen}
@@ -903,56 +455,80 @@ export default function CounselingSessions() {
         topics={topics}
         selectedStudents={selectedStudents}
         onSelectedStudentsChange={setSelectedStudents}
-        onSubmit={(data) => createSessionMutation.mutate(data)}
-        isPending={createSessionMutation.isPending}
+        onSubmit={handleCreateSession}
+        isPending={actions.createSessionMutation.isPending}
       />
 
-      <EnhancedCompleteSessionDialog
-        open={completeDialogOpen}
-        onOpenChange={setCompleteDialogOpen}
-        session={selectedSession}
-        onSubmit={handleCompleteSubmit}
-        isPending={completeSessionMutation.isPending}
-      />
+      {selectedSession && (
+        <EnhancedCompleteSessionDialog
+          open={completeDialogOpen}
+          onOpenChange={setCompleteDialogOpen}
+          session={selectedSession}
+          onSubmit={handleCompleteSubmit}
+          isPending={actions.completeSessionMutation.isPending}
+        />
+      )}
 
       <ReminderDialog
         open={reminderDialogOpen}
         onOpenChange={setReminderDialogOpen}
         students={students}
-        onSubmit={handleReminderSubmit}
-        isPending={createReminderMutation.isPending || updateReminderMutation.isPending}
         initialData={selectedReminder ? {
           id: selectedReminder.id,
+          sessionId: selectedReminder.sessionId,
           reminderType: selectedReminder.reminderType,
           reminderDate: new Date(selectedReminder.reminderDate),
           reminderTime: selectedReminder.reminderTime,
           title: selectedReminder.title,
           description: selectedReminder.description,
-          studentIds: JSON.parse(selectedReminder.studentIds),
+          studentIds: selectedReminder.studentIds ? JSON.parse(selectedReminder.studentIds) : [],
         } : undefined}
+        onSubmit={(data) => {
+          if (selectedReminder) {
+            actions.updateReminderMutation.mutate({ id: selectedReminder.id, data });
+          } else {
+            actions.createReminderMutation.mutate(data);
+          }
+          setReminderDialogOpen(false);
+          setSelectedReminder(null);
+        }}
+        isPending={selectedReminder 
+          ? actions.updateReminderMutation.isPending 
+          : actions.createReminderMutation.isPending
+        }
       />
 
       <FollowUpDialog
         open={followUpDialogOpen}
         onOpenChange={setFollowUpDialogOpen}
-        onSubmit={handleFollowUpSubmit}
-        isPending={createFollowUpMutation.isPending || updateFollowUpMutation.isPending}
         initialData={selectedFollowUp ? {
           id: selectedFollowUp.id,
+          sessionId: selectedFollowUp.sessionId,
           followUpDate: new Date(selectedFollowUp.followUpDate),
           assignedTo: selectedFollowUp.assignedTo,
           priority: selectedFollowUp.priority,
           actionItems: selectedFollowUp.actionItems,
           notes: selectedFollowUp.notes,
         } : undefined}
+        onSubmit={(data) => {
+          if (selectedFollowUp) {
+            actions.updateFollowUpMutation.mutate({ id: selectedFollowUp.id, data });
+          } else {
+            actions.createFollowUpMutation.mutate(data);
+          }
+          setFollowUpDialogOpen(false);
+          setSelectedFollowUp(null);
+        }}
+        isPending={selectedFollowUp 
+          ? actions.updateFollowUpMutation.isPending 
+          : actions.createFollowUpMutation.isPending
+        }
       />
 
       <SessionOutcomeDialog
         open={outcomeDialogOpen}
         onOpenChange={setOutcomeDialogOpen}
         session={selectedOutcome?.session || null}
-        onSubmit={handleOutcomeSubmit}
-        isPending={createOutcomeMutation.isPending || updateOutcomeMutation.isPending}
         initialData={selectedOutcome ? {
           id: selectedOutcome.id,
           sessionId: selectedOutcome.sessionId,
@@ -964,6 +540,19 @@ export default function CounselingSessions() {
           followUpRequired: selectedOutcome.followUpRequired,
           followUpDate: selectedOutcome.followUpDate ? new Date(selectedOutcome.followUpDate) : undefined,
         } : undefined}
+        onSubmit={(data) => {
+          if (selectedOutcome) {
+            actions.updateOutcomeMutation.mutate({ id: selectedOutcome.id, data });
+          } else {
+            actions.createOutcomeMutation.mutate(data);
+          }
+          setOutcomeDialogOpen(false);
+          setSelectedOutcome(null);
+        }}
+        isPending={selectedOutcome 
+          ? actions.updateOutcomeMutation.isPending 
+          : actions.createOutcomeMutation.isPending
+        }
       />
 
       <ReportGenerationDialog

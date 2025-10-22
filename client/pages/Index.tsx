@@ -221,7 +221,9 @@ export default function Index() {
         value: stats.studentCount, 
         icon: Users2, 
         color: "from-violet-500/20 to-purple-600/20",
+        bgGradient: "from-violet-50/50 via-purple-50/30 to-background dark:from-violet-950/20 dark:via-purple-950/10 dark:to-background",
         iconColor: "text-violet-600",
+        borderColor: "hover:border-violet-300 dark:hover:border-violet-700",
         change: "+12%",
         trend: "up"
       },
@@ -230,7 +232,9 @@ export default function Index() {
         value: stats.meetingCount, 
         icon: CalendarDays, 
         color: "from-blue-500/20 to-indigo-600/20",
+        bgGradient: "from-blue-50/50 via-indigo-50/30 to-background dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-background",
         iconColor: "text-blue-600",
+        borderColor: "hover:border-blue-300 dark:hover:border-blue-700",
         change: `${stats.activeCounselingSessionsToday} bugün`,
         trend: "neutral"
       },
@@ -239,7 +243,9 @@ export default function Index() {
         value: stats.openInterventionCount, 
         icon: AlertTriangle, 
         color: "from-amber-500/20 to-orange-600/20",
+        bgGradient: "from-amber-50/50 via-orange-50/30 to-background dark:from-amber-950/20 dark:via-orange-950/10 dark:to-background",
         iconColor: "text-amber-600",
+        borderColor: "hover:border-amber-300 dark:hover:border-amber-700",
         change: `${stats.completedInterventionsThisMonth} bu ay`,
         trend: "neutral"
       },
@@ -248,7 +254,9 @@ export default function Index() {
         value: stats.activeSurveyCount, 
         icon: MessageSquare, 
         color: "from-emerald-500/20 to-green-600/20",
+        bgGradient: "from-emerald-50/50 via-green-50/30 to-background dark:from-emerald-950/20 dark:via-green-950/10 dark:to-background",
         iconColor: "text-emerald-600",
+        borderColor: "hover:border-emerald-300 dark:hover:border-emerald-700",
         change: "Devam ediyor",
         trend: "neutral"
       },
@@ -319,7 +327,7 @@ export default function Index() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1, duration: 0.3 }}
           >
-            <Card className="group hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer border-2 hover:border-primary/50 bg-gradient-to-br from-card to-card/50">
+            <Card className={`group hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer border-2 ${stat.borderColor} bg-gradient-to-br ${stat.bgGradient}`}>
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="space-y-2 flex-1">
