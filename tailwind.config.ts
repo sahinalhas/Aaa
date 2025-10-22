@@ -8,14 +8,15 @@ export default {
     container: {
       center: true,
       padding: {
-        DEFAULT: "1rem",
-        sm: "1.5rem",
-        md: "2rem",
-        lg: "3rem",
-        xl: "4rem",
-        "2xl": "5rem",
+        DEFAULT: "0.75rem",
+        sm: "1rem",
+        md: "1.5rem",
+        lg: "2rem",
+        xl: "3rem",
+        "2xl": "4rem",
       },
       screens: {
+        xs: "475px",
         sm: "640px",
         md: "768px",
         lg: "1024px",
@@ -178,8 +179,23 @@ export default {
   },
   plugins: [
     require("tailwindcss-animate"),
-    function({ addVariant }: any) {
+    function({ addVariant, addUtilities }: any) {
       addVariant('hover-hover', '@media (hover: hover) and (pointer: fine)');
+      addVariant('touch', '@media (hover: none) and (pointer: coarse)');
+      addUtilities({
+        '.tap-highlight-transparent': {
+          '-webkit-tap-highlight-color': 'transparent',
+        },
+        '.touch-pan-y': {
+          'touch-action': 'pan-y',
+        },
+        '.touch-pan-x': {
+          'touch-action': 'pan-x',
+        },
+        '.touch-manipulation': {
+          'touch-action': 'manipulation',
+        },
+      });
     }
   ],
 } satisfies Config;

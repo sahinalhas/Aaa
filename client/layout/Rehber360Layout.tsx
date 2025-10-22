@@ -247,14 +247,14 @@ export default function Rehber360Layout() {
   return (
     <SidebarProvider open={open} onOpenChange={setOpen} defaultOpen={isDesktop}>
       <Sidebar className="border-r" collapsible="icon">
-        <SidebarHeader>
+        <SidebarHeader className="p-3 md:p-4">
           <Brand />
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent className="pb-20 md:pb-4">
           <SidebarGroup>
-            <SidebarGroupLabel>Modüller</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-3 py-2 text-xs md:text-sm">Modüller</SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="gap-1">
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Ana Sayfa">
                     <NavLink to="/" end>
@@ -324,11 +324,11 @@ export default function Rehber360Layout() {
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-10 border-b bg-gradient-to-b from-background/70 to-background/40 supports-[backdrop-filter]:backdrop-blur-xl">
-          <div className="flex h-14 items-center gap-3 px-4 md:px-6">
-            <SidebarTrigger />
-            <Separator orientation="vertical" className="h-6" />
-            <Breadcrumb>
-              <BreadcrumbList>
+          <div className="flex h-14 md:h-16 items-center gap-2 md:gap-3 px-3 md:px-6">
+            <SidebarTrigger className="h-10 w-10 md:h-9 md:w-9" />
+            <Separator orientation="vertical" className="h-6 hidden sm:block" />
+            <Breadcrumb className="hidden sm:block">
+              <BreadcrumbList className="text-sm">
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
                     <Link to="/">Ana Sayfa</Link>
@@ -350,11 +350,12 @@ export default function Rehber360Layout() {
                 ))}
               </BreadcrumbList>
             </Breadcrumb>
-            <div className="ml-auto flex items-center gap-2 relative">
+            <div className="ml-auto flex items-center gap-1 md:gap-2 relative">
               {!searchOpen ? (
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="h-10 w-10 md:h-9 md:w-9"
                   onClick={() => {
                     setSearchOpen(true);
                     setTimeout(() => {
@@ -367,7 +368,7 @@ export default function Rehber360Layout() {
                   <Search className="h-5 w-5" />
                 </Button>
               ) : (
-                <div className="absolute right-0 top-0 z-50 w-full sm:w-[400px] max-w-[calc(100vw-2rem)]">
+                <div className="fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-16 sm:top-0 z-50 sm:w-[400px]">
                   <div className="relative">
                     <Input
                       id="header-search-input"
@@ -402,8 +403,8 @@ export default function Rehber360Layout() {
                     searchResults.surveys.length > 0 || 
                     searchResults.pages.length > 0
                   ) && (
-                    <Card className="search-results absolute top-12 w-full max-h-[400px] overflow-hidden shadow-lg border-primary/20">
-                      <ScrollArea className="h-full max-h-[400px]">
+                    <Card className="search-results absolute top-12 w-full max-h-[60vh] sm:max-h-[400px] overflow-hidden shadow-lg border-primary/20">
+                      <ScrollArea className="h-full max-h-[60vh] sm:max-h-[400px]">
                         {searchResults.students.length > 0 && (
                           <div className="p-2">
                             <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Öğrenciler</div>
@@ -517,10 +518,11 @@ export default function Rehber360Layout() {
                   )}
                 </div>
               )}
-              <AIStatusIndicator />
+              <AIStatusIndicator className="hidden sm:flex" />
               <Button
                 variant="ghost"
                 size="icon"
+                className="h-10 w-10 md:h-9 md:w-9"
                 onClick={() =>
                   setDark((v) => {
                     const next = !v;
@@ -531,20 +533,20 @@ export default function Rehber360Layout() {
                 aria-label="Tema Değiştir"
               >
                 {dark ? (
-                  <Sun className="h-5 w-5" />
+                  <Sun className="h-4 w-4 md:h-5 md:w-5" />
                 ) : (
-                  <Moon className="h-5 w-5" />
+                  <Moon className="h-4 w-4 md:h-5 md:w-5" />
                 )}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring">
-                    <Avatar className="size-8">
-                      <AvatarFallback>{initials}</AvatarFallback>
+                  <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring p-1">
+                    <Avatar className="size-9 md:size-8">
+                      <AvatarFallback className="text-sm">{initials}</AvatarFallback>
                     </Avatar>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-56 mr-2 md:mr-0">
                   <DropdownMenuLabel>Hızlı Erişim</DropdownMenuLabel>
                   <DropdownMenuItem asChild>
                     <Link to="/ayarlar?tab=genel#account">Profil Düzenle</Link>
@@ -563,7 +565,7 @@ export default function Rehber360Layout() {
             </div>
           </div>
         </header>
-        <div className="p-6 md:p-8">
+        <div className="p-3 sm:p-4 md:p-6 lg:p-8">
           <Outlet />
         </div>
       </SidebarInset>
