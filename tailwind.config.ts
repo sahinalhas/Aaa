@@ -163,6 +163,56 @@ export default {
             boxShadow: "0 0 30px hsl(var(--primary) / 0.5)",
           },
         },
+        "bounce-subtle": {
+          "0%, 100%": {
+            transform: "translateY(0)",
+          },
+          "50%": {
+            transform: "translateY(-5px)",
+          },
+        },
+        "float": {
+          "0%, 100%": {
+            transform: "translateY(0px)",
+          },
+          "50%": {
+            transform: "translateY(-10px)",
+          },
+        },
+        "gradient-x": {
+          "0%, 100%": {
+            backgroundPosition: "0% 50%",
+          },
+          "50%": {
+            backgroundPosition: "100% 50%",
+          },
+        },
+        "gradient-y": {
+          "0%, 100%": {
+            backgroundPosition: "50% 0%",
+          },
+          "50%": {
+            backgroundPosition: "50% 100%",
+          },
+        },
+        "spin-slow": {
+          from: {
+            transform: "rotate(0deg)",
+          },
+          to: {
+            transform: "rotate(360deg)",
+          },
+        },
+        "ping-slow": {
+          "0%": {
+            transform: "scale(1)",
+            opacity: "1",
+          },
+          "75%, 100%": {
+            transform: "scale(2)",
+            opacity: "0",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -174,6 +224,12 @@ export default {
         "slide-in-left": "slide-in-left 0.4s ease-out",
         "shimmer": "shimmer 2s infinite linear",
         "glow": "glow 2s ease-in-out infinite",
+        "bounce-subtle": "bounce-subtle 2s ease-in-out infinite",
+        "float": "float 3s ease-in-out infinite",
+        "gradient-x": "gradient-x 15s ease infinite",
+        "gradient-y": "gradient-y 15s ease infinite",
+        "spin-slow": "spin-slow 8s linear infinite",
+        "ping-slow": "ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite",
       },
     },
   },

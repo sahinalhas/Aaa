@@ -8,6 +8,25 @@ export const CHART_COLORS = {
   accent: "#7c3aed",
 } as const;
 
+export const GRADIENT_COLORS = {
+  primary: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  success: "linear-gradient(135deg, #16a34a 0%, #15803d 100%)",
+  warning: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+  danger: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+  info: "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)",
+  accent: "linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)",
+  vibrant: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+  sunset: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+  ocean: "linear-gradient(135deg, #2e3192 0%, #1bffff 100%)",
+} as const;
+
+export const GLASS_STYLES = {
+  light: "bg-white/70 backdrop-blur-md border border-white/20",
+  dark: "bg-gray-900/70 backdrop-blur-md border border-gray-700/20",
+  primary: "bg-primary/10 backdrop-blur-md border border-primary/20",
+  accent: "bg-accent/10 backdrop-blur-md border border-accent/20",
+} as const;
+
 export const RISK_COLORS = {
   Düşük: "#16a34a",
   Orta: "#d97706",
