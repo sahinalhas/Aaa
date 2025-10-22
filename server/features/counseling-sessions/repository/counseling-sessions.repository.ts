@@ -73,10 +73,13 @@ function ensureInitialized(): void {
     `),
     autoCompleteSession: db.prepare(`
       UPDATE counseling_sessions 
-      SET exitTime = ?, completed = 1, autoCompleted = 1, 
-          detailedNotes = COALESCE(detailedNotes, '') || '\n\n⚠️ Bu görüşme otomatik olarak tamamlanmıştır.',
+      SET exitTime = ?, 
+          exitClassHourId = NULL,
+          completed = 1, 
+          autoCompleted = 1, 
+          detailedNotes = COALESCE(detailedNotes, '') || CHAR(10) || CHAR(10) || '⚠️ Bu görüşme otomatik olarak tamamlanmıştır (60+ dakika).',
           updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
+      WHERE id = ? AND completed = 0
     `),
     deleteSession: db.prepare('DELETE FROM counseling_sessions WHERE id = ?'),
     getAppSettings: db.prepare('SELECT settings FROM app_settings WHERE id = 1')
@@ -180,7 +183,7 @@ export function completeSession(
     communicationQuality || null,
     sessionTags || null,
     achievedOutcomes || null,
-    followUpNeeded || 0,
+    followUpNeeded !== undefined ? followUpNeeded : 0,
     followUpPlan || null,
     actionItems || null,
     id

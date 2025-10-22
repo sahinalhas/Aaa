@@ -163,8 +163,14 @@ export function autoCompleteSessions(): { success: boolean; completedCount: numb
   const completedCount = sessionsToComplete.length;
   
   if (completedCount > 0) {
+    console.log(`⏰ Auto-completing ${completedCount} session(s) that exceeded time limit...`);
     for (const session of sessionsToComplete) {
-      repository.autoCompleteSession(session.id, currentTime);
+      try {
+        repository.autoCompleteSession(session.id, currentTime);
+        console.log(`✅ Auto-completed session: ${session.id}`);
+      } catch (error) {
+        console.error(`❌ Failed to auto-complete session ${session.id}:`, error);
+      }
     }
   }
   
