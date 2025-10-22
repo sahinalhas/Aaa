@@ -18,9 +18,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
   SidebarSeparator,
@@ -54,23 +51,16 @@ import {
   MessageSquare,
   BarChart3,
   Settings,
-  ShieldAlert,
   Search,
-  Bot,
-  Brain,
-  ChevronDown,
   Sparkles,
   ClipboardList,
-  Menu,
+  LogOut,
+  User,
+  Bell,
 } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { loadSettings, updateSettings, SETTINGS_KEY, AppSettings } from "@/lib/app-settings";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -80,31 +70,33 @@ import AIStatusIndicator from "@/components/AIStatusIndicator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
-function Brand() {
+// Modern Logo Component
+function AppLogo() {
   const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
 
   return (
     <Link
       to="/"
-      className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-sidebar-accent transition-all duration-200"
-      title={state === "collapsed" ? "Rehber360 - Ana Sayfa" : ""}
+      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent/50 transition-all duration-300 group"
+      title={isCollapsed ? "Rehber360 - Ana Sayfa" : ""}
     >
-      <div className="size-8 rounded-md bg-primary text-primary-foreground grid place-items-center font-extrabold shrink-0">
+      <div className="size-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground grid place-items-center font-black text-xl shrink-0 shadow-md group-hover:shadow-lg transition-shadow">
         R
       </div>
-      <div className={cn(
-        "leading-tight overflow-hidden transition-all duration-200",
-        state === "collapsed" ? "w-0 opacity-0" : "w-auto opacity-100"
-      )}>
-        <div className="text-sm font-bold whitespace-nowrap">Rehber360</div>
-        <div className="text-[10px] text-muted-foreground whitespace-nowrap">
-          Dijital Rehberlik Sistemi
+      {!isCollapsed && (
+        <div className="leading-tight">
+          <div className="text-base font-bold tracking-tight">Rehber360</div>
+          <div className="text-[11px] text-muted-foreground font-medium">
+            Dijital Rehberlik
+          </div>
         </div>
-      </div>
+      )}
     </Link>
   );
 }
 
+// Modern Breadcrumb Hook
 function useBreadcrumbs() {
   const location = useLocation();
   const crumbs = useMemo(() => {
@@ -117,11 +109,6 @@ function useBreadcrumbs() {
       "olcme-degerlendirme": "Ölçme Değerlendirme",
       ayarlar: "Ayarlar",
       "ai-araclari": "AI Araçları",
-      risk: "Risk Takip",
-      "ai-asistan": "AI Asistan",
-      "ai-insights": "Günlük AI Raporları",
-      "gelismis-analiz": "Derinlemesine Analiz",
-      "gunluk-plan": "Günlük Plan",
     };
     const parts = location.pathname.split("/").filter(Boolean);
     return parts.map((p, i) => ({
@@ -133,29 +120,60 @@ function useBreadcrumbs() {
   return crumbs;
 }
 
-function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    setMatches(media.matches);
-
-    const listener = () => setMatches(media.matches);
-    media.addEventListener("change", listener);
-    return () => media.removeEventListener("change", listener);
-  }, [query]);
-
-  return matches;
-}
+// Modern Navigation Items
+const navigationItems = [
+  {
+    label: "Ana Sayfa",
+    icon: BarChart3,
+    to: "/",
+    end: true,
+  },
+  {
+    label: "Öğrenci Yönetimi",
+    icon: Users2,
+    to: "/ogrenci",
+  },
+  {
+    label: "Görüşmeler",
+    icon: CalendarDays,
+    to: "/gorusmeler",
+  },
+  {
+    label: "Anket & Test",
+    icon: MessageSquare,
+    to: "/anketler",
+  },
+  {
+    label: "Raporlama",
+    icon: FileText,
+    to: "/raporlar",
+  },
+  {
+    label: "Ölçme Değerlendirme",
+    icon: ClipboardList,
+    to: "/olcme-degerlendirme",
+  },
+  {
+    label: "AI Araçları",
+    icon: Sparkles,
+    to: "/ai-araclari",
+  },
+  {
+    label: "Ayarlar",
+    icon: Settings,
+    to: "/ayarlar",
+  },
+];
 
 export default function Rehber360Layout() {
-  const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const [dark, setDark] = useState(false);
   const [account, setAccount] = useState<AppSettings["account"] | undefined>(undefined);
-
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useIsMobile();
+  const crumbs = useBreadcrumbs();
+  const navigate = useNavigate();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -169,6 +187,7 @@ export default function Rehber360Layout() {
     return (first + second).toUpperCase();
   }, [account]);
 
+  // Load Settings
   useEffect(() => {
     loadSettings().then(settings => {
       setDark(settings.theme === "dark");
@@ -176,12 +195,14 @@ export default function Rehber360Layout() {
     });
   }, []);
 
+  // Apply Dark Mode
   useEffect(() => {
     const root = document.documentElement;
     if (dark) root.classList.add("dark");
     else root.classList.remove("dark");
   }, [dark]);
 
+  // Settings Storage Listener
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (e.key === SETTINGS_KEY) {
@@ -197,13 +218,8 @@ export default function Rehber360Layout() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  const crumbs = useBreadcrumbs();
-  const navigate = useNavigate();
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // Evrensel arama için API çağrısı
-  const { data: searchResults, refetch: refetchSearch } = useQuery<{
+  // Global Search
+  const { data: searchResults } = useQuery<{
     students: any[];
     counselingSessions: any[];
     surveys: any[];
@@ -221,7 +237,7 @@ export default function Rehber360Layout() {
     enabled: searchQuery.length >= 2,
   });
 
-
+  // Keyboard Shortcuts
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
@@ -243,91 +259,57 @@ export default function Rehber360Layout() {
     return () => window.removeEventListener("keydown", onKey);
   }, [searchOpen]);
 
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
   return (
-    <SidebarProvider defaultOpen={isDesktop}>
+    <SidebarProvider defaultOpen={!isMobile}>
       <Sidebar collapsible="icon" variant="sidebar">
-        <SidebarHeader className="p-3 md:p-4">
-          <Brand />
+        <SidebarHeader className="p-4 border-b border-sidebar-border">
+          <AppLogo />
         </SidebarHeader>
-        <SidebarContent className="pb-20 md:pb-4">
+
+        <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel className="px-2 py-2 text-xs md:text-sm">Modüller</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Navigasyon
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu className="gap-1 px-2">
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Ana Sayfa">
-                    <NavLink to="/" end>
-                      <BarChart3 /> <span>Ana Sayfa</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Öğrenci Yönetimi">
-                    <NavLink to="/ogrenci">
-                      <Users2 /> <span>Öğrenci Yönetimi</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Görüşmeler">
-                    <NavLink to="/gorusmeler">
-                      <CalendarDays /> <span>Görüşmeler</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Anket & Test">
-                    <NavLink to="/anketler">
-                      <MessageSquare /> <span>Anket & Test</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Raporlama">
-                    <NavLink to="/raporlar">
-                      <FileText /> <span>Raporlama</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Ölçme Değerlendirme">
-                    <NavLink to="/olcme-degerlendirme">
-                      <ClipboardList /> <span>Ölçme Değerlendirme</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="AI Araçları">
-                    <NavLink to="/ai-araclari">
-                      <Sparkles /> <span>AI Araçları</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Ayarlar">
-                    <NavLink to="/ayarlar">
-                      <Settings /> <span>Ayarlar</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {navigationItems.map((item) => (
+                  <SidebarMenuItem key={item.to}>
+                    <SidebarMenuButton asChild tooltip={item.label}>
+                      <NavLink to={item.to} end={item.end}>
+                        <item.icon className="h-5 w-5" />
+                        <span className="font-medium">{item.label}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter>
+
+        <SidebarFooter className="p-3 border-t border-sidebar-border">
+          <div className="flex items-center gap-2 px-2 py-2">
+            <AIStatusIndicator className="flex-1" />
+          </div>
         </SidebarFooter>
+
         <SidebarRail />
       </Sidebar>
+
       <SidebarInset>
-        <header className="sticky top-0 left-0 right-0 z-10 border-b bg-gradient-to-b from-background/70 to-background/40 supports-[backdrop-filter]:backdrop-blur-xl">
-          <div className="flex h-14 md:h-16 items-center gap-2 md:gap-3 px-3 md:px-6">
-            <SidebarTrigger className="h-10 w-10 md:h-9 md:w-9 shrink-0" />
-            <Separator orientation="vertical" className="h-6 hidden sm:block" />
+        <header className="sticky top-0 left-0 right-0 z-10 border-b bg-background/80 backdrop-blur-xl">
+          <div className="flex h-16 items-center gap-4 px-6">
+            <SidebarTrigger className="h-9 w-9" />
+            <Separator orientation="vertical" className="h-6" />
+
             <Breadcrumb className="hidden sm:block">
-              <BreadcrumbList className="text-sm">
+              <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
                     <Link to="/">Ana Sayfa</Link>
@@ -349,61 +331,51 @@ export default function Rehber360Layout() {
                 ))}
               </BreadcrumbList>
             </Breadcrumb>
-            <div className="ml-auto flex items-center gap-1 md:gap-2 relative">
+
+            <div className="ml-auto flex items-center gap-2">
               {!searchOpen ? (
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10 md:h-9 md:w-9"
                   onClick={() => {
                     setSearchOpen(true);
                     setTimeout(() => {
                       document.getElementById('header-search-input')?.focus();
                     }, 100);
                   }}
-                  aria-label="Ara"
                   title="Ara (⌘K / Ctrl+K)"
                 >
                   <Search className="h-5 w-5" />
                 </Button>
               ) : (
-                <div className="fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-16 sm:top-0 z-50 sm:w-[400px]">
-                  <div className="relative">
-                    <Input
-                      id="header-search-input"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Öğrenci, görüşme, anket veya sayfa ara... (ESC)"
-                      className="pr-8"
-                      onBlur={() => {
-                        setTimeout(() => {
-                          if (!document.activeElement?.closest('.search-results')) {
-                            setSearchOpen(false);
-                            setSearchQuery("");
-                          }
-                        }, 200);
-                      }}
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-0 top-0 h-10 w-10"
-                      onClick={() => {
+                <div className="relative w-[400px]">
+                  <Input
+                    id="header-search-input"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Ara... (ESC)"
+                    className="pr-10"
+                    onBlur={() => {
+                      setTimeout(() => {
                         setSearchOpen(false);
                         setSearchQuery("");
-                      }}
-                    >
-                      <Search className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      }, 200);
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-10 w-10"
+                    onClick={() => {
+                      setSearchOpen(false);
+                      setSearchQuery("");
+                    }}
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
                   {searchQuery && searchQuery.length >= 2 && searchResults && (
-                    searchResults.students.length > 0 ||
-                    searchResults.counselingSessions.length > 0 ||
-                    searchResults.surveys.length > 0 ||
-                    searchResults.pages.length > 0
-                  ) && (
-                    <Card className="search-results absolute top-12 w-full max-h-[60vh] sm:max-h-[400px] overflow-hidden shadow-lg border-primary/20">
-                      <ScrollArea className="h-full max-h-[60vh] sm:max-h-[400px]">
+                    <Card className="absolute top-12 w-full max-h-[400px] overflow-hidden shadow-lg">
+                      <ScrollArea className="h-full max-h-[400px]">
                         {searchResults.students.length > 0 && (
                           <div className="p-2">
                             <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Öğrenciler</div>
@@ -415,89 +387,13 @@ export default function Rehber360Layout() {
                                   setSearchOpen(false);
                                   setSearchQuery("");
                                 }}
-                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-accent text-left transition-colors"
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-accent text-left"
                               >
-                                <Users2 className="h-4 w-4 text-muted-foreground shrink-0" />
-                                <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                                  <div className="font-medium truncate">{student.name}</div>
-                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <span>No: {student.id}</span>
-                                    {student.className && (
-                                      <>
-                                        <span>•</span>
-                                        <span>Sınıf: {student.className}</span>
-                                      </>
-                                    )}
-                                  </div>
+                                <Users2 className="h-4 w-4 text-muted-foreground" />
+                                <div>
+                                  <div className="font-medium">{student.name}</div>
+                                  <div className="text-xs text-muted-foreground">No: {student.id}</div>
                                 </div>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                        {searchResults.counselingSessions.length > 0 && (
-                          <div className="p-2">
-                            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Görüşmeler</div>
-                            {searchResults.counselingSessions.map((session) => (
-                              <button
-                                key={session.id}
-                                onClick={() => {
-                                  navigate(`/gorusmeler`);
-                                  setSearchOpen(false);
-                                  setSearchQuery("");
-                                }}
-                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-accent text-left transition-colors"
-                              >
-                                <CalendarDays className="h-4 w-4 text-muted-foreground shrink-0" />
-                                <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                                  <div className="font-medium truncate">{session.title}</div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {new Date(session.date).toLocaleDateString('tr-TR')}
-                                    {session.studentNames && ` • ${session.studentNames}`}
-                                  </div>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                        {searchResults.surveys.length > 0 && (
-                          <div className="p-2">
-                            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Anketler</div>
-                            {searchResults.surveys.map((survey) => (
-                              <button
-                                key={survey.id}
-                                onClick={() => {
-                                  navigate(`/anketler`);
-                                  setSearchOpen(false);
-                                  setSearchQuery("");
-                                }}
-                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-accent text-left transition-colors"
-                              >
-                                <MessageSquare className="h-4 w-4 text-muted-foreground shrink-0" />
-                                <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                                  <div className="font-medium truncate">{survey.title}</div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {survey.status} • {new Date(survey.createdAt).toLocaleDateString('tr-TR')}
-                                  </div>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                        {searchResults.pages.length > 0 && (
-                          <div className="p-2">
-                            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Sayfalar</div>
-                            {searchResults.pages.map((item) => (
-                              <button
-                                key={item.path}
-                                onClick={() => {
-                                  navigate(item.path);
-                                  setSearchOpen(false);
-                                  setSearchQuery("");
-                                }}
-                                className="w-full flex items-center gap-2 px-2 py-2 rounded-md hover:bg-accent text-left transition-colors"
-                              >
-                                <Search className="h-4 w-4 text-muted-foreground shrink-0" />
-                                <span className="truncate">{item.label}</span>
                               </button>
                             ))}
                           </div>
@@ -505,23 +401,12 @@ export default function Rehber360Layout() {
                       </ScrollArea>
                     </Card>
                   )}
-                  {searchQuery && searchQuery.length >= 2 && searchResults && (
-                    searchResults.students.length === 0 &&
-                    searchResults.counselingSessions.length === 0 &&
-                    searchResults.surveys.length === 0 &&
-                    searchResults.pages.length === 0
-                  ) && (
-                    <Card className="search-results absolute top-12 w-full p-4 text-sm text-muted-foreground text-center">
-                      Sonuç bulunamadı
-                    </Card>
-                  )}
                 </div>
               )}
-              <AIStatusIndicator className="hidden sm:flex" />
+
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 md:h-9 md:w-9"
                 onClick={() =>
                   setDark((v) => {
                     const next = !v;
@@ -529,42 +414,45 @@ export default function Rehber360Layout() {
                     return next;
                   })
                 }
-                aria-label="Tema Değiştir"
               >
-                {dark ? (
-                  <Sun className="h-4 w-4 md:h-5 md:w-5" />
-                ) : (
-                  <Moon className="h-4 w-4 md:h-5 md:w-5" />
-                )}
+                {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring p-1">
-                    <Avatar className="size-9 md:size-8">
-                      <AvatarFallback className="text-sm">{initials}</AvatarFallback>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="text-sm font-semibold">{initials}</AvatarFallback>
                     </Avatar>
-                  </button>
+                  </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 mr-2 md:mr-0">
-                  <DropdownMenuLabel>Hızlı Erişim</DropdownMenuLabel>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Hesabım</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to="/ayarlar?tab=genel#account">Profil Düzenle</Link>
+                    <Link to="/ayarlar" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Profil
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/ayarlar?tab=bildirim#notifications">
+                    <Link to="/bildirimler" className="flex items-center gap-2">
+                      <Bell className="h-4 w-4" />
                       Bildirimler
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/ayarlar">Ayarlar</Link>
+                  <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 text-destructive">
+                    <LogOut className="h-4 w-4" />
+                    Çıkış Yap
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
         </header>
-        <div className={`p-3 sm:p-4 md:p-6 lg:p-8 ${isMobile ? 'pb-20' : ''}`}>
+
+        <div className={`p-6 ${isMobile ? 'pb-20' : ''}`}>
           <div className="max-w-full overflow-x-hidden">
             <Outlet />
           </div>
