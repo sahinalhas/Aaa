@@ -371,6 +371,19 @@
     body {
       font-size: 16px; /* Prevents iOS zoom on input focus */
       padding-bottom: env(safe-area-inset-bottom);
+      overflow-x: hidden;
+    }
+    
+    /* Sidebar overlay fix for mobile */
+    [data-mobile="true"] {
+      left: 0 !important;
+      right: auto !important;
+      max-width: 85vw !important;
+    }
+    
+    /* Remove any residual sidebar elements on mobile */
+    .peer.hidden.md\\:block {
+      display: none !important;
     }
 
     /* Larger touch targets for mobile */

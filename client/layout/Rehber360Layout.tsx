@@ -328,7 +328,7 @@ export default function Rehber360Layout() {
       <SidebarInset>
         <header className="sticky top-0 z-10 border-b bg-gradient-to-b from-background/70 to-background/40 supports-[backdrop-filter]:backdrop-blur-xl">
           <div className="flex h-14 md:h-16 items-center gap-2 md:gap-3 px-3 md:px-6">
-            <SidebarTrigger className="h-10 w-10 md:h-9 md:w-9" />
+            <SidebarTrigger className="h-10 w-10 md:h-9 md:w-9 shrink-0" />
             <Separator orientation="vertical" className="h-6 hidden sm:block" />
             <Breadcrumb className="hidden sm:block">
               <BreadcrumbList className="text-sm">
