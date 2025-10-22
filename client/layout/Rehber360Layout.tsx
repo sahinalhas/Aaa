@@ -150,7 +150,6 @@ export default function Rehber360Layout() {
   const { isAuthenticated } = useAuth();
   const [dark, setDark] = useState(false);
   const [account, setAccount] = useState<AppSettings["account"] | undefined>(undefined);
-  const [open, setOpen] = useState<boolean | undefined>(undefined);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const isMobile = useIsMobile();
@@ -194,12 +193,6 @@ export default function Rehber360Layout() {
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, []);
-
-  useEffect(() => {
-    if (isMobile) {
-      setOpen(false);
-    }
-  }, [location.pathname, isMobile]);
 
   const crumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -248,7 +241,7 @@ export default function Rehber360Layout() {
   }, [searchOpen]);
 
   return (
-    <SidebarProvider open={open} onOpenChange={setOpen} defaultOpen={isDesktop}>
+    <SidebarProvider defaultOpen={isDesktop}>
       <Sidebar className="border-r" collapsible="icon">
         <SidebarHeader className="p-3 md:p-4">
           <Brand />
