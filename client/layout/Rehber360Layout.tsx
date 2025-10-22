@@ -61,6 +61,7 @@ import {
   ChevronDown,
   Sparkles,
   ClipboardList,
+  Menu,
 } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { loadSettings, updateSettings, SETTINGS_KEY, AppSettings } from "@/lib/app-settings";
@@ -254,9 +255,9 @@ export default function Rehber360Layout() {
         </SidebarHeader>
         <SidebarContent className="pb-20 md:pb-4">
           <SidebarGroup>
-            <SidebarGroupLabel className="px-3 py-2 text-xs md:text-sm">Modüller</SidebarGroupLabel>
+            <SidebarGroupLabel className="px-2 py-2 text-xs md:text-sm">Modüller</SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu className="gap-1">
+              <SidebarMenu className="gap-1 px-2">
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Ana Sayfa">
                     <NavLink to="/" end>
