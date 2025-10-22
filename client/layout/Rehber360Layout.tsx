@@ -10,17 +10,12 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarRail,
-  SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -57,6 +52,7 @@ import {
   LogOut,
   User,
   Bell,
+  Home,
 } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { loadSettings, updateSettings, SETTINGS_KEY, AppSettings } from "@/lib/app-settings";
@@ -70,7 +66,7 @@ import AIStatusIndicator from "@/components/AIStatusIndicator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
-// Modern Logo Component
+// Modern minimalist logo
 function AppLogo() {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
@@ -78,25 +74,27 @@ function AppLogo() {
   return (
     <Link
       to="/"
-      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent/50 transition-all duration-300 group"
-      title={isCollapsed ? "Rehber360 - Ana Sayfa" : ""}
+      className={cn(
+        "flex items-center gap-3 px-2 py-3 transition-all duration-200",
+        "hover:opacity-80"
+      )}
     >
-      <div className="size-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground grid place-items-center font-black text-xl shrink-0 shadow-md group-hover:shadow-lg transition-shadow">
+      <div className="size-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg shrink-0">
         R
       </div>
       {!isCollapsed && (
-        <div className="leading-tight">
-          <div className="text-base font-bold tracking-tight">Rehber360</div>
-          <div className="text-[11px] text-muted-foreground font-medium">
+        <div className="flex flex-col leading-none">
+          <span className="text-sm font-semibold tracking-tight">Rehber360</span>
+          <span className="text-[10px] text-muted-foreground mt-0.5">
             Dijital Rehberlik
-          </div>
+          </span>
         </div>
       )}
     </Link>
   );
 }
 
-// Modern Breadcrumb Hook
+// Modern breadcrumb
 function useBreadcrumbs() {
   const location = useLocation();
   const crumbs = useMemo(() => {
@@ -120,49 +118,16 @@ function useBreadcrumbs() {
   return crumbs;
 }
 
-// Modern Navigation Items
+// Modern navigation
 const navigationItems = [
-  {
-    label: "Ana Sayfa",
-    icon: BarChart3,
-    to: "/",
-    end: true,
-  },
-  {
-    label: "Öğrenci Yönetimi",
-    icon: Users2,
-    to: "/ogrenci",
-  },
-  {
-    label: "Görüşmeler",
-    icon: CalendarDays,
-    to: "/gorusmeler",
-  },
-  {
-    label: "Anket & Test",
-    icon: MessageSquare,
-    to: "/anketler",
-  },
-  {
-    label: "Raporlama",
-    icon: FileText,
-    to: "/raporlar",
-  },
-  {
-    label: "Ölçme Değerlendirme",
-    icon: ClipboardList,
-    to: "/olcme-degerlendirme",
-  },
-  {
-    label: "AI Araçları",
-    icon: Sparkles,
-    to: "/ai-araclari",
-  },
-  {
-    label: "Ayarlar",
-    icon: Settings,
-    to: "/ayarlar",
-  },
+  { label: "Ana Sayfa", icon: Home, to: "/", end: true },
+  { label: "Öğrenci Yönetimi", icon: Users2, to: "/ogrenci" },
+  { label: "Görüşmeler", icon: CalendarDays, to: "/gorusmeler" },
+  { label: "Anket & Test", icon: MessageSquare, to: "/anketler" },
+  { label: "Raporlama", icon: FileText, to: "/raporlar" },
+  { label: "Ölçme Değerlendirme", icon: ClipboardList, to: "/olcme-degerlendirme" },
+  { label: "AI Araçları", icon: Sparkles, to: "/ai-araclari" },
+  { label: "Ayarlar", icon: Settings, to: "/ayarlar" },
 ];
 
 export default function Rehber360Layout() {
@@ -187,7 +152,6 @@ export default function Rehber360Layout() {
     return (first + second).toUpperCase();
   }, [account]);
 
-  // Load Settings
   useEffect(() => {
     loadSettings().then(settings => {
       setDark(settings.theme === "dark");
@@ -195,14 +159,12 @@ export default function Rehber360Layout() {
     });
   }, []);
 
-  // Apply Dark Mode
   useEffect(() => {
     const root = document.documentElement;
     if (dark) root.classList.add("dark");
     else root.classList.remove("dark");
   }, [dark]);
 
-  // Settings Storage Listener
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (e.key === SETTINGS_KEY) {
@@ -218,7 +180,6 @@ export default function Rehber360Layout() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  // Global Search
   const { data: searchResults } = useQuery<{
     students: any[];
     counselingSessions: any[];
@@ -237,7 +198,6 @@ export default function Rehber360Layout() {
     enabled: searchQuery.length >= 2,
   });
 
-  // Keyboard Shortcuts
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
@@ -266,49 +226,46 @@ export default function Rehber360Layout() {
 
   return (
     <SidebarProvider defaultOpen={!isMobile}>
-      <Sidebar collapsible="icon" variant="sidebar">
-        <SidebarHeader className="p-4 border-b border-sidebar-border">
+      <Sidebar collapsible="icon" className="border-r">
+        <SidebarHeader className="border-b px-3 py-2">
           <AppLogo />
         </SidebarHeader>
 
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Navigasyon
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className="gap-1 px-2">
-                {navigationItems.map((item) => (
-                  <SidebarMenuItem key={item.to}>
-                    <SidebarMenuButton asChild tooltip={item.label}>
-                      <NavLink to={item.to} end={item.end}>
-                        <item.icon className="h-5 w-5" />
-                        <span className="font-medium">{item.label}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+        <SidebarContent className="px-2 py-4">
+          <SidebarMenu className="gap-1">
+            {navigationItems.map((item) => (
+              <SidebarMenuItem key={item.to}>
+                <SidebarMenuButton asChild tooltip={item.label}>
+                  <NavLink
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) => cn(
+                      "flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors",
+                      "hover:bg-accent hover:text-accent-foreground",
+                      isActive && "bg-accent text-accent-foreground font-medium"
+                    )}
+                  >
+                    <item.icon className="h-4 w-4 shrink-0" />
+                    <span className="text-sm">{item.label}</span>
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
         </SidebarContent>
 
-        <SidebarFooter className="p-3 border-t border-sidebar-border">
-          <div className="flex items-center gap-2 px-2 py-2">
-            <AIStatusIndicator className="flex-1" />
-          </div>
+        <SidebarFooter className="border-t p-3">
+          <AIStatusIndicator />
         </SidebarFooter>
-
-        <SidebarRail />
       </Sidebar>
 
       <SidebarInset>
-        <header className="sticky top-0 left-0 right-0 z-10 border-b bg-background/80 backdrop-blur-xl">
-          <div className="flex h-16 items-center gap-4 px-6">
-            <SidebarTrigger className="h-9 w-9" />
-            <Separator orientation="vertical" className="h-6" />
+        <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-14 items-center gap-4 px-4">
+            <SidebarTrigger />
+            <Separator orientation="vertical" className="h-5" />
 
-            <Breadcrumb className="hidden sm:block">
+            <Breadcrumb className="hidden sm:flex">
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
@@ -343,18 +300,17 @@ export default function Rehber360Layout() {
                       document.getElementById('header-search-input')?.focus();
                     }, 100);
                   }}
-                  title="Ara (⌘K / Ctrl+K)"
                 >
-                  <Search className="h-5 w-5" />
+                  <Search className="h-4 w-4" />
                 </Button>
               ) : (
-                <div className="relative w-[400px]">
+                <div className="relative w-[300px]">
                   <Input
                     id="header-search-input"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Ara... (ESC)"
-                    className="pr-10"
+                    placeholder="Ara..."
+                    className="pr-8"
                     onBlur={() => {
                       setTimeout(() => {
                         setSearchOpen(false);
@@ -362,23 +318,14 @@ export default function Rehber360Layout() {
                       }, 200);
                     }}
                   />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-0 top-0 h-10 w-10"
-                    onClick={() => {
-                      setSearchOpen(false);
-                      setSearchQuery("");
-                    }}
-                  >
-                    <Search className="h-4 w-4" />
-                  </Button>
                   {searchQuery && searchQuery.length >= 2 && searchResults && (
-                    <Card className="absolute top-12 w-full max-h-[400px] overflow-hidden shadow-lg">
-                      <ScrollArea className="h-full max-h-[400px]">
+                    <Card className="absolute top-12 w-full max-h-[300px] overflow-hidden shadow-lg z-50">
+                      <ScrollArea className="h-full max-h-[300px]">
                         {searchResults.students.length > 0 && (
                           <div className="p-2">
-                            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Öğrenciler</div>
+                            <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+                              Öğrenciler
+                            </div>
                             {searchResults.students.map((student) => (
                               <button
                                 key={student.id}
@@ -387,13 +334,10 @@ export default function Rehber360Layout() {
                                   setSearchOpen(false);
                                   setSearchQuery("");
                                 }}
-                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-accent text-left"
+                                className="w-full flex items-center gap-2 px-2 py-2 rounded hover:bg-accent text-left"
                               >
                                 <Users2 className="h-4 w-4 text-muted-foreground" />
-                                <div>
-                                  <div className="font-medium">{student.name}</div>
-                                  <div className="text-xs text-muted-foreground">No: {student.id}</div>
-                                </div>
+                                <div className="text-sm">{student.name}</div>
                               </button>
                             ))}
                           </div>
@@ -415,18 +359,20 @@ export default function Rehber360Layout() {
                   })
                 }
               >
-                {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarFallback className="text-sm font-semibold">{initials}</AvatarFallback>
+                      <AvatarFallback className="text-xs font-semibold">
+                        {initials}
+                      </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuLabel>Hesabım</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
@@ -442,7 +388,10 @@ export default function Rehber360Layout() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 text-destructive">
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 text-destructive focus:text-destructive"
+                  >
                     <LogOut className="h-4 w-4" />
                     Çıkış Yap
                   </DropdownMenuItem>
@@ -452,11 +401,11 @@ export default function Rehber360Layout() {
           </div>
         </header>
 
-        <div className={`p-6 ${isMobile ? 'pb-20' : ''}`}>
-          <div className="max-w-full overflow-x-hidden">
+        <main className="flex-1 p-6">
+          <div className="mx-auto max-w-7xl">
             <Outlet />
           </div>
-        </div>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
