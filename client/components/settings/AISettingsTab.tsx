@@ -57,10 +57,28 @@ export default function AISettingsTab() {
   const [currentActiveProvider, setCurrentActiveProvider] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [providerModelsCache, setProviderModelsCache] = useState<Record<string, string[]>>({});
+  const [healthStatus, setHealthStatus] = useState<Record<string, any>>({});
 
   useEffect(() => {
     loadCurrentSettings();
+    loadHealthStatus();
+    
+    // Health status'u her 30 saniyede güncelle
+    const interval = setInterval(loadHealthStatus, 30000);
+    return () => clearInterval(interval);
   }, []);
+
+  const loadHealthStatus = async () => {
+    try {
+      const response = await fetch('/api/ai-assistant/health-status');
+      if (response.ok) {
+        const data = await response.json();
+        setHealthStatus(data.data || {});
+      }
+    } catch (error) {
+      console.error('Failed to load health status:', error);
+    }
+  };
 
   const handleProviderChange = (selectedProvider: 'ollama' | 'openai' | 'gemini') => {
     setProvider(selectedProvider);
