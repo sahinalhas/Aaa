@@ -196,10 +196,10 @@ export default function Rehber360Layout() {
   }, []);
 
   useEffect(() => {
-    if (!isDesktop && open !== false) {
+    if (isMobile) {
       setOpen(false);
     }
-  }, [location.pathname, isDesktop, open]);
+  }, [location.pathname, isMobile]);
 
   const crumbs = useBreadcrumbs();
   const navigate = useNavigate();
