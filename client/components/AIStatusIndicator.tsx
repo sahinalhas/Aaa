@@ -8,7 +8,7 @@ interface AIStatusIndicatorProps {
 }
 
 export default function AIStatusIndicator({ className }: AIStatusIndicatorProps) {
-  const { data: status, isLoading } = useQuery({
+  const { data: status, isLoading, error } = useQuery({
     queryKey: ['/api/ai-status'],
     queryFn: async () => {
       const response = await fetch('/api/ai-status');
@@ -18,29 +18,36 @@ export default function AIStatusIndicator({ className }: AIStatusIndicatorProps)
     refetchInterval: 30000,
   });
 
+  // Sarı - Bağlantı kontrol ediliyor
   if (isLoading) {
     return (
-      <Badge variant="outline" className={cn("gap-1.5", className)}>
+      <Badge variant="outline" className={cn("gap-1.5 border-yellow-500 bg-yellow-50 text-yellow-700", className)}>
         <Loader2 className="h-3 w-3 animate-spin" />
         <span className="hidden md:inline">Kontrol ediliyor...</span>
+        <span className="md:hidden">AI</span>
       </Badge>
     );
   }
 
-  const isHealthy = status?.status === 'healthy';
+  // Kırmızı - AI devre dışı veya hata var
+  if (error || !status?.isActive) {
+    return (
+      <Badge variant="destructive" className={cn("gap-1.5", className)}>
+        <AlertCircle className="h-3 w-3" />
+        <span className="hidden md:inline">AI Devre Dışı</span>
+        <span className="md:hidden">AI</span>
+      </Badge>
+    );
+  }
 
+  // Yeşil - AI aktif ve sağlıklı
   return (
     <Badge
-      variant={isHealthy ? "default" : "destructive"}
-      className={cn("gap-1.5", className)}
+      className={cn("gap-1.5 border-green-500 bg-green-50 text-green-700", className)}
     >
-      {isHealthy ? (
-        <CheckCircle2 className="h-3 w-3" />
-      ) : (
-        <AlertCircle className="h-3 w-3" />
-      )}
+      <CheckCircle2 className="h-3 w-3" />
       <span className="hidden md:inline">
-        AI: {status?.provider || 'N/A'}
+        AI: {status.providerName || status.provider || 'Aktif'}
       </span>
       <span className="md:hidden">AI</span>
     </Badge>

@@ -9,13 +9,17 @@ router.get('/status', async (_req, res) => {
     const provider = aiService.getProvider();
     const model = aiService.getModel();
     
+    // Provider'ın gerçekten kullanılabilir olup olmadığını kontrol et
+    const isAvailable = await aiService.isAvailable();
+    
     const status = {
-      isActive: true,
+      isActive: isAvailable,
       provider: provider,
       model: model,
-      providerName: provider === 'gemini' ? 'Google Gemini' : 
+      providerName: provider === 'gemini' ? 'Gemini' : 
                     provider === 'openai' ? 'OpenAI' : 
-                    provider === 'ollama' ? 'Ollama (Yerel)' : provider
+                    provider === 'ollama' ? 'Ollama' : provider,
+      status: isAvailable ? 'healthy' : 'unavailable'
     };
     
     res.json(status);
@@ -24,7 +28,8 @@ router.get('/status', async (_req, res) => {
       isActive: false,
       provider: null,
       model: null,
-      providerName: 'AI Devre Dışı'
+      providerName: 'Devre Dışı',
+      status: 'error'
     });
   }
 });
