@@ -158,6 +158,7 @@ export default function Register() {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   disabled={isLoading}
                   className={validationErrors.email ? 'border-destructive' : ''}
+                  autoComplete="email"
                 />
                 {validationErrors.email && (
                   <p className="text-sm text-destructive">{validationErrors.email}</p>
@@ -178,6 +179,7 @@ export default function Register() {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   disabled={isLoading}
                   className={validationErrors.password ? 'border-destructive' : ''}
+                  autoComplete="new-password"
                 />
                 {validationErrors.password && (
                   <p className="text-sm text-destructive">{validationErrors.password}</p>
@@ -196,6 +198,7 @@ export default function Register() {
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   disabled={isLoading}
                   className={validationErrors.confirmPassword ? 'border-destructive' : ''}
+                  autoComplete="new-password"
                 />
                 {validationErrors.confirmPassword && (
                   <p className="text-sm text-destructive">{validationErrors.confirmPassword}</p>
