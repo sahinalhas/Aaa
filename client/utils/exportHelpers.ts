@@ -8,7 +8,7 @@ export function exportToCSV(students: Student[], filename: string = 'ogrenciler.
     s.id,
     s.ad,
     s.soyad,
-    s.sinif,
+    s.class,
     s.cinsiyet === 'E' ? 'Erkek' : 'Kız',
     s.risk || 'Düşük',
   ]);
@@ -42,7 +42,7 @@ export function exportToPDF(students: Student[], filename: string = 'ogrenciler.
     s.id,
     s.ad,
     s.soyad,
-    s.sinif,
+    s.class,
     s.cinsiyet === 'E' ? 'Erkek' : 'Kız',
     s.risk || 'Düşük',
   ]);
@@ -76,7 +76,7 @@ export function exportToExcel(students: Student[], filename: string = 'ogrencile
         'Öğrenci No': s.id,
         Ad: s.ad,
         Soyad: s.soyad,
-        Sınıf: s.sinif,
+        Sınıf: s.class,
         Cinsiyet: s.cinsiyet === 'E' ? 'Erkek' : 'Kız',
         'Risk Seviyesi': s.risk || 'Düşük',
       }))

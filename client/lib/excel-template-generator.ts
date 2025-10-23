@@ -381,7 +381,7 @@ export function parseExcelResponses(base64Data: string): any[] {
         if (header === 'Öğrenci No') response.studentInfo.id = value;
         else if (header === 'Ad') response.studentInfo.ad = value;
         else if (header === 'Soyad') response.studentInfo.soyad = value;
-        else if (header === 'Sınıf') response.studentInfo.sinif = value;
+        else if (header === 'Sınıf') response.studentInfo.class = value;
         else if (header === 'Cinsiyet') response.studentInfo.cinsiyet = value;
         else if (header.match(/^\d+\./)) {
           // This is a question
