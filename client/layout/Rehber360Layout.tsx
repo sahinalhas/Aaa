@@ -226,7 +226,7 @@ export default function Rehber360Layout() {
 
   return (
     <SidebarProvider defaultOpen={!isMobile}>
-      <Sidebar collapsible="icon" className="border-r">
+      <Sidebar collapsible="icon">
         <SidebarHeader className="border-b px-3 py-2">
           <AppLogo />
         </SidebarHeader>
