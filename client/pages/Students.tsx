@@ -81,7 +81,7 @@ export default function Students() {
     id: true,
     ad: true,
     soyad: true,
-    sinif: true,
+    class: true,
     cinsiyet: true,
     risk: true,
     actions: true,

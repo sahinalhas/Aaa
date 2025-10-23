@@ -10,7 +10,7 @@ export const getStudents: RequestHandler = (req, res) => {
       ...s,
       ad: s.name,
       soyad: s.surname,
-      sinif: s.class,
+      class: s.class,
       cinsiyet: s.gender,
     }));
     res.json(mappedStudents);
@@ -28,7 +28,7 @@ export const saveStudentHandler: RequestHandler = (req, res) => {
       ...student,
       name: student.ad || student.name,
       surname: student.soyad || student.surname,
-      class: student.sinif || student.class,
+      class: student.class,
       gender: student.cinsiyet || student.gender,
     };
     
@@ -64,7 +64,7 @@ export const saveStudentsHandler: RequestHandler = (req, res) => {
       ...student,
       name: student.ad || student.name,
       surname: student.soyad || student.surname,
-      class: student.sinif || student.class,
+      class: student.class,
       gender: student.cinsiyet || student.gender,
     }));
     
