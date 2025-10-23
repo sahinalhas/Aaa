@@ -186,7 +186,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: hsl(var(--sidebar-background));
+    background: hsl(var(--background));
     z-index: -1;
   }
 
