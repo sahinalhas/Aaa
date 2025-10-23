@@ -768,7 +768,7 @@ function StudentFormDialog({
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Sınıf</label>
-          <Input placeholder="9/A" {...register('sinif')} />
+          <Input placeholder="9/A" {...register('class')} />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Cinsiyet</label>
@@ -877,7 +877,7 @@ function parseImportedRows(rows: unknown[][]): Student[] {
   const iName = idx(['adisoyadi', 'adisoyad'].map(slug));
   const iAd = idx(['ad', 'adi']);
   const iSoyad = idx(['soyad', 'soyadi']);
-  const iSinif = idx(['sinif', 'sınıf'].map(slug));
+  const iSinif = idx(['class', 'sinif', 'sınıf'].map(slug));
   const iCins = idx(['cinsiyet', 'cinsiyeti']);
   const iRisk = idx(['risk']);
 

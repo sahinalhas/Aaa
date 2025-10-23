@@ -211,7 +211,7 @@ export default function ParentAccess() {
             <SelectContent>
               {students?.map((student: any) => (
                 <SelectItem key={student.id} value={student.id.toString()}>
-                  {student.ad} {student.soyad} - {student.sinif}
+                  {student.ad} {student.soyad} - {student.class}
                 </SelectItem>
               ))}
             </SelectContent>
