@@ -11,7 +11,7 @@ import { z } from "zod";
 export const basicInfoValidation = {
   ad: z.string().min(1, "Ad zorunludur").max(50, "Ad maksimum 50 karakter olabilir"),
   soyad: z.string().min(1, "Soyad zorunludur").max(50, "Soyad maksimum 50 karakter olabilir"),
-  sinif: z.string().optional(),
+  class: z.string().optional(),
   cinsiyet: z.enum(["K", "E"]).optional(),
   dogumTarihi: z.string().optional(),
   telefon: z.string().optional(),
