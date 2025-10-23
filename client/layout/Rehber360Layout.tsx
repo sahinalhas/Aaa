@@ -6,18 +6,6 @@ import {
   useNavigate,
   Navigate,
 } from "react-router-dom";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -53,6 +41,8 @@ import {
   User,
   Bell,
   Home,
+  Menu,
+  X,
 } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { loadSettings, updateSettings, SETTINGS_KEY, AppSettings } from "@/lib/app-settings";
@@ -60,17 +50,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth-context";
 import AIStatusIndicator from "@/components/AIStatusIndicator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 // Modern minimalist logo
-function AppLogo() {
-  const { state } = useSidebar();
-  const isCollapsed = state === "collapsed";
-
+function AppLogo({ collapsed }: { collapsed?: boolean }) {
   return (
     <Link
       to="/"
@@ -82,7 +68,7 @@ function AppLogo() {
       <div className="size-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg shrink-0">
         R
       </div>
-      {!isCollapsed && (
+      {!collapsed && (
         <div className="flex flex-col leading-none">
           <span className="text-sm font-semibold tracking-tight">Rehber360</span>
           <span className="text-[10px] text-muted-foreground mt-0.5">
@@ -136,6 +122,8 @@ export default function Rehber360Layout() {
   const [account, setAccount] = useState<AppSettings["account"] | undefined>(undefined);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
   const crumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -225,20 +213,63 @@ export default function Rehber360Layout() {
   };
 
   return (
-    <SidebarProvider defaultOpen={!isMobile}>
-      <Sidebar collapsible="icon">
-        <SidebarHeader className="border-b px-3 py-2">
-          <AppLogo />
-        </SidebarHeader>
+    <div className="flex h-screen overflow-hidden bg-background">
+      {/* Desktop Sidebar */}
+      {!isMobile && (
+        <aside
+          className={cn(
+            "flex flex-col bg-background transition-all duration-300 ease-in-out",
+            sidebarOpen ? "w-64" : "w-16"
+          )}
+        >
+          <div className="border-b px-3 py-2">
+            <AppLogo collapsed={!sidebarOpen} />
+          </div>
 
-        <SidebarContent className="px-2 py-4">
-          <SidebarMenu className="gap-1">
-            {navigationItems.map((item) => (
-              <SidebarMenuItem key={item.to}>
-                <SidebarMenuButton asChild tooltip={item.label}>
+          <ScrollArea className="flex-1 px-2 py-4">
+            <nav className="space-y-1">
+              {navigationItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) => cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors",
+                    "hover:bg-accent hover:text-accent-foreground",
+                    isActive && "bg-accent text-accent-foreground font-medium"
+                  )}
+                >
+                  <item.icon className="h-4 w-4 shrink-0" />
+                  {sidebarOpen && <span className="text-sm">{item.label}</span>}
+                </NavLink>
+              ))}
+            </nav>
+          </ScrollArea>
+
+          <div className="border-t p-3">
+            <AIStatusIndicator />
+          </div>
+        </aside>
+      )}
+
+      {/* Mobile Menu */}
+      {isMobile && mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 bg-background">
+          <div className="flex h-full flex-col">
+            <div className="flex items-center justify-between border-b px-4 py-3">
+              <AppLogo />
+              <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <ScrollArea className="flex-1 p-4">
+              <nav className="space-y-1">
+                {navigationItems.map((item) => (
                   <NavLink
+                    key={item.to}
                     to={item.to}
                     end={item.end}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={({ isActive }) => cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors",
                       "hover:bg-accent hover:text-accent-foreground",
@@ -248,21 +279,34 @@ export default function Rehber360Layout() {
                     <item.icon className="h-4 w-4 shrink-0" />
                     <span className="text-sm">{item.label}</span>
                   </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarContent>
+                ))}
+              </nav>
+            </ScrollArea>
+            <div className="border-t p-4">
+              <AIStatusIndicator />
+            </div>
+          </div>
+        </div>
+      )}
 
-        <SidebarFooter className="border-t p-3">
-          <AIStatusIndicator />
-        </SidebarFooter>
-      </Sidebar>
-
-      <SidebarInset>
+      {/* Main Content */}
+      <div className="flex flex-1 flex-col overflow-hidden">
         <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex h-14 items-center gap-4 px-4">
-            <SidebarTrigger />
+            {isMobile ? (
+              <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
+                <Menu className="h-5 w-5" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            )}
+            
             <Separator orientation="vertical" className="h-5" />
 
             <Breadcrumb className="hidden sm:flex">
@@ -401,12 +445,12 @@ export default function Rehber360Layout() {
           </div>
         </header>
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 overflow-auto p-6">
           <div className="mx-auto max-w-7xl">
             <Outlet />
           </div>
         </main>
-      </SidebarInset>
-    </SidebarProvider>
+      </div>
+    </div>
   );
 }
