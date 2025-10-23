@@ -104,7 +104,7 @@ export default function Students() {
       id: '',
       ad: '',
       soyad: '',
-      sinif: '9/A',
+      class: '9/A',
       cinsiyet: 'K',
       risk: 'Düşük',
     },
@@ -156,7 +156,7 @@ export default function Students() {
     setValue('id', student.id);
     setValue('ad', student.ad);
     setValue('soyad', student.soyad);
-    setValue('sinif', student.sinif);
+    setValue('class', student.class);
     setValue('cinsiyet', student.cinsiyet);
     setValue('risk', student.risk || 'Düşük');
     setEditOpen(true);
@@ -888,7 +888,7 @@ function parseImportedRows(rows: unknown[][]): Student[] {
     const nameStr = typeof nameCombined === 'string' ? nameCombined : '';
     const ad = iAd >= 0 ? normalize(String(r[iAd])) : (nameStr ? nameStr.split(/\s+/).slice(0, -1).join(' ') || nameStr : '');
     const soyad = iSoyad >= 0 ? normalize(String(r[iSoyad])) : (nameStr ? nameStr.split(/\s+/).slice(-1)[0] || '' : '');
-    const sinif = iSinif >= 0 ? normalize(String(r[iSinif])) : '';
+    const classValue = iSinif >= 0 ? normalize(String(r[iSinif])) : '';
     const cRaw = iCins >= 0 ? slug(String(r[iCins])) : '';
     const risk = iRisk >= 0 ? normalize(String(r[iRisk])) : undefined;
 
@@ -901,7 +901,7 @@ function parseImportedRows(rows: unknown[][]): Student[] {
       id,
       ad,
       soyad,
-      sinif: sinif || '9/A',
+      class: classValue || '9/A',
       cinsiyet,
       risk: risk
         ? risk.toLowerCase() === 'high' || risk.toLowerCase() === 'yüksek'

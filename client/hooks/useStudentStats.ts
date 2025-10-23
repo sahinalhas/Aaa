@@ -40,8 +40,8 @@ export function useStudentStats(students: Student[]): StudentStats {
       else if (risk === 'Orta') stats.mediumRisk++;
       else stats.lowRisk++;
 
-      const sinif = student.sinif || '';
-      const classBase = sinif ? (sinif.split('/')[0] || sinif) : 'Belirtilmemiş';
+      const classValue = student.class || '';
+      const classBase = classValue ? (classValue.split('/')[0] || classValue) : 'Belirtilmemiş';
       stats.classCounts[classBase] = (stats.classCounts[classBase] || 0) + 1;
 
       if (student.kayitTarihi) {

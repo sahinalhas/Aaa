@@ -84,7 +84,7 @@ export function StudentCard({
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="text-xs">
               <GraduationCap className="mr-1 h-3 w-3" />
-              {student.sinif}
+              {student.class}
             </Badge>
             <Badge variant="outline" className="text-xs">
               {student.cinsiyet === 'E' ? 'Erkek' : 'Kız'}

@@ -40,7 +40,7 @@ import {
 const basicInfoSchema = z.object({
   ad: z.string().min(1, "Ad zorunludur"),
   soyad: z.string().min(1, "Soyad zorunludur"),
-  sinif: z.string().optional(),
+  class: z.string().optional(),
   cinsiyet: z.enum(["K", "E"]).optional(),
   dogumTarihi: z.string().optional(),
   telefon: z.string().optional(),
@@ -70,7 +70,7 @@ export default function BasicInfoSection({ student, onUpdate }: BasicInfoSection
     defaultValues: {
       ad: student.ad || "",
       soyad: student.soyad || "",
-      sinif: student.sinif || "",
+      class: student.class || "",
       cinsiyet: student.cinsiyet,
       dogumTarihi: student.dogumTarihi || "",
       telefon: student.telefon || "",
@@ -93,7 +93,7 @@ export default function BasicInfoSection({ student, onUpdate }: BasicInfoSection
     form.reset({
       ad: student.ad || "",
       soyad: student.soyad || "",
-      sinif: student.sinif || "",
+      class: student.class || "",
       cinsiyet: student.cinsiyet,
       dogumTarihi: student.dogumTarihi || "",
       telefon: student.telefon || "",
@@ -234,7 +234,7 @@ export default function BasicInfoSection({ student, onUpdate }: BasicInfoSection
 
               <FormField
                 control={form.control}
-                name="sinif"
+                name="class"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs flex items-center gap-1.5">

@@ -120,7 +120,7 @@ function generateSingleSheetTemplate(
         student.id,
         student.ad,
         student.soyad,
-        student.sinif,
+        student.class,
         student.cinsiyet
       );
     }

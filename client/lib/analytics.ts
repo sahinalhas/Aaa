@@ -429,7 +429,7 @@ export async function generateClassComparisons(options: {
   const classMap = new Map<string, Student[]>();
 
   students.forEach(student => {
-    const className = student.sinif || ANALYTICS_MESSAGES.DEFAULT_CLASS_NAME;
+    const className = student.class || ANALYTICS_MESSAGES.DEFAULT_CLASS_NAME;
     if (!classMap.has(className)) {
       classMap.set(className, []);
     }
@@ -548,7 +548,7 @@ export async function exportAnalyticsData(options: {
 
     exportData.push({
       name: options.includePersonalData ? `${student.ad} ${student.soyad}` : `Öğrenci ${student.id.slice(-4)}`,
-      class: student.sinif,
+      class: student.class,
       risk: student.risk,
       attendanceRate: calculateAttendanceRate(attendance),
       academicTrend: calculateAcademicTrend(academics),

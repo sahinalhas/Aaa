@@ -23,7 +23,7 @@ export function StudentHeader({ student }: StudentHeaderProps) {
             <CardDescription>
               <span className="flex flex-wrap items-center gap-3 text-sm">
                 <span className="inline-flex items-center gap-1">
-                  <GraduationCap className="h-4 w-4" /> Sınıf: {student.sinif}
+                  <GraduationCap className="h-4 w-4" /> Sınıf: {student.class}
                 </span>
                 <span>Cinsiyet: {student.cinsiyet}</span>
                 <span className="inline-flex items-center gap-1">

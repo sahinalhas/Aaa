@@ -15,7 +15,7 @@ import type { Student } from '@/lib/storage';
 import { Link } from 'react-router-dom';
 import type { ColumnVisibility } from './TableControls';
 
-export type SortColumn = 'id' | 'ad' | 'soyad' | 'sinif' | 'cinsiyet' | 'risk';
+export type SortColumn = 'id' | 'ad' | 'soyad' | 'class' | 'cinsiyet' | 'risk';
 export type SortDirection = 'asc' | 'desc' | null;
 
 interface EnhancedStudentTableProps {
@@ -98,7 +98,7 @@ const StudentRow = memo(
         {columnVisibility.sinif && (
           <TableCell className={cellPadding}>
             <Badge variant="outline" className="font-normal">
-              {student.sinif}
+              {student.class}
             </Badge>
           </TableCell>
         )}
@@ -239,10 +239,10 @@ export function EnhancedStudentTable({
                     variant="ghost"
                     size="sm"
                     className="-ml-3 h-8 font-semibold"
-                    onClick={() => onSort('sinif')}
+                    onClick={() => onSort('class')}
                   >
                     Sınıf
-                    <SortIcon column="sinif" />
+                    <SortIcon column="class" />
                   </Button>
                 </TableHead>
               )}

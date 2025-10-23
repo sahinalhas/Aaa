@@ -95,7 +95,7 @@ export function StudentDrawer({ student, open, onOpenChange, onEdit }: StudentDr
                 </div>
                 <div className="flex-1">
                   <p className="text-xs text-muted-foreground">Sınıf</p>
-                  <p className="font-medium">{student.sinif}</p>
+                  <p className="font-medium">{student.class}</p>
                 </div>
               </div>
 
