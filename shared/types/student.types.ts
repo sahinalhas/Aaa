@@ -73,8 +73,12 @@ export interface BackendStudent {
 
 export function backendToUnified(backend: BackendStudent): UnifiedStudent {
   const nameParts = backend.name.split(' ');
-  const ad = nameParts[0] || '';
-  const soyad = nameParts.slice(1).join(' ') || '';
+  let ad = nameParts[0] || '';
+  let soyad = nameParts.slice(1).join(' ') || '';
+  
+  // Handle "undefined undefined" case
+  if (ad === 'undefined') ad = '';
+  if (soyad === 'undefined') soyad = '';
   
   return {
     id: backend.id,
