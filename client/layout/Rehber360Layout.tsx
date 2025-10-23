@@ -61,17 +61,17 @@ function AppLogo({ collapsed }: { collapsed?: boolean }) {
     <Link
       to="/"
       className={cn(
-        "flex items-center gap-3 px-2 py-3 transition-all duration-200",
-        "hover:opacity-80"
+        "flex items-center gap-3 px-3 py-4 transition-all duration-200 group",
+        "hover:bg-accent/50 rounded-lg"
       )}
     >
-      <div className="size-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg shrink-0">
+      <div className="size-8 rounded-md bg-gradient-to-br from-primary to-chart-2 flex items-center justify-center text-primary-foreground font-bold text-base shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
         R
       </div>
       {!collapsed && (
         <div className="flex flex-col leading-none">
-          <span className="text-sm font-semibold tracking-tight">Rehber360</span>
-          <span className="text-[10px] text-muted-foreground mt-0.5">
+          <span className="text-sm font-bold tracking-tight">Rehber360</span>
+          <span className="text-[10px] text-muted-foreground mt-0.5 font-medium">
             Dijital Rehberlik
           </span>
         </div>
@@ -218,15 +218,15 @@ export default function Rehber360Layout() {
       {!isMobile && (
         <aside
           className={cn(
-            "flex flex-col bg-background transition-all duration-300 ease-in-out",
+            "flex flex-col border-r bg-sidebar transition-all duration-300 ease-in-out",
             sidebarOpen ? "w-64" : "w-16"
           )}
         >
-          <div className="border-b h-14 flex items-center px-4">
+          <div className="h-16 flex items-center px-2 border-b">
             <AppLogo collapsed={!sidebarOpen} />
           </div>
 
-          <ScrollArea className="flex-1 px-4 py-4">
+          <ScrollArea className="flex-1 px-3 py-4">
             <nav className="space-y-1">
               {navigationItems.map((item) => (
                 <NavLink
@@ -234,19 +234,20 @@ export default function Rehber360Layout() {
                   to={item.to}
                   end={item.end}
                   className={({ isActive }) => cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    isActive && "bg-accent text-accent-foreground font-medium"
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                    "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    "text-sm font-medium text-sidebar-foreground/70",
+                    isActive && "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
                   )}
                 >
                   <item.icon className="h-4 w-4 shrink-0" />
-                  {sidebarOpen && <span className="text-sm">{item.label}</span>}
+                  {sidebarOpen && <span>{item.label}</span>}
                 </NavLink>
               ))}
             </nav>
           </ScrollArea>
 
-          <div className="border-t px-4 py-3">
+          <div className="border-t px-3 py-4">
             <AIStatusIndicator />
           </div>
         </aside>
@@ -291,29 +292,30 @@ export default function Rehber360Layout() {
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-14 items-center gap-4 px-4">
+        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-16 items-center gap-4 px-4 md:px-6">
             {isMobile ? (
-              <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
+              <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setMobileMenuOpen(true)}>
                 <Menu className="h-5 w-5" />
               </Button>
             ) : (
               <Button
                 variant="ghost"
                 size="icon"
+                className="shrink-0"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
                 <Menu className="h-5 w-5" />
               </Button>
             )}
             
-            <Separator orientation="vertical" className="h-5" />
+            <Separator orientation="vertical" className="h-6" />
 
             <Breadcrumb className="hidden sm:flex">
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to="/">Ana Sayfa</Link>
+                    <Link to="/" className="text-sm font-medium">Ana Sayfa</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 {crumbs.map((c, i) => (
@@ -321,10 +323,10 @@ export default function Rehber360Layout() {
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                       {i === crumbs.length - 1 ? (
-                        <BreadcrumbPage>{c.label}</BreadcrumbPage>
+                        <BreadcrumbPage className="text-sm font-medium">{c.label}</BreadcrumbPage>
                       ) : (
                         <BreadcrumbLink asChild>
-                          <Link to={c.to}>{c.label}</Link>
+                          <Link to={c.to} className="text-sm font-medium">{c.label}</Link>
                         </BreadcrumbLink>
                       )}
                     </BreadcrumbItem>
@@ -445,8 +447,8 @@ export default function Rehber360Layout() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto p-6">
-          <div className="mx-auto max-w-7xl">
+        <main className="flex-1 overflow-auto bg-background">
+          <div className="mx-auto max-w-7xl p-6 md:p-8">
             <Outlet />
           </div>
         </main>

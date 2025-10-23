@@ -281,42 +281,42 @@ export default function Index() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <Card className="bg-gradient-to-br from-primary/15 via-primary/5 to-accent/15 border-primary/30 shadow-2xl">
-          <CardHeader>
-            <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-br from-primary/5 via-background to-chart-2/5 rounded-xl border border-border/50 shadow-lg backdrop-blur-sm">
+          <div className="p-6 md:p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
-                <CardTitle className="text-2xl flex items-center gap-2">
-                  <Sparkles className="h-6 w-6 text-primary" />
-                  Rehber360 Dashboard
-                </CardTitle>
-                <CardDescription className="text-base mt-1">
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3">
+                  <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Sparkles className="h-6 w-6 text-primary" />
+                  </div>
+                  Rehber360
+                </h1>
+                <p className="text-muted-foreground mt-2 text-sm md:text-base">
                   {new Date().toLocaleDateString('tr-TR', { 
                     weekday: 'long', 
                     year: 'numeric', 
                     month: 'long', 
                     day: 'numeric' 
                   })}
-                </CardDescription>
+                </p>
               </div>
-              <Badge variant="outline" className="text-sm px-4 py-2">
-                <Clock className="h-4 w-4 mr-2" />
+              <Badge variant="secondary" className="text-sm px-4 py-2 h-fit gap-2 bg-primary/10 text-primary border-primary/20">
+                <Clock className="h-4 w-4" />
                 Gerçek Zamanlı
               </Badge>
             </div>
-          </CardHeader>
-          <CardContent>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Öğrenci ara: No / ad / soyad"
-                className="pl-11 h-12 text-base"
+                className="pl-12 h-12 text-base bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-colors"
                 aria-label="Öğrenci arama"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </motion.div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -325,22 +325,23 @@ export default function Index() {
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1, duration: 0.3 }}
+            transition={{ delay: i * 0.08, duration: 0.3 }}
           >
-            <Card className={`group hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer border-2 ${stat.borderColor} bg-gradient-to-br ${stat.bgGradient}`}>
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2 flex-1">
-                    <div className="text-sm font-medium text-muted-foreground">{stat.label}</div>
-                    <div className="text-3xl font-bold tracking-tight">{stat.value.toLocaleString()}</div>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      {stat.trend === "up" && <ArrowUpRight className="h-3 w-3 text-green-600" />}
-                      {stat.trend === "down" && <ArrowDownRight className="h-3 w-3 text-red-600" />}
-                      <span>{stat.change}</span>
+            <Card className={`group relative overflow-hidden hover:shadow-xl transition-all duration-300 border ${stat.borderColor}`}>
+              <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+              <CardContent className="relative p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-3 flex-1 min-w-0">
+                    <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+                    <p className="text-3xl font-bold tracking-tight">{stat.value.toLocaleString()}</p>
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                      {stat.trend === "up" && <ArrowUpRight className="h-3.5 w-3.5 text-success" />}
+                      {stat.trend === "down" && <ArrowDownRight className="h-3.5 w-3.5 text-destructive" />}
+                      <span className="truncate">{stat.change}</span>
                     </div>
                   </div>
-                  <div className={`size-14 rounded-xl bg-gradient-to-br ${stat.color} grid place-items-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
-                    <stat.icon className={`h-7 w-7 ${stat.iconColor}`} />
+                  <div className={`size-12 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                    <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
                   </div>
                 </div>
               </CardContent>
