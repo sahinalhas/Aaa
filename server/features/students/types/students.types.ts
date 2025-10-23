@@ -1,17 +1,19 @@
 export interface Student {
   id: string;
-  name: string;
+  ad: string;
+  soyad: string;
   email?: string;
   phone?: string;
   birthDate?: string;
   address?: string;
-  className?: string;
+  sinif?: string;
   enrollmentDate: string;
   status: 'active' | 'inactive' | 'graduated';
   avatar?: string;
   parentContact?: string;
   notes?: string;
-  gender?: 'K' | 'E';
+  cinsiyet?: 'K' | 'E';
+  risk?: 'Düşük' | 'Orta' | 'Yüksek';
 }
 
 export interface AcademicRecord {

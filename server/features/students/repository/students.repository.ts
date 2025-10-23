@@ -10,31 +10,33 @@ function ensureInitialized(): void {
   const db = getDatabase();
   
   statements = {
-    getStudents: db.prepare('SELECT * FROM students ORDER BY name'),
+    getStudents: db.prepare('SELECT * FROM students ORDER BY ad, soyad'),
     getStudent: db.prepare('SELECT * FROM students WHERE id = ?'),
     insertStudent: db.prepare(`
-      INSERT INTO students (id, name, email, phone, birthDate, address, className, enrollmentDate, status, avatar, parentContact, notes, gender)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO students (id, ad, soyad, email, phone, birthDate, address, sinif, enrollmentDate, status, avatar, parentContact, notes, cinsiyet, risk)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `),
     upsertStudent: db.prepare(`
-      INSERT INTO students (id, name, email, phone, birthDate, address, className, enrollmentDate, status, avatar, parentContact, notes, gender)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO students (id, ad, soyad, email, phone, birthDate, address, sinif, enrollmentDate, status, avatar, parentContact, notes, cinsiyet, risk)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
-        name = excluded.name,
+        ad = excluded.ad,
+        soyad = excluded.soyad,
         email = excluded.email,
         phone = excluded.phone,
         birthDate = excluded.birthDate,
         address = excluded.address,
-        className = excluded.className,
+        sinif = excluded.sinif,
         status = excluded.status,
         avatar = excluded.avatar,
         parentContact = excluded.parentContact,
         notes = excluded.notes,
-        gender = excluded.gender
+        cinsiyet = excluded.cinsiyet,
+        risk = excluded.risk
     `),
     updateStudent: db.prepare(`
-      UPDATE students SET name = ?, email = ?, phone = ?, birthDate = ?, address = ?, className = ?, 
-                         status = ?, avatar = ?, parentContact = ?, notes = ?, gender = ?
+      UPDATE students SET ad = ?, soyad = ?, email = ?, phone = ?, birthDate = ?, address = ?, sinif = ?, 
+                         status = ?, avatar = ?, parentContact = ?, notes = ?, cinsiyet = ?, risk = ?
       WHERE id = ?
     `),
     deleteStudent: db.prepare('DELETE FROM students WHERE id = ?'),
@@ -68,8 +70,12 @@ export function loadStudents(): Student[] {
         console.warn('Skipping invalid student: missing id', student);
         return false;
       }
-      if (!student.name || student.name.trim() === '') {
-        console.warn(`Skipping student ${student.id}: missing or empty name`);
+      if (!student.ad || student.ad.trim() === '') {
+        console.warn(`Skipping student ${student.id}: missing or empty ad`);
+        return false;
+      }
+      if (!student.soyad || student.soyad.trim() === '') {
+        console.warn(`Skipping student ${student.id}: missing or empty soyad`);
         return false;
       }
       return true;
@@ -99,15 +105,15 @@ export function saveStudents(students: Student[]): void {
         }
         
         for (const student of students) {
-          if (!student.id || !student.name) {
-            throw new Error(`Invalid student data: missing required fields (id: ${student.id}, name: ${student.name})`);
+          if (!student.id || !student.ad || !student.soyad) {
+            throw new Error(`Invalid student data: missing required fields (id: ${student.id}, ad: ${student.ad}, soyad: ${student.soyad})`);
           }
           
           statements.upsertStudent.run(
-            student.id, student.name, student.email, student.phone,
-            student.birthDate, student.address, student.className,
+            student.id, student.ad, student.soyad, student.email, student.phone,
+            student.birthDate, student.address, student.sinif,
             student.enrollmentDate, student.status, student.avatar,
-            student.parentContact, student.notes, student.gender
+            student.parentContact, student.notes, student.cinsiyet, student.risk
           );
         }
       } catch (transactionError) {
@@ -127,8 +133,8 @@ export function saveStudent(student: Student): void {
   if (!student || typeof student !== 'object') {
     throw new Error('Student parameter is required and must be an object');
   }
-  if (!student.id || !student.name) {
-    throw new Error(`Invalid student data: missing required fields (id: ${student.id}, name: ${student.name})`);
+  if (!student.id || !student.ad || !student.soyad) {
+    throw new Error(`Invalid student data: missing required fields (id: ${student.id}, ad: ${student.ad}, soyad: ${student.soyad})`);
   }
   
   try {
@@ -136,17 +142,17 @@ export function saveStudent(student: Student): void {
     const existing = statements.getStudent.get(student.id);
     if (existing) {
       statements.updateStudent.run(
-        student.name, student.email, student.phone, student.birthDate,
-        student.address, student.className, student.status,
-        student.avatar, student.parentContact, student.notes, student.gender,
+        student.ad, student.soyad, student.email, student.phone, student.birthDate,
+        student.address, student.sinif, student.status,
+        student.avatar, student.parentContact, student.notes, student.cinsiyet, student.risk,
         student.id
       );
     } else {
       statements.insertStudent.run(
-        student.id, student.name, student.email, student.phone,
-        student.birthDate, student.address, student.className,
+        student.id, student.ad, student.soyad, student.email, student.phone,
+        student.birthDate, student.address, student.sinif,
         student.enrollmentDate, student.status, student.avatar,
-        student.parentContact, student.notes, student.gender
+        student.parentContact, student.notes, student.cinsiyet, student.risk
       );
     }
   } catch (error) {
