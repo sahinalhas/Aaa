@@ -80,17 +80,17 @@ export class BulkAIAnalysisService {
 
     // Get all classes with student data
     const classes = db.prepare(`
-      SELECT DISTINCT sinif FROM students ORDER BY sinif
-    `).all() as { sinif: string }[];
+      SELECT DISTINCT class FROM students ORDER BY class
+    `).all() as { class: string }[];
 
     const classAnalyses: ClassComparison[] = [];
 
     for (const classInfo of classes) {
       const students = db.prepare(`
-        SELECT * FROM students WHERE sinif = ?
-      `).all(classInfo.sinif);
+        SELECT * FROM students WHERE class = ?
+      `).all(classInfo.class);
 
-      const analysis = await this.analyzeClass(classInfo.sinif, students);
+      const analysis = await this.analyzeClass(classInfo.class, students);
       classAnalyses.push(analysis);
     }
 

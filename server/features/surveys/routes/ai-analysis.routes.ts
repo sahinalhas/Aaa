@@ -77,7 +77,7 @@ router.post('/compare-classes', async (req, res) => {
 
     // Get responses grouped by class
     const responses = db.prepare(`
-      SELECT sr.*, s.sinif 
+      SELECT sr.*, s.class 
       FROM survey_responses sr
       JOIN students s ON sr.student_id = s.id
       WHERE sr.distribution_id = ?
@@ -86,23 +86,23 @@ router.post('/compare-classes', async (req, res) => {
     // Group by class
     const classeData: any = {};
     responses.forEach((r: any) => {
-      if (!classeData[r.sinif]) {
-        classeData[r.sinif] = [];
+      if (!classeData[r.class]) {
+        classeData[r.class] = [];
       }
-      classeData[r.sinif].push(r);
+      classeData[r.class].push(r);
     });
 
     // Get student counts per class
     const classStudentCounts = db.prepare(`
-      SELECT sinif, COUNT(*) as count 
+      SELECT class, COUNT(*) as count 
       FROM students 
-      GROUP BY sinif
+      GROUP BY class
     `).all() as any[];
 
     const classesDataArray = Object.keys(classeData).map(className => ({
       className,
       responses: classeData[className],
-      studentCount: classStudentCounts.find((c: any) => c.sinif === className)?.count || 0
+      studentCount: classStudentCounts.find((c: any) => c.class === className)?.count || 0
     }));
 
     const analysis = await aiAnalysisService.compareClassResults(classesDataArray);

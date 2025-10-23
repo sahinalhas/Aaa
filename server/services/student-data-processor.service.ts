@@ -37,8 +37,8 @@ export function normalizeStudentData(student: any): UnifiedStudent {
   }
   
   // Alan eşlemeleri
-  if (normalized.className && !normalized.sinif) {
-    normalized.sinif = normalized.className;
+  if (normalized.className && !normalized.class) {
+    normalized.class = normalized.className;
   }
   if (normalized.gender && !normalized.cinsiyet) {
     normalized.cinsiyet = normalized.gender;
@@ -193,7 +193,7 @@ export function calculateProfileCompleteness(student: UnifiedStudent): ProfileCo
   const temelFields = [
     { key: 'ad', label: 'Ad' },
     { key: 'soyad', label: 'Soyad' },
-    { key: 'sinif', label: 'Sınıf' },
+    { key: 'class', label: 'Sınıf' },
     { key: 'okulNo', label: 'Okul No' },
     { key: 'cinsiyet', label: 'Cinsiyet' },
     { key: 'dogumTarihi', label: 'Doğum Tarihi' },
@@ -323,7 +323,7 @@ export function detectStudentChanges(
   const changes: string[] = [];
   
   const fieldsToCheck: (keyof UnifiedStudent)[] = [
-    'ad', 'soyad', 'sinif', 'cinsiyet', 'telefon', 'eposta',
+    'ad', 'soyad', 'class', 'cinsiyet', 'telefon', 'eposta',
     'adres', 'veliAdi', 'veliTelefon', 'risk', 'rehberOgretmen'
   ];
   

@@ -38,7 +38,7 @@ export class ProfileQualityValidator {
    * Temel öğrenci bilgilerini doğrula
    */
   validateBasicInfo(student: any): ProfileQualityReport {
-    const criticalFields = ['id', 'ad', 'soyad', 'sinif'];
+    const criticalFields = ['id', 'ad', 'soyad', 'class'];
     const optionalFields = ['cinsiyet', 'dogumTarihi', 'telefon', 'eposta', 'adres', 'veliTelefon'];
     
     const missingCritical: string[] = [];
