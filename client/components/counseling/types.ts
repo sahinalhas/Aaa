@@ -164,8 +164,7 @@ export interface Student {
   id: string;
   name: string;
   surname: string;
-  className: string;
-  sinif: string;
+  class: string;
 }
 
 export interface ClassHour {
@@ -299,7 +298,7 @@ export interface ParticipantAnalysis {
 }
 
 export interface ClassAnalysis {
-  className: string;
+  class: string;
   count: number;
 }
 

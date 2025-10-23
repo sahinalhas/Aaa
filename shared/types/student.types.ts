@@ -10,7 +10,7 @@ export interface UnifiedStudent {
   soyad: string;
   
   // Eğitim Bilgileri
-  sinif?: string;
+  class?: string;
   okulNo?: string;
   cinsiyet?: 'K' | 'E';
   dogumTarihi?: string;
@@ -78,7 +78,7 @@ export function backendToUnified(backend: BackendStudent): UnifiedStudent {
     id: backend.id,
     ad: backend.name || '',
     soyad: backend.surname || '',
-    sinif: backend.class,
+    class: backend.class,
     cinsiyet: backend.gender,
     telefon: backend.phone,
     eposta: backend.email,
@@ -105,7 +105,7 @@ export function unifiedToBackend(unified: UnifiedStudent): BackendStudent {
     address: unified.adres,
     il: unified.il,
     ilce: unified.ilce,
-    class: unified.sinif,
+    class: unified.class,
     enrollmentDate: unified.kayitTarihi || new Date().toISOString().split('T')[0],
     status: unified.durum === 'aktif' ? 'active' : unified.durum === 'pasif' ? 'inactive' : unified.durum === 'mezun' ? 'graduated' : 'active',
     parentContact: unified.veliTelefon,
@@ -129,7 +129,7 @@ export function frontendToBackend(student: any): BackendStudent {
     phone: student.telefon || student.phone,
     birthDate: student.dogumTarihi || student.birthDate,
     address: student.adres || student.address,
-    class: student.sinif || student.class,
+    class: student.class,
     enrollmentDate: student.kayitTarihi || student.enrollmentDate || new Date().toISOString().split('T')[0],
     status: student.durum === 'aktif' ? 'active' : student.durum === 'pasif' ? 'inactive' : student.durum === 'mezun' ? 'graduated' : student.status || 'active',
     avatar: student.avatar,
