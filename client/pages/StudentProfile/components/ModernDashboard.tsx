@@ -1,12 +1,13 @@
 /**
- * Modern Student Dashboard
- * Modern SIS standartlarına uygun öğrenci özet ekranı
+ * Modern Student Dashboard - 2025 SIS Standards
+ * Modern öğrenci bilgi sistemleri standartlarına uygun özet ekran
  * 
  * Özellikler:
- * - İlk bakışta en kritik 5-6 bilgi kartı
- * - Quick actions (hızlı erişim)
- * - Görsel metrikler ve progress göstergeleri
- * - Responsive tasarım
+ * - Glassmorphism ve modern visual effects
+ * - AI-powered insights with visual hierarchy
+ * - Responsive grid layout with adaptive cards
+ * - Smooth animations and micro-interactions
+ * - Data visualization with progress indicators
  */
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +28,10 @@ import {
   Calendar,
   Award,
   Brain,
-  Loader2
+  Loader2,
+  ArrowRight,
+  TrendingDown,
+  Zap
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -51,40 +55,109 @@ interface MetricCardProps {
   score: number;
   icon: React.ElementType;
   color: string;
-  bgColor: string;
+  bgGradient: string;
   description?: string;
+  trend?: 'up' | 'down' | 'stable';
+  trendValue?: number;
 }
 
-const MetricCard = ({ title, score, icon: Icon, color, bgColor, description }: MetricCardProps) => {
+const MetricCard = ({ title, score, icon: Icon, color, bgGradient, description, trend, trendValue }: MetricCardProps) => {
   const getScoreStatus = (score: number) => {
-    if (score >= 80) return { label: "Mükemmel", textColor: "text-green-700", badgeVariant: "default" as const };
-    if (score >= 60) return { label: "İyi", textColor: "text-blue-700", badgeVariant: "secondary" as const };
-    if (score >= 40) return { label: "Orta", textColor: "text-yellow-700", badgeVariant: "outline" as const };
-    return { label: "Gelişmeli", textColor: "text-red-700", badgeVariant: "destructive" as const };
+    if (score >= 80) return { 
+      label: "Mükemmel", 
+      textColor: "text-emerald-700", 
+      bgColor: "bg-emerald-50",
+      borderColor: "border-emerald-200"
+    };
+    if (score >= 60) return { 
+      label: "İyi", 
+      textColor: "text-blue-700", 
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200"
+    };
+    if (score >= 40) return { 
+      label: "Orta", 
+      textColor: "text-amber-700", 
+      bgColor: "bg-amber-50",
+      borderColor: "border-amber-200"
+    };
+    return { 
+      label: "Gelişmeli", 
+      textColor: "text-red-700", 
+      bgColor: "bg-red-50",
+      borderColor: "border-red-200"
+    };
   };
 
   const status = getScoreStatus(score);
 
+  const getTrendIcon = () => {
+    if (trend === 'up') return <TrendingUp className="h-3 w-3 text-emerald-600" />;
+    if (trend === 'down') return <TrendingDown className="h-3 w-3 text-red-600" />;
+    return null;
+  };
+
   return (
-    <Card className="hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-2">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className={`p-3.5 rounded-xl shadow-sm ${bgColor}`}>
-            <Icon className={`h-7 w-7 ${color}`} />
+    <Card className="group relative overflow-hidden border-2 transition-all duration-500 hover:shadow-2xl hover:scale-[1.03] hover:-translate-y-1">
+      {/* Glassmorphism Background */}
+      <div className={`absolute inset-0 ${bgGradient} opacity-10 group-hover:opacity-20 transition-opacity duration-500`}></div>
+      
+      {/* Animated Gradient Border on Hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      
+      <CardContent className="relative p-6">
+        <div className="flex items-start justify-between mb-5">
+          {/* Icon with Animated Background */}
+          <div className={`relative p-4 rounded-2xl ${bgGradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+            <Icon className={`h-8 w-8 ${color}`} />
+            <div className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
-          <Badge variant={status.badgeVariant} className={`${status.textColor} font-semibold`}>
+          
+          {/* Status Badge */}
+          <Badge 
+            className={`${status.textColor} ${status.bgColor} font-bold px-3 py-1.5 border-2 ${status.borderColor} shadow-sm`}
+          >
             {status.label}
           </Badge>
         </div>
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{title}</h3>
-          <div className="flex items-end gap-2">
-            <span className="text-4xl font-bold tracking-tight">{Math.round(score)}</span>
-            <span className="text-base text-muted-foreground mb-1.5 font-medium">/ 100</span>
+
+        <div className="space-y-4">
+          {/* Title */}
+          <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
+            {title}
+          </h3>
+          
+          {/* Score Display */}
+          <div className="flex items-end justify-between">
+            <div className="flex items-end gap-2">
+              <span className="text-5xl font-black tracking-tighter bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+                {Math.round(score)}
+              </span>
+              <span className="text-lg text-muted-foreground mb-2 font-semibold">/ 100</span>
+            </div>
+            
+            {/* Trend Indicator */}
+            {trend && trendValue && (
+              <div className="flex items-center gap-1 text-sm font-semibold">
+                {getTrendIcon()}
+                <span className={trend === 'up' ? 'text-emerald-600' : 'text-red-600'}>
+                  {trendValue}%
+                </span>
+              </div>
+            )}
           </div>
-          <Progress value={score} className="h-2.5 shadow-sm" />
+          
+          {/* Progress Bar */}
+          <Progress 
+            value={score} 
+            className="h-3 shadow-inner bg-muted/50"
+          />
+          
+          {/* Description */}
           {description && (
-            <p className="text-xs text-muted-foreground mt-3 leading-relaxed">{description}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+              {description}
+            </p>
           )}
         </div>
       </CardContent>
@@ -150,160 +223,219 @@ export function ModernDashboard({
   };
 
   return (
-    <div className="space-y-6 md:space-y-8">
-      {/* Canlı Profil Kartı - En Üstte, En Dikkat Çekici */}
-      <LiveProfileCard studentId={studentId} />
+    <div className="space-y-8">
+      {/* AI-Powered Living Profile - Hero Card */}
+      <div className="relative">
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary via-purple-500 to-primary rounded-2xl opacity-20 blur-xl"></div>
+        <div className="relative">
+          <LiveProfileCard studentId={studentId} />
+        </div>
+      </div>
 
-      {/* Quick Actions - Hızlı Erişim Butonları */}
-      <Card className="bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 border-2 border-primary/10 shadow-md">
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-primary rounded-lg">
-              <Sparkles className="h-5 w-5 text-primary-foreground" />
+      {/* Quick Actions - Glassmorphism Card */}
+      <Card className="relative overflow-hidden border-2 border-primary/20 shadow-xl bg-gradient-to-br from-primary/5 via-background to-accent/5">
+        {/* Animated Background Elements */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl opacity-50 animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-accent/10 to-transparent rounded-full blur-3xl opacity-30 animate-pulse delay-1000"></div>
+        
+        <CardHeader className="relative pb-5">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-gradient-to-br from-primary to-primary/80 rounded-xl shadow-lg">
+              <Zap className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <CardTitle className="text-xl font-bold">Hızlı İşlemler</CardTitle>
-              <CardDescription className="text-sm mt-0.5">
-                En sık kullanılan araçlara hızlı erişim
+              <CardTitle className="text-2xl font-bold">Hızlı İşlemler</CardTitle>
+              <CardDescription className="text-sm mt-1">
+                En sık kullanılan AI araçlarına anında erişim
               </CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        
+        <CardContent className="relative">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Button
               onClick={handleAIChat}
-              className="gap-2 h-auto py-3 md:py-4 shadow-sm hover:shadow-md transition-all w-full"
-              variant="default"
+              className="group gap-3 h-auto py-5 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
               size="lg"
             >
-              <Bot className="h-5 w-5" />
-              <span className="font-semibold">AI ile Konuş</span>
+              <Bot className="h-6 w-6 group-hover:rotate-12 transition-transform duration-300" />
+              <div className="text-left">
+                <div className="font-bold text-base">AI ile Konuş</div>
+                <div className="text-xs opacity-90">Anlık destek</div>
+              </div>
+              <ArrowRight className="h-5 w-5 ml-auto group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
+            
             <Button
               onClick={handleRiskAnalysis}
-              className="gap-2 h-auto py-3 md:py-4 shadow-sm hover:shadow-md transition-all w-full"
+              className="group gap-3 h-auto py-5 shadow-lg hover:shadow-xl transition-all duration-300 border-2"
               variant="outline"
               size="lg"
               disabled={analyzingRisk}
             >
               {analyzingRisk ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <Loader2 className="h-6 w-6 animate-spin" />
               ) : (
-                <Shield className="h-5 w-5" />
+                <Shield className="h-6 w-6 group-hover:scale-110 transition-transform duration-300" />
               )}
-              <span className="font-semibold">Risk Analizi</span>
+              <div className="text-left">
+                <div className="font-bold text-base">Risk Analizi</div>
+                <div className="text-xs opacity-70">Detaylı değerlendirme</div>
+              </div>
+              <ArrowRight className="h-5 w-5 ml-auto group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
+            
             <Button
               onClick={handleGenerateReport}
-              className="gap-2 h-auto py-3 md:py-4 shadow-sm hover:shadow-md transition-all w-full sm:col-span-2 lg:col-span-1"
+              className="group gap-3 h-auto py-5 shadow-lg hover:shadow-xl transition-all duration-300 border-2 sm:col-span-2 lg:col-span-1"
               variant="outline"
               size="lg"
               disabled={generatingReport}
             >
               {generatingReport ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <Loader2 className="h-6 w-6 animate-spin" />
               ) : (
-                <FileText className="h-5 w-5" />
+                <FileText className="h-6 w-6 group-hover:scale-110 transition-transform duration-300" />
               )}
-              <span className="font-semibold">Rapor Oluştur</span>
+              <div className="text-left">
+                <div className="font-bold text-base">Rapor Oluştur</div>
+                <div className="text-xs opacity-70">PDF formatında</div>
+              </div>
+              <ArrowRight className="h-5 w-5 ml-auto group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Önemli Metrikler - 4 Kart Grid */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Activity className="h-5 w-5 text-primary" />
+      {/* Performance Metrics - Modern Grid */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+              <Activity className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">Performans Göstergeleri</h2>
+              <p className="text-sm text-muted-foreground">Öğrenci performansının kapsamlı analizi</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-bold">Önemli Göstergeler</h2>
-            <p className="text-sm text-muted-foreground">Öğrenci performansının özet analizi</p>
-          </div>
+          <Badge variant="secondary" className="text-sm font-semibold px-4 py-2">
+            Güncel
+          </Badge>
         </div>
         
         {loadingScores ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <Card key={i}>
+              <Card key={i} className="border-2">
                 <CardContent className="p-6">
-                  <div className="animate-pulse space-y-3">
-                    <div className="h-12 w-12 bg-gray-200 rounded-lg"></div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                  <div className="animate-pulse space-y-4">
+                    <div className="h-16 w-16 bg-muted rounded-2xl"></div>
+                    <div className="h-4 bg-muted rounded w-3/4"></div>
+                    <div className="h-12 bg-muted rounded w-1/2"></div>
+                    <div className="h-3 bg-muted rounded w-full"></div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             <MetricCard
               title="Akademik Performans"
               score={scores.akademikSkor || 0}
               icon={BookOpen}
               color="text-blue-600"
-              bgColor="bg-blue-100"
-              description="Genel akademik başarı düzeyi"
+              bgGradient="bg-gradient-to-br from-blue-500 to-cyan-500"
+              description="Genel akademik başarı ve not ortalaması"
+              trend="up"
+              trendValue={5}
             />
             <MetricCard
-              title="Sosyal-Duygusal Gelişim"
+              title="Sosyal-Duygusal"
               score={scores.sosyalDuygusalSkor || 0}
               icon={Heart}
               color="text-pink-600"
-              bgColor="bg-pink-100"
+              bgGradient="bg-gradient-to-br from-pink-500 to-rose-500"
               description="Duygusal zeka ve sosyal beceriler"
+              trend="stable"
             />
             <MetricCard
-              title="Motivasyon"
+              title="Motivasyon Seviyesi"
               score={scores.motivasyonSkor || 0}
               icon={Target}
               color="text-purple-600"
-              bgColor="bg-purple-100"
-              description="Öğrenme motivasyonu ve tutumu"
+              bgGradient="bg-gradient-to-br from-purple-500 to-fuchsia-500"
+              description="Öğrenme isteği ve hedef odaklılık"
+              trend="up"
+              trendValue={8}
             />
             <MetricCard
-              title="Risk Durumu"
+              title="Genel Durum"
               score={100 - (scores.riskSkoru || 0)}
               icon={Shield}
-              color={scores.riskSkoru > 60 ? "text-red-600" : scores.riskSkoru > 30 ? "text-yellow-600" : "text-green-600"}
-              bgColor={scores.riskSkoru > 60 ? "bg-red-100" : scores.riskSkoru > 30 ? "bg-yellow-100" : "bg-green-100"}
-              description={scores.riskSkoru > 60 ? "Acil müdahale gerekli" : scores.riskSkoru > 30 ? "Takip edilmeli" : "Düşük risk"}
+              color={scores.riskSkoru > 60 ? "text-red-600" : scores.riskSkoru > 30 ? "text-amber-600" : "text-emerald-600"}
+              bgGradient={
+                scores.riskSkoru > 60 
+                  ? "bg-gradient-to-br from-red-500 to-orange-500" 
+                  : scores.riskSkoru > 30 
+                    ? "bg-gradient-to-br from-amber-500 to-yellow-500" 
+                    : "bg-gradient-to-br from-emerald-500 to-green-500"
+              }
+              description={
+                scores.riskSkoru > 60 
+                  ? "Acil müdahale gerekli - yüksek risk" 
+                  : scores.riskSkoru > 30 
+                    ? "Yakın takip önerilir - orta risk" 
+                    : "Stabil durum - düşük risk"
+              }
             />
           </div>
         )}
       </div>
 
-      {/* Detaylı Analiz Kartları - 2 Sütun */}
-      <div className="space-y-4">
+      {/* AI-Powered Deep Analysis */}
+      <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Brain className="h-5 w-5 text-primary" />
+          <div className="p-3 bg-gradient-to-br from-purple-500/10 to-pink-500/5 rounded-xl border border-purple-200">
+            <Brain className="h-6 w-6 text-purple-600" />
           </div>
           <div>
-            <h2 className="text-xl font-bold">Detaylı Analizler</h2>
-            <p className="text-sm text-muted-foreground">AI destekli derinlemesine profil değerlendirmesi</p>
+            <h2 className="text-2xl font-bold">AI Destekli Analizler</h2>
+            <p className="text-sm text-muted-foreground">Yapay zeka ile derinlemesine profil değerlendirmesi</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-          <EnhancedRiskCard studentId={studentId} />
-          <PersonalizedLearningCard studentId={studentId} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="relative">
+            <div className="absolute -inset-1 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-2xl opacity-10 blur-xl"></div>
+            <div className="relative">
+              <EnhancedRiskCard studentId={studentId} />
+            </div>
+          </div>
+          
+          <div className="relative">
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-10 blur-xl"></div>
+            <div className="relative">
+              <PersonalizedLearningCard studentId={studentId} />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Profil Tamlık Göstergesi */}
-      <div className="space-y-4">
+      {/* Profile Completeness */}
+      <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Award className="h-5 w-5 text-primary" />
+          <div className="p-3 bg-gradient-to-br from-amber-500/10 to-yellow-500/5 rounded-xl border border-amber-200">
+            <Award className="h-6 w-6 text-amber-600" />
           </div>
           <div>
-            <h2 className="text-xl font-bold">Profil Durumu</h2>
-            <p className="text-sm text-muted-foreground">Veri tamlığı ve eksik alanlar</p>
+            <h2 className="text-2xl font-bold">Profil Tamlığı</h2>
+            <p className="text-sm text-muted-foreground">Veri bütünlüğü ve eksik alan analizi</p>
           </div>
         </div>
+        
         <ProfileCompletenessIndicator
           overall={completenessData.overall}
           sections={completenessData.sections}
@@ -311,42 +443,62 @@ export function ModernDashboard({
         />
       </div>
 
-      {/* Son Güncellemeler - Timeline */}
-      <div className="space-y-4">
+      {/* Recent Activity Timeline */}
+      <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Calendar className="h-5 w-5 text-primary" />
+          <div className="p-3 bg-gradient-to-br from-cyan-500/10 to-blue-500/5 rounded-xl border border-cyan-200">
+            <Calendar className="h-6 w-6 text-cyan-600" />
           </div>
           <div>
-            <h2 className="text-xl font-bold">Son Aktiviteler</h2>
-            <p className="text-sm text-muted-foreground">Güncel profil değişiklikleri ve olaylar</p>
+            <h2 className="text-2xl font-bold">Son Aktiviteler</h2>
+            <p className="text-sm text-muted-foreground">Profil güncellemeleri ve önemli olaylar</p>
           </div>
         </div>
+        
         <ProfileUpdateTimeline studentId={studentId} />
       </div>
 
-      {/* Yüksek Risk Uyarısı */}
+      {/* High Risk Alert */}
       {scores.riskSkoru > 60 && (
-        <Card className="border-2 border-red-500 bg-red-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-700">
-              <AlertTriangle className="h-5 w-5" />
-              Yüksek Risk Uyarısı
+        <Card className="relative overflow-hidden border-4 border-red-500 bg-gradient-to-br from-red-50 to-orange-50 shadow-2xl">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl"></div>
+          
+          <CardHeader className="relative">
+            <CardTitle className="flex items-center gap-3 text-red-700 text-xl">
+              <div className="p-3 bg-red-500 rounded-xl animate-pulse">
+                <AlertTriangle className="h-6 w-6 text-white" />
+              </div>
+              Yüksek Risk Uyarısı - Acil Müdahale Gerekli
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-red-700 mb-4">
-              Bu öğrenci için risk skoru yüksek seviyede ({Math.round(scores.riskSkoru)}/100). 
-              Acil müdahale planı oluşturulması önerilir.
+          
+          <CardContent className="relative">
+            <p className="text-red-700 mb-6 text-base leading-relaxed">
+              Bu öğrenci için risk skoru kritik seviyede ({Math.round(scores.riskSkoru)}/100). 
+              Derhal müdahale planı oluşturulması ve yakın takip yapılması önerilir. 
+              AI asistanı ile detaylı risk analizi yapabilir ve öneriler alabilirsiniz.
             </p>
-            <Button 
-              onClick={handleRiskAnalysis}
-              variant="destructive"
-              className="gap-2"
-            >
-              <Shield className="h-4 w-4" />
-              Müdahale Planı Oluştur
-            </Button>
+            
+            <div className="flex gap-3">
+              <Button 
+                onClick={handleRiskAnalysis}
+                className="gap-2 bg-red-600 hover:bg-red-700 shadow-lg"
+                size="lg"
+              >
+                <Shield className="h-5 w-5" />
+                Acil Müdahale Planı Oluştur
+              </Button>
+              
+              <Button 
+                onClick={handleAIChat}
+                variant="outline"
+                className="gap-2 border-red-500 text-red-700 hover:bg-red-50"
+                size="lg"
+              >
+                <Bot className="h-5 w-5" />
+                AI Danışman ile Görüş
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}

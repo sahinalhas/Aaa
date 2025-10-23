@@ -53,10 +53,6 @@ import ProfileChangeTimeline from "@/components/profile-sync/ProfileChangeTimeli
 import ConflictResolutionPanel from "@/components/profile-sync/ConflictResolutionPanel";
 import UnifiedProfileCard from "@/components/profile-sync/UnifiedProfileCard";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info, User, Users } from "lucide-react";
-
 interface StudentProfileTabsProps {
   student: Student;
   studentId: string;
@@ -76,21 +72,23 @@ export function StudentProfileTabs({
 }: StudentProfileTabsProps) {
   return (
     <Tabs defaultValue="dashboard" className="space-y-6">
-      {/* Ana Sekmeler */}
-      <TabsList className="flex flex-wrap gap-2 h-auto w-full justify-start min-h-[2.5rem] p-1.5 bg-muted/30 rounded-lg border shadow-sm">
+      {/* Main Navigation Tabs - Modern Design */}
+      <TabsList className="flex flex-wrap gap-2 md:gap-3 h-auto w-full justify-start min-h-[3rem] p-2 bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl border-2 border-primary/10 shadow-lg backdrop-blur-sm">
         {MAIN_TABS.map(({ value, label, icon: Icon }) => (
           <TabsTrigger 
             key={value} 
             value={value} 
-            className="flex items-center gap-2 shrink-0 data-[state=active]:bg-background data-[state=active]:shadow-md transition-all px-4 py-2.5 font-semibold"
+            className="flex items-center gap-2 shrink-0 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105 px-4 py-3 font-semibold rounded-lg border-2 border-transparent data-[state=active]:border-primary/20"
           >
-            <Icon className="h-4 w-4" /> {label}
+            <Icon className="h-5 w-5" />
+            <span className="hidden sm:inline">{label}</span>
+            <span className="sm:hidden text-xs">{label.split(' ')[0]}</span>
           </TabsTrigger>
         ))}
       </TabsList>
 
-      {/* DASHBOARD - MODERN SIS STANDARTLARI */}
-      <TabsContent value="dashboard" className="mt-4 min-h-[400px]">
+      {/* DASHBOARD - MODERN SIS STANDARDS */}
+      <TabsContent value="dashboard" className="mt-6 min-h-[400px] animate-in fade-in-50 duration-500">
         <ModernDashboard 
           student={student}
           studentId={studentId}
@@ -99,45 +97,45 @@ export function StudentProfileTabs({
         />
       </TabsContent>
 
-      {/* AKADEMİK PROFİL - GENİŞLETİLMİŞ (Sınavlar eklendi) */}
-      <TabsContent value="akademik" className="mt-6 min-h-[400px]">
-        <Tabs defaultValue="performans" className="space-y-5">
-          <TabsList className="w-full justify-start bg-muted/30 p-1.5 flex-wrap h-auto min-h-[2.5rem] border rounded-lg">
+      {/* ACADEMIC PROFILE - Extended with Exams */}
+      <TabsContent value="akademik" className="mt-6 min-h-[400px] animate-in fade-in-50 duration-500">
+        <Tabs defaultValue="performans" className="space-y-6">
+          <TabsList className="w-full justify-start bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 p-2 flex-wrap h-auto min-h-[2.5rem] border-2 border-blue-200/50 dark:border-blue-800/50 rounded-xl shadow-md">
             {AKADEMIK_TABS_NEW.map(({ value, label, icon: Icon }) => (
               <TabsTrigger 
                 key={value} 
                 value={value} 
-                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm shrink-0 px-3 py-2 transition-all"
+                className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-md data-[state=active]:border data-[state=active]:border-blue-300 dark:data-[state=active]:border-blue-700 shrink-0 px-4 py-2.5 transition-all duration-200 hover:bg-white/50 dark:hover:bg-slate-800/50 rounded-lg"
               >
                 <Icon className="h-4 w-4" />
-                <span className="font-medium">{label}</span>
+                <span className="font-medium text-sm">{label}</span>
               </TabsTrigger>
             ))}
           </TabsList>
 
-          <TabsContent value="performans">
+          <TabsContent value="performans" className="animate-in slide-in-from-left-10 duration-300">
             <StandardizedAcademicSection
               studentId={studentId}
               onUpdate={onUpdate}
             />
           </TabsContent>
 
-          <TabsContent value="sinavlar">
+          <TabsContent value="sinavlar" className="animate-in slide-in-from-left-10 duration-300">
             <StudentExamResultsSection studentId={studentId} />
           </TabsContent>
 
-          <TabsContent value="calisma-programi">
+          <TabsContent value="calisma-programi" className="animate-in slide-in-from-left-10 duration-300">
             <CalismaProgramiSection studentId={studentId} />
           </TabsContent>
 
-          <TabsContent value="ilerleme">
+          <TabsContent value="ilerleme" className="animate-in slide-in-from-left-10 duration-300">
             <IlerlemeTakibiSection
               studentId={studentId}
               onUpdate={onUpdate}
             />
           </TabsContent>
 
-          <TabsContent value="anketler">
+          <TabsContent value="anketler" className="animate-in slide-in-from-left-10 duration-300">
             <AnketlerSection
               studentId={studentId}
               onUpdate={onUpdate}
@@ -146,24 +144,24 @@ export function StudentProfileTabs({
         </Tabs>
       </TabsContent>
 
-      {/* KİŞİSEL & SOSYAL - BİRLEŞTİRİLMİŞ (Kimlik + Sosyal-Duygusal + Yetenek) */}
-      <TabsContent value="kisisel-sosyal" className="mt-6 min-h-[400px]">
-        <Tabs defaultValue="kimlik-bilgiler" className="space-y-5">
-          <TabsList className="w-full justify-start bg-muted/30 p-1.5 flex-wrap h-auto min-h-[2.5rem] border rounded-lg">
+      {/* PERSONAL & SOCIAL - Unified (Identity + Social-Emotional + Talents) */}
+      <TabsContent value="kisisel-sosyal" className="mt-6 min-h-[400px] animate-in fade-in-50 duration-500">
+        <Tabs defaultValue="kimlik-bilgiler" className="space-y-6">
+          <TabsList className="w-full justify-start bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20 p-2 flex-wrap h-auto min-h-[2.5rem] border-2 border-pink-200/50 dark:border-pink-800/50 rounded-xl shadow-md">
             {KISISEL_SOSYAL_TABS_NEW.map(({ value, label, icon: Icon }) => (
               <TabsTrigger 
                 key={value} 
                 value={value} 
-                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm shrink-0 px-3 py-2 transition-all"
+                className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-md data-[state=active]:border data-[state=active]:border-pink-300 dark:data-[state=active]:border-pink-700 shrink-0 px-4 py-2.5 transition-all duration-200 hover:bg-white/50 dark:hover:bg-slate-800/50 rounded-lg"
               >
                 <Icon className="h-4 w-4" />
-                <span className="font-medium">{label}</span>
+                <span className="font-medium text-sm">{label}</span>
               </TabsTrigger>
             ))}
           </TabsList>
 
-          <TabsContent value="kimlik-bilgiler">
-            <div className="space-y-4">
+          <TabsContent value="kimlik-bilgiler" className="animate-in slide-in-from-left-10 duration-300">
+            <div className="space-y-6">
               <BasicInfoSection student={student} onUpdate={onUpdate} />
               <OzelEgitimSection
                 studentId={studentId}
@@ -173,22 +171,22 @@ export function StudentProfileTabs({
             </div>
           </TabsContent>
 
-          <TabsContent value="saglik">
+          <TabsContent value="saglik" className="animate-in slide-in-from-left-10 duration-300">
             <StandardizedHealthSection
               studentId={studentId}
               onUpdate={onUpdate}
             />
           </TabsContent>
 
-          <TabsContent value="sosyal-duygusal">
+          <TabsContent value="sosyal-duygusal" className="animate-in slide-in-from-left-10 duration-300">
             <StandardizedSocialEmotionalSection
               studentId={studentId}
               onUpdate={onUpdate}
             />
           </TabsContent>
 
-          <TabsContent value="kisilik-yetenek">
-            <div className="space-y-4">
+          <TabsContent value="kisilik-yetenek" className="animate-in slide-in-from-left-10 duration-300">
+            <div className="space-y-6">
               <KisilikProfiliSection
                 studentId={studentId}
                 multipleIntelligence={data.multipleIntelligence}
@@ -206,7 +204,7 @@ export function StudentProfileTabs({
             </div>
           </TabsContent>
 
-          <TabsContent value="motivasyon">
+          <TabsContent value="motivasyon" className="animate-in slide-in-from-left-10 duration-300">
             <MotivationProfileSection
               studentId={studentId}
               onUpdate={onUpdate}
@@ -215,23 +213,23 @@ export function StudentProfileTabs({
         </Tabs>
       </TabsContent>
 
-      {/* REHBERLİK & DESTEK - YENİ BİRLEŞTİRİLMİŞ SEKME */}
-      <TabsContent value="rehberlik-destek" className="mt-6 min-h-[400px]">
-        <Tabs defaultValue="risk-mudahale" className="space-y-5">
-          <TabsList className="w-full justify-start bg-muted/30 p-1.5 flex-wrap h-auto min-h-[2.5rem] border rounded-lg">
+      {/* GUIDANCE & SUPPORT - New Unified Tab */}
+      <TabsContent value="rehberlik-destek" className="mt-6 min-h-[400px] animate-in fade-in-50 duration-500">
+        <Tabs defaultValue="risk-mudahale" className="space-y-6">
+          <TabsList className="w-full justify-start bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-2 flex-wrap h-auto min-h-[2.5rem] border-2 border-amber-200/50 dark:border-amber-800/50 rounded-xl shadow-md">
             {REHBERLIK_DESTEK_TABS.map(({ value, label, icon: Icon }) => (
               <TabsTrigger 
                 key={value} 
                 value={value} 
-                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm shrink-0 px-3 py-2 transition-all"
+                className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-md data-[state=active]:border data-[state=active]:border-amber-300 dark:data-[state=active]:border-amber-700 shrink-0 px-4 py-2.5 transition-all duration-200 hover:bg-white/50 dark:hover:bg-slate-800/50 rounded-lg"
               >
                 <Icon className="h-4 w-4" />
-                <span className="font-medium">{label}</span>
+                <span className="font-medium text-sm">{label}</span>
               </TabsTrigger>
             ))}
           </TabsList>
 
-          <TabsContent value="risk-mudahale">
+          <TabsContent value="risk-mudahale" className="animate-in slide-in-from-left-10 duration-300">
             <UnifiedRiskSection
               studentId={studentId}
               student={student}
@@ -239,8 +237,8 @@ export function StudentProfileTabs({
             />
           </TabsContent>
 
-          <TabsContent value="aile-iletisim">
-            <div className="space-y-4">
+          <TabsContent value="aile-iletisim" className="animate-in slide-in-from-left-10 duration-300">
+            <div className="space-y-6">
               <UnifiedMeetingsSection
                 studentId={studentId}
                 onUpdate={onUpdate}
@@ -258,8 +256,8 @@ export function StudentProfileTabs({
             </div>
           </TabsContent>
 
-          <TabsContent value="mesleki-rehberlik">
-            <div className="space-y-4">
+          <TabsContent value="mesleki-rehberlik" className="animate-in slide-in-from-left-10 duration-300">
+            <div className="space-y-6">
               <HedeflerPlanlamaSection
                 studentId={studentId}
                 academicGoals={data.academicGoals}
@@ -272,7 +270,7 @@ export function StudentProfileTabs({
             </div>
           </TabsContent>
 
-          <TabsContent value="ai-destegi">
+          <TabsContent value="ai-destegi" className="animate-in slide-in-from-left-10 duration-300">
             <AIToolsHub
               studentId={studentId}
               studentName={`${student.ad} ${student.soyad}`}
@@ -282,37 +280,37 @@ export function StudentProfileTabs({
         </Tabs>
       </TabsContent>
 
-      {/* SİSTEM - TEKNİK ARAÇLAR */}
-      <TabsContent value="sistem" className="mt-6 min-h-[400px]">
-        <Tabs defaultValue="profil-gecmisi" className="space-y-5">
-          <TabsList className="w-full justify-start bg-muted/30 p-1.5 flex-wrap h-auto min-h-[2.5rem] border rounded-lg">
+      {/* SYSTEM - Technical Tools */}
+      <TabsContent value="sistem" className="mt-6 min-h-[400px] animate-in fade-in-50 duration-500">
+        <Tabs defaultValue="profil-gecmisi" className="space-y-6">
+          <TabsList className="w-full justify-start bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-950/20 dark:to-gray-950/20 p-2 flex-wrap h-auto min-h-[2.5rem] border-2 border-slate-200/50 dark:border-slate-800/50 rounded-xl shadow-md">
             {SISTEM_TABS.map(({ value, label, icon: Icon }) => (
               <TabsTrigger 
                 key={value} 
                 value={value} 
-                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm shrink-0 px-3 py-2 transition-all"
+                className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-md data-[state=active]:border data-[state=active]:border-slate-300 dark:data-[state=active]:border-slate-700 shrink-0 px-4 py-2.5 transition-all duration-200 hover:bg-white/50 dark:hover:bg-slate-800/50 rounded-lg"
               >
                 <Icon className="h-4 w-4" />
-                <span className="font-medium">{label}</span>
+                <span className="font-medium text-sm">{label}</span>
               </TabsTrigger>
             ))}
           </TabsList>
 
-          <TabsContent value="profil-gecmisi">
-            <div className="space-y-4">
+          <TabsContent value="profil-gecmisi" className="animate-in slide-in-from-left-10 duration-300">
+            <div className="space-y-6">
               <UnifiedProfileCard studentId={studentId} />
               <ProfileChangeTimeline studentId={studentId} />
             </div>
           </TabsContent>
 
-          <TabsContent value="manuel-duzeltme">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <TabsContent value="manuel-duzeltme" className="animate-in slide-in-from-left-10 duration-300">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ManualCorrectionPanel studentId={studentId} />
               <ConflictResolutionPanel studentId={studentId} />
             </div>
           </TabsContent>
 
-          <TabsContent value="celiski-cozum">
+          <TabsContent value="celiski-cozum" className="animate-in slide-in-from-left-10 duration-300">
             <ConflictResolutionUI studentId={studentId} />
           </TabsContent>
         </Tabs>
