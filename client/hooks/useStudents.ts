@@ -5,10 +5,10 @@ import { backendToFrontend } from '@/lib/storage';
 
 async function fetchStudents(): Promise<Student[]> {
   try {
-    const response = await apiClient.get<{ data: BackendStudent[] }>('/api/students', { 
+    const response = await apiClient.get<BackendStudent[]>('/api/students', { 
       showErrorToast: false 
     });
-    return response.data.map(backendToFrontend);
+    return response.map(backendToFrontend);
   } catch (error) {
     console.error('Error fetching students:', error);
     return [];
