@@ -132,12 +132,12 @@ function ensureInitialized(): void {
     
     getClassAnalysis: db.prepare(`
       SELECT 
-        COALESCE(s.className, 'Sınıf Belirtilmemiş') as className,
+        COALESCE(s.class, 'Sınıf Belirtilmemiş') as className,
         COUNT(DISTINCT cs.id) as count
       FROM counseling_sessions cs
       LEFT JOIN counseling_session_students css ON cs.id = css.sessionId
       LEFT JOIN students s ON css.studentId = s.id
-      GROUP BY s.className
+      GROUP BY s.class
       ORDER BY count DESC
     `),
     

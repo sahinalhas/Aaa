@@ -247,7 +247,7 @@ export function getFilteredSessions(filters: SessionFilters): CounselingSession[
   }
   
   if (filters.className && filters.className.trim() !== '') {
-    whereConditions.push('s.className = ?');
+    whereConditions.push('s.class = ?');
     params.push(filters.className);
   }
   

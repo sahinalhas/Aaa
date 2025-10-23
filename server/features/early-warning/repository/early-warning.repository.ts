@@ -56,7 +56,7 @@ function ensureInitialized(): void {
     deleteRecommendation: db.prepare('DELETE FROM intervention_recommendations WHERE id = ?'),
     
     getHighRiskStudents: db.prepare(`
-      SELECT rsh.studentId, s.name, s.className, rsh.overallRiskScore, rsh.riskLevel, rsh.assessmentDate
+      SELECT rsh.studentId, (s.name || ' ' || s.surname) as name, s.class as className, rsh.overallRiskScore, rsh.riskLevel, rsh.assessmentDate
       FROM risk_score_history rsh
       JOIN students s ON rsh.studentId = s.id
       WHERE rsh.id IN (

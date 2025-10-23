@@ -55,7 +55,7 @@ export async function generateDeepAnalysis(studentId: string): Promise<DeepAnaly
   
   return {
     studentId,
-    studentName: student.name,
+    studentName: `${student.name} ${student.surname}`,
     generatedAt: new Date().toISOString(),
     trajectory,
     interventionPlan,
@@ -286,8 +286,8 @@ async function generateComparativeAnalysis(studentId: string): Promise<Comparati
       COUNT(DISTINCT s.id) as totalStudents
     FROM students s
     LEFT JOIN exam_results er ON s.id = er.studentId
-    WHERE s.className = ?
-  `).get(student.className) as any;
+    WHERE s.class = ?
+  `).get(student.class) as any;
   
   const studentAvg = db.prepare(`
     SELECT AVG(CAST(grade AS REAL)) as avg
@@ -297,9 +297,9 @@ async function generateComparativeAnalysis(studentId: string): Promise<Comparati
   
   return {
     studentId,
-    studentName: student.name,
+    studentName: `${student.name} ${student.surname}`,
     classComparison: {
-      className: student.className || 'Bilinmiyor',
+      className: student.class || 'Bilinmiyor',
       studentRank: 0,
       totalStudents: classStats?.totalStudents || 0,
       percentile: 50,

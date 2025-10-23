@@ -12,13 +12,13 @@ export function getClassComparisons(classNames?: string[]): ClassComparison[] {
   let classFilter = '';
   if (classNames && classNames.length > 0) {
     const placeholders = classNames.map(() => '?').join(',');
-    classFilter = `WHERE s.className IN (${placeholders})`;
+    classFilter = `WHERE s.class IN (${placeholders})`;
   }
   
   const query = `
     WITH class_stats AS (
       SELECT 
-        s.className,
+        s.class as className,
         COUNT(s.id) as studentCount,
         AVG(sas.avg_exam_score) as averageGPA,
         AVG(sas.attendance_rate) as attendanceRate,
@@ -33,7 +33,7 @@ export function getClassComparisons(classNames?: string[]): ClassComparison[] {
       LEFT JOIN behavior_incidents bi ON s.id = bi.studentId
       LEFT JOIN counseling_session_students css ON s.id = css.studentId
       ${classFilter}
-      GROUP BY s.className
+      GROUP BY s.class
     )
     SELECT * FROM class_stats ORDER BY className
   `;
@@ -75,11 +75,11 @@ function getTopPerformers(className: string, limit: number): StudentBrief[] {
   const performers = db.prepare(`
     SELECT 
       s.id,
-      s.name,
+      (s.name || ' ' || s.surname) as name,
       sas.avg_exam_score as gpa
     FROM students s
     JOIN student_analytics_snapshot sas ON s.id = sas.student_id
-    WHERE s.className = ? AND sas.avg_exam_score IS NOT NULL
+    WHERE s.class = ? AND sas.avg_exam_score IS NOT NULL
     ORDER BY sas.avg_exam_score DESC
     LIMIT ?
   `).all(className, limit) as any[];
@@ -98,12 +98,12 @@ function getAtRiskStudents(className: string, limit: number): StudentBrief[] {
   const atRisk = db.prepare(`
     SELECT 
       s.id,
-      s.name,
+      (s.name || ' ' || s.surname) as name,
       sas.risk_level as riskLevel,
       sas.risk_score
     FROM students s
     JOIN student_analytics_snapshot sas ON s.id = sas.student_id
-    WHERE s.className = ? 
+    WHERE s.class = ? 
       AND sas.risk_level IN ('Yüksek', 'Kritik')
     ORDER BY sas.risk_score DESC
     LIMIT ?

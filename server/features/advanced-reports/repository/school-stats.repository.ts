@@ -14,9 +14,9 @@ export function getSchoolStatistics(): SchoolStatistics {
   
   // Total classes
   const totalClasses = db.prepare(`
-    SELECT COUNT(DISTINCT className) as count 
+    SELECT COUNT(DISTINCT class) as count 
     FROM students 
-    WHERE className IS NOT NULL
+    WHERE class IS NOT NULL
   `).get() as { count: number };
   
   // Total counselors
@@ -42,23 +42,23 @@ export function getSchoolStatistics(): SchoolStatistics {
   // Class distribution
   const classDistData = db.prepare(`
     SELECT 
-      className,
+      class as className,
       COUNT(*) as studentCount,
-      SUM(CASE WHEN gender = 'Erkek' THEN 1 ELSE 0 END) as maleCount,
-      SUM(CASE WHEN gender = 'Kız' THEN 1 ELSE 0 END) as femaleCount,
+      SUM(CASE WHEN gender = 'E' THEN 1 ELSE 0 END) as maleCount,
+      SUM(CASE WHEN gender = 'K' THEN 1 ELSE 0 END) as femaleCount,
       AVG(CAST(JULIANDAY('now') - JULIANDAY(birthDate) AS REAL) / 365.25) as averageAge
     FROM students
-    WHERE className IS NOT NULL
-    GROUP BY className
-    ORDER BY className
+    WHERE class IS NOT NULL
+    GROUP BY class
+    ORDER BY class
   `).all() as ClassDistribution[];
   
   // Gender distribution
   const genderData = db.prepare(`
     SELECT 
-      SUM(CASE WHEN gender = 'Erkek' THEN 1 ELSE 0 END) as male,
-      SUM(CASE WHEN gender = 'Kız' THEN 1 ELSE 0 END) as female,
-      SUM(CASE WHEN gender NOT IN ('Erkek', 'Kız') OR gender IS NULL THEN 1 ELSE 0 END) as other
+      SUM(CASE WHEN gender = 'E' THEN 1 ELSE 0 END) as male,
+      SUM(CASE WHEN gender = 'K' THEN 1 ELSE 0 END) as female,
+      SUM(CASE WHEN gender NOT IN ('E', 'K') OR gender IS NULL THEN 1 ELSE 0 END) as other
     FROM students
   `).get() as any;
   
@@ -124,10 +124,10 @@ export function getSchoolStatistics(): SchoolStatistics {
 export function getClassList(): string[] {
   const db = getDatabase();
   const classes = db.prepare(`
-    SELECT DISTINCT className 
+    SELECT DISTINCT class as className 
     FROM students 
-    WHERE className IS NOT NULL 
-    ORDER BY className
+    WHERE class IS NOT NULL 
+    ORDER BY class
   `).all() as { className: string }[];
   
   return classes.map(c => c.className);
