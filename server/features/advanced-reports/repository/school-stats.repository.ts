@@ -124,11 +124,11 @@ export function getSchoolStatistics(): SchoolStatistics {
 export function getClassList(): string[] {
   const db = getDatabase();
   const classes = db.prepare(`
-    SELECT DISTINCT class as className 
+    SELECT DISTINCT class 
     FROM students 
     WHERE class IS NOT NULL 
     ORDER BY class
-  `).all() as { className: string }[];
+  `).all() as { class: string }[];
   
-  return classes.map(c => c.className);
+  return classes.map(c => c.class);
 }

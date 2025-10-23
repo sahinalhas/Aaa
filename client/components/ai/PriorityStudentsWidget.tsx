@@ -103,7 +103,7 @@ export default function PriorityStudentsWidget() {
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground truncate">
-                          {student.className}
+                          {student.class}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {student.reason}

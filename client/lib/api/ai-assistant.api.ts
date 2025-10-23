@@ -13,7 +13,7 @@ export interface MeetingPrepResponse {
 export interface PriorityStudent {
   studentId: string;
   studentName: string;
-  className: string;
+  class: string;
   priorityScore: number;
   status: string;
   criticalAlerts: number;

@@ -42,7 +42,7 @@ export interface StudentAnalytics {
 }
 
 export interface ClassComparison {
-  className: string;
+  class: string;
   studentCount: number;
   averageGPA: number;
   attendanceRate: number;
@@ -482,7 +482,7 @@ export async function generateClassComparisons(options: {
     }
 
     comparisons.push({
-      className,
+      class: className,
       studentCount: classStudents.length,
       averageGPA,
       attendanceRate,

@@ -118,7 +118,7 @@ async function generateDemographicComparisons(): Promise<DemographicComparison[]
   const classComparison: DemographicComparison = {
     category: "Sınıf",
     groups: classComparisons.map(cls => ({
-      name: cls.className,
+      name: cls.class,
       studentCount: cls.studentCount,
       averageSuccess: cls.averageGPA / 4.0,
       averageGPA: cls.averageGPA,
@@ -139,7 +139,7 @@ async function generatePerformanceMetrics(): Promise<PerformanceMetrics[]> {
     {
       metric: "Ortalama GPA",
       values: classComparisons.map(cls => ({
-        name: cls.className,
+        name: cls.class,
         value: cls.averageGPA,
         trend: cls.averageGPA >= 3.0 ? "up" : cls.averageGPA >= 2.0 ? "stable" : "down"
       })),
@@ -147,7 +147,7 @@ async function generatePerformanceMetrics(): Promise<PerformanceMetrics[]> {
     {
       metric: "Devam Oranı",
       values: classComparisons.map(cls => ({
-        name: cls.className,
+        name: cls.class,
         value: cls.attendanceRate * 100,
         trend: cls.attendanceRate >= 0.85 ? "up" : cls.attendanceRate >= 0.75 ? "stable" : "down"
       })),
@@ -155,7 +155,7 @@ async function generatePerformanceMetrics(): Promise<PerformanceMetrics[]> {
     {
       metric: "Risk Altında Öğrenci",
       values: classComparisons.map(cls => ({
-        name: cls.className,
+        name: cls.class,
         value: cls.atRiskStudents.length,
         trend: cls.atRiskStudents.length <= 2 ? "up" : cls.atRiskStudents.length <= 5 ? "stable" : "down"
       })),
@@ -458,7 +458,7 @@ const ComparativeReports = React.memo(function ComparativeReports() {
   // Sınıf karşılaştırması için veri
   const classComparisonData = useMemo(() => 
     classComparisons.map(cls => ({
-      category: cls.className,
+      category: cls.class,
       current: cls.averageGPA,
       previous: cls.averageGPA * 0.9, // Simüle önceki dönem
       target: 3.5, // Hedef GPA
@@ -576,7 +576,7 @@ const ComparativeReports = React.memo(function ComparativeReports() {
           <div className="mt-6">
             <PerformanceTrendChart 
               data={classComparisons.map((cls) => ({
-                date: cls.className,
+                date: cls.class,
                 value: cls.averageGPA,
                 target: 3.5,
               }))}

@@ -18,7 +18,7 @@ export function getClassComparisons(classNames?: string[]): ClassComparison[] {
   const query = `
     WITH class_stats AS (
       SELECT 
-        s.class as className,
+        s.class,
         COUNT(s.id) as studentCount,
         AVG(sas.avg_exam_score) as averageGPA,
         AVG(sas.attendance_rate) as attendanceRate,
@@ -35,21 +35,21 @@ export function getClassComparisons(classNames?: string[]): ClassComparison[] {
       ${classFilter}
       GROUP BY s.class
     )
-    SELECT * FROM class_stats ORDER BY className
+    SELECT * FROM class_stats ORDER BY class
   `;
   
   const params = classNames && classNames.length > 0 ? classNames : [];
   const classStats = db.prepare(query).all(...params) as any[];
   
   return classStats.map(stat => {
-    const className = stat.className;
+    const className = stat.class;
     
     const topPerformers = getTopPerformers(className, 5);
     const atRiskStudents = getAtRiskStudents(className, 5);
     const { strengths, challenges } = analyzeClassPerformance(stat);
     
     return {
-      className,
+      class: className,
       studentCount: stat.studentCount,
       averageGPA: stat.averageGPA || 0,
       attendanceRate: stat.attendanceRate || 0,
@@ -169,24 +169,24 @@ export function compareClasses(className1: string, className2: string): {
   const insights: string[] = [];
   
   if (class1.averageGPA > class2.averageGPA + 5) {
-    insights.push(`${class1.className} akademik olarak ${class2.className}'dan daha başarılı`);
+    insights.push(`${class1.class} akademik olarak ${class2.class}'dan daha başarılı`);
   } else if (class2.averageGPA > class1.averageGPA + 5) {
-    insights.push(`${class2.className} akademik olarak ${class1.className}'dan daha başarılı`);
+    insights.push(`${class2.class} akademik olarak ${class1.class}'dan daha başarılı`);
   }
   
   if (class1.attendanceRate > class2.attendanceRate + 0.05) {
-    insights.push(`${class1.className} devam konusunda daha iyi`);
+    insights.push(`${class1.class} devam konusunda daha iyi`);
   } else if (class2.attendanceRate > class1.attendanceRate + 0.05) {
-    insights.push(`${class2.className} devam konusunda daha iyi`);
+    insights.push(`${class2.class} devam konusunda daha iyi`);
   }
   
   const class1RiskRate = (class1.riskDistribution.high + class1.riskDistribution.critical) / class1.studentCount;
   const class2RiskRate = (class2.riskDistribution.high + class2.riskDistribution.critical) / class2.studentCount;
   
   if (class1RiskRate > class2RiskRate + 0.1) {
-    insights.push(`${class1.className}'da daha fazla risk altında öğrenci var`);
+    insights.push(`${class1.class}'da daha fazla risk altında öğrenci var`);
   } else if (class2RiskRate > class1RiskRate + 0.1) {
-    insights.push(`${class2.className}'da daha fazla risk altında öğrenci var`);
+    insights.push(`${class2.class}'da daha fazla risk altında öğrenci var`);
   }
   
   return {

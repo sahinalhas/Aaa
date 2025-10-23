@@ -113,7 +113,7 @@ export interface ComparativeAnalysis {
   
   // Sınıf içi karşılaştırma
   classComparison: {
-    className: string;
+    class: string;
     studentRank: number;
     totalStudents: number;
     percentile: number;

@@ -434,7 +434,7 @@ export interface GroupDynamics {
 export interface ComparativeAnalysisReport {
   analysisDate: string;
   classId?: string;
-  className?: string;
+  class?: string;
   studentCount: number;
   studentComparisons: StudentComparison[];
   classPatterns: ClassPattern[];

@@ -154,7 +154,7 @@ export class AdvancedReportsService {
 
 ## Sınıf Karşılaştırmaları
 ${classComparisons.slice(0, 5).map(cc => `
-### ${cc.className}
+### ${cc.class}
 - Öğrenci Sayısı: ${cc.studentCount}
 - Ortalama GPA: ${cc.averageGPA.toFixed(2)}
 - Devam Oranı: %${(cc.attendanceRate * 100).toFixed(1)}

@@ -59,7 +59,7 @@ interface PredictionResult {
 }
 
 interface ClassPrediction {
-  className: string;
+  class: string;
   totalStudents: number;
   highSuccessProbability: number; // >80%
   mediumSuccessProbability: number; // 50-80%
@@ -196,7 +196,7 @@ async function generateClassPredictions(): Promise<ClassPrediction[]> {
     }
 
     classPredictions.push({
-      className,
+      class: className,
       totalStudents: studentIds.length,
       highSuccessProbability,
       mediumSuccessProbability,
@@ -207,7 +207,7 @@ async function generateClassPredictions(): Promise<ClassPrediction[]> {
     });
   }
 
-  return classPredictions.sort((a, b) => a.className.localeCompare(b.className));
+  return classPredictions.sort((a, b) => a.class.localeCompare(b.class));
 }
 
 // =================== BİLEŞENLER ===================
@@ -433,8 +433,8 @@ export function ClassPredictionOverview() {
           <SelectContent>
             <SelectItem value="all">Tüm Sınıflar</SelectItem>
             {classPredictions.map(cls => (
-              <SelectItem key={cls.className} value={cls.className}>
-                {cls.className}
+              <SelectItem key={cls.class} value={cls.class}>
+                {cls.class}
               </SelectItem>
             ))}
           </SelectContent>
@@ -444,12 +444,12 @@ export function ClassPredictionOverview() {
       {/* Sınıf Detayları */}
       <div className="grid gap-4">
         {filteredData.map(cls => (
-          <Card key={cls.className}>
+          <Card key={cls.class}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
-                  {cls.className}
+                  {cls.class}
                 </span>
                 <Badge variant="outline">
                   {cls.totalStudents} öğrenci

@@ -156,7 +156,7 @@ export default function MeetingPrepPanel({ selectedStudent, students = [] }: Mee
               {currentStudent.name}
             </CardTitle>
             <CardDescription>
-              {currentStudent.className} • Toplantı Hazırlık Asistanı
+              {currentStudent.class} • Toplantı Hazırlık Asistanı
             </CardDescription>
           </CardHeader>
         </Card>

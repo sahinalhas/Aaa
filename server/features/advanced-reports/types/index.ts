@@ -35,7 +35,7 @@ export interface SchoolStatistics {
 }
 
 export interface ClassDistribution {
-  className: string;
+  class: string;
   studentCount: number;
   maleCount: number;
   femaleCount: number;
@@ -43,7 +43,7 @@ export interface ClassDistribution {
 }
 
 export interface ClassComparison {
-  className: string;
+  class: string;
   studentCount: number;
   averageGPA: number;
   attendanceRate: number;

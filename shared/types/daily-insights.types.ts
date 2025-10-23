@@ -96,7 +96,7 @@ export interface StudentInsightDetail {
   student: {
     id: string;
     name: string;
-    className: string;
+    class: string;
     riskLevel: string;
   };
   dailyStatus: StudentDailyStatus;

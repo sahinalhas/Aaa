@@ -160,7 +160,7 @@ export default function SurveyDistributionDialog({
 
   // Get unique class names from students
   const availableClasses = Array.from(
-    new Set(students.map(s => s.sinif))
+    new Set(students.map(s => s.class))
   ).sort();
 
   // Filter students based on selected criteria
@@ -552,7 +552,7 @@ export default function SurveyDistributionDialog({
                                 control={form.control}
                                 name="targetClasses"
                                 render={({ field }) => {
-                                  const studentCount = students.filter(s => s.sinif === className).length;
+                                  const studentCount = students.filter(s => s.class === className).length;
                                   return (
                                     <FormItem
                                       key={className}
@@ -606,7 +606,7 @@ export default function SurveyDistributionDialog({
                     <CardContent>
                       <div className="space-y-4">
                         {watchedClasses.map((className) => {
-                          const classStudents = students.filter(s => s.sinif === className);
+                          const classStudents = students.filter(s => s.class === className);
                           const selectedInClass = classStudents.filter(s => 
                             selectedStudents.includes(s.id)
                           ).length;

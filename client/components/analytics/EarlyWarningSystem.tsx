@@ -56,7 +56,7 @@ import { RISK_BADGE_COLORS, STATUS_SURFACE_COLORS } from "@/lib/config/theme.con
 interface RiskProfile {
   studentId: string;
   studentName: string;
-  className: string;
+  class: string;
   riskScore: number;
   riskLevel: "Düşük" | "Orta" | "Yüksek" | "Kritik";
   riskFactors: {
@@ -149,7 +149,7 @@ async function generateRiskProfiles(): Promise<RiskProfile[]> {
         return {
           studentId: student.id,
           studentName: `${student.ad} ${student.soyad}`,
-          className: student.class || "Belirtilmemiş",
+          class: student.class || "Belirtilmemiş",
           riskScore,
           riskLevel,
           riskFactors,
@@ -222,11 +222,11 @@ export function RiskProfilesTable({ profiles }: { profiles: RiskProfile[] }) {
 
   const filteredProfiles = profiles.filter(profile => {
     if (filterRisk !== "all" && profile.riskLevel !== filterRisk) return false;
-    if (filterClass !== "all" && profile.className !== filterClass) return false;
+    if (filterClass !== "all" && profile.class !== filterClass) return false;
     return true;
   });
 
-  const classes = Array.from(new Set(profiles.map(p => p.className)));
+  const classes = Array.from(new Set(profiles.map(p => p.class)));
   
   // Sayfalama
   const totalPages = Math.ceil(filteredProfiles.length / itemsPerPage);
@@ -316,7 +316,7 @@ export function RiskProfilesTable({ profiles }: { profiles: RiskProfile[] }) {
                       <div className="flex items-center justify-between mb-3">
                   <div>
                     <h3 className="font-medium">{profile.studentName}</h3>
-                    <p className="text-sm text-muted-foreground">{profile.className}</p>
+                    <p className="text-sm text-muted-foreground">{profile.class}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge className={cn(RISK_BADGE_COLORS[profile.riskLevel])}>
