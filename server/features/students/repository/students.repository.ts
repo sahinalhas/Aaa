@@ -62,7 +62,18 @@ function ensureInitialized(): void {
 export function loadStudents(): Student[] {
   try {
     ensureInitialized();
-    return statements.getStudents.all() as Student[];
+    const students = statements.getStudents.all() as Student[];
+    return students.filter(student => {
+      if (!student || !student.id) {
+        console.warn('Skipping invalid student: missing id', student);
+        return false;
+      }
+      if (!student.name || student.name.trim() === '') {
+        console.warn(`Skipping student ${student.id}: missing or empty name`);
+        return false;
+      }
+      return true;
+    });
   } catch (error) {
     console.error('Database error in loadStudents:', error);
     return [];

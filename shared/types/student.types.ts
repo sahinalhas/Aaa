@@ -72,7 +72,8 @@ export interface BackendStudent {
  */
 
 export function backendToUnified(backend: BackendStudent): UnifiedStudent {
-  const nameParts = (backend.name || '').split(' ');
+  const name = backend?.name || '';
+  const nameParts = (typeof name === 'string' ? name : String(name)).split(' ');
   let ad = nameParts[0] || '';
   let soyad = nameParts.slice(1).join(' ') || '';
   

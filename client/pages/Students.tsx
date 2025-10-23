@@ -885,8 +885,9 @@ function parseImportedRows(rows: unknown[][]): Student[] {
   for (const r of rows.slice(1)) {
     const numVal = iNum >= 0 ? normalize(String(r[iNum])) : '';
     const nameCombined = iName >= 0 ? normalize(String(r[iName])) : '';
-    const ad = iAd >= 0 ? normalize(String(r[iAd])) : nameCombined.split(/\s+/).slice(0, -1).join(' ') || nameCombined;
-    const soyad = iSoyad >= 0 ? normalize(String(r[iSoyad])) : nameCombined.split(/\s+/).slice(-1)[0] || '';
+    const nameStr = typeof nameCombined === 'string' ? nameCombined : '';
+    const ad = iAd >= 0 ? normalize(String(r[iAd])) : (nameStr ? nameStr.split(/\s+/).slice(0, -1).join(' ') || nameStr : '');
+    const soyad = iSoyad >= 0 ? normalize(String(r[iSoyad])) : (nameStr ? nameStr.split(/\s+/).slice(-1)[0] || '' : '');
     const sinif = iSinif >= 0 ? normalize(String(r[iSinif])) : '';
     const cRaw = iCins >= 0 ? slug(String(r[iCins])) : '';
     const risk = iRisk >= 0 ? normalize(String(r[iRisk])) : undefined;
