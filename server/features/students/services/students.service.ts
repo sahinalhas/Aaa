@@ -135,7 +135,7 @@ export function bulkSaveStudents(students: any[]): void {
   repository.saveStudents(normalizedStudents);
 }
 
-export function removeStudent(id: string, confirmationName: string): { studentName: string } {
+export function removeStudent(id: string, confirmationName?: string): { studentName: string } {
   const students = repository.loadStudents();
   const student = students.find(s => s.id === id);
   
@@ -143,11 +143,13 @@ export function removeStudent(id: string, confirmationName: string): { studentNa
     throw new Error("Öğrenci bulunamadı");
   }
   
-  const expectedName = `${student.name}`.trim();
-  const sanitizedConfirmationName = (confirmationName || '').trim();
-  
-  if (sanitizedConfirmationName !== expectedName) {
-    throw new Error("Silme işlemini onaylamak için öğrencinin tam adını doğru yazmalısınız");
+  if (confirmationName) {
+    const expectedName = `${student.name}`.trim();
+    const sanitizedConfirmationName = (confirmationName || '').trim();
+    
+    if (sanitizedConfirmationName !== expectedName) {
+      throw new Error("Silme işlemini onaylamak için öğrencinin tam adını doğru yazmalısınız");
+    }
   }
   
   repository.deleteStudent(id);

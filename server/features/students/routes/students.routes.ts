@@ -6,11 +6,20 @@ import { sanitizeString } from "../../../middleware/validation.js";
 export const getStudents: RequestHandler = (req, res) => {
   try {
     const students = studentsService.getAllStudents();
-    const mappedStudents = students.map((s: any) => ({
-      ...s,
-      name: `${s.ad} ${s.soyad}`,
-      className: s.sinif,
-    }));
+    const mappedStudents = students.map((s: any) => {
+      const nameParts = s.name ? s.name.trim().split(/\s+/) : ['', ''];
+      const ad = nameParts.length > 1 ? nameParts.slice(0, -1).join(' ') : nameParts[0] || '';
+      const soyad = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
+      
+      return {
+        ...s,
+        ad,
+        soyad,
+        sinif: s.className || '',
+        cinsiyet: s.gender || 'K',
+        risk: s.risk || 'Düşük',
+      };
+    });
     res.json(mappedStudents);
   } catch (error) {
     console.error('Error fetching students:', error);
