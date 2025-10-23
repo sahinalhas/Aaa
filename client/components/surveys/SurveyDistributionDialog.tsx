@@ -199,7 +199,7 @@ export default function SurveyDistributionDialog({
 
   // Filter students by selected classes
   const studentsInSelectedClasses = students.filter(student => 
-    watchedClasses.includes(student.sinif)
+    watchedClasses.includes(student.class)
   );
 
   // Update selected students when classes change
@@ -219,7 +219,7 @@ export default function SurveyDistributionDialog({
   };
 
   const toggleAllStudentsInClass = (className: string) => {
-    const classStudents = students.filter(s => s.sinif === className);
+    const classStudents = students.filter(s => s.class === className);
     const allSelected = classStudents.every(s => selectedStudents.includes(s.id));
     
     let newSelected;

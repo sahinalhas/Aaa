@@ -583,7 +583,7 @@ export default function ProgressCharts() {
             <SelectContent>
               {students.map(student => (
                 <SelectItem key={student.id} value={student.id}>
-                  {student.ad} {student.soyad} ({student.sinif})
+                  {student.ad} {student.soyad} ({student.class})
                 </SelectItem>
               ))}
             </SelectContent>

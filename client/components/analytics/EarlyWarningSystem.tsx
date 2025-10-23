@@ -149,7 +149,7 @@ async function generateRiskProfiles(): Promise<RiskProfile[]> {
         return {
           studentId: student.id,
           studentName: `${student.ad} ${student.soyad}`,
-          className: student.sinif || "Belirtilmemiş",
+          className: student.class || "Belirtilmemiş",
           riskScore,
           riskLevel,
           riskFactors,

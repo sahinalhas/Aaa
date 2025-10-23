@@ -278,7 +278,7 @@ export default function SessionDrawer({
                       <div key={student.id} className="text-sm flex items-center gap-2">
                         <span className="text-muted-foreground">{index + 1}.</span>
                         <span className="font-medium">{student.name}</span>
-                        <span className="text-xs text-muted-foreground">({student.sinif})</span>
+                        <span className="text-xs text-muted-foreground">({student.class})</span>
                       </div>
                     ))}
                   </div>

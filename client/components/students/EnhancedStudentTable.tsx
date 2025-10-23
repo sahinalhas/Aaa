@@ -95,7 +95,7 @@ const StudentRow = memo(
             {student.soyad}
           </TableCell>
         )}
-        {columnVisibility.sinif && (
+        {columnVisibility.class && (
           <TableCell className={cellPadding}>
             <Badge variant="outline" className="font-normal">
               {student.class}
@@ -233,7 +233,7 @@ export function EnhancedStudentTable({
                   </Button>
                 </TableHead>
               )}
-              {columnVisibility.sinif && (
+              {columnVisibility.class && (
                 <TableHead className={headerPadding}>
                   <Button
                     variant="ghost"

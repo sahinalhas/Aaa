@@ -144,7 +144,7 @@ async function calculateDetailedPrediction(studentId: string): Promise<Predictio
   return {
     studentId,
     studentName: `${student.ad} ${student.soyad}`,
-    currentGrade: student.sinif || "Belirtilmemiş",
+    currentGrade: student.class || "Belirtilmemiş",
     successProbability,
     riskLevel,
     keyFactors,
@@ -160,7 +160,7 @@ async function generateClassPredictions(): Promise<ClassPrediction[]> {
 
   // Öğrencileri sınıfa göre grupla
   students.forEach(student => {
-    const className = student.sinif || "Belirtilmemiş";
+    const className = student.class || "Belirtilmemiş";
     if (!classGroups.has(className)) {
       classGroups.set(className, []);
     }
@@ -589,7 +589,7 @@ const PredictiveAnalysis = React.memo(function PredictiveAnalysis() {
               <SelectContent>
                 {students.map(student => (
                   <SelectItem key={student.id} value={student.id}>
-                    {student.ad} {student.soyad} ({student.sinif})
+                    {student.ad} {student.soyad} ({student.class})
                   </SelectItem>
                 ))}
               </SelectContent>

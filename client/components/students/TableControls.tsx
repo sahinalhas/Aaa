@@ -21,7 +21,7 @@ export interface ColumnVisibility {
   id: boolean;
   ad: boolean;
   soyad: boolean;
-  sinif: boolean;
+  class: boolean;
   cinsiyet: boolean;
   risk: boolean;
   actions: boolean;
@@ -40,7 +40,7 @@ const COLUMN_LABELS: Record<keyof ColumnVisibility, string> = {
   id: 'Öğrenci No',
   ad: 'Ad',
   soyad: 'Soyad',
-  sinif: 'Sınıf',
+  class: 'Sınıf',
   cinsiyet: 'Cinsiyet',
   risk: 'Risk Seviyesi',
   actions: 'İşlemler',
