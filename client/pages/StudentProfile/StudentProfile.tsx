@@ -83,7 +83,7 @@ export default function StudentProfile() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 md:space-y-6 px-2 md:px-4 lg:px-0">
       <StudentHeader student={student} />
 
       <StudentProfileTabs

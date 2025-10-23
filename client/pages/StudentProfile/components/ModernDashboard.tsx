@@ -57,34 +57,34 @@ interface MetricCardProps {
 
 const MetricCard = ({ title, score, icon: Icon, color, bgColor, description }: MetricCardProps) => {
   const getScoreStatus = (score: number) => {
-    if (score >= 80) return { label: "Mükemmel", textColor: "text-green-700" };
-    if (score >= 60) return { label: "İyi", textColor: "text-blue-700" };
-    if (score >= 40) return { label: "Orta", textColor: "text-yellow-700" };
-    return { label: "Gelişmeli", textColor: "text-red-700" };
+    if (score >= 80) return { label: "Mükemmel", textColor: "text-green-700", badgeVariant: "default" as const };
+    if (score >= 60) return { label: "İyi", textColor: "text-blue-700", badgeVariant: "secondary" as const };
+    if (score >= 40) return { label: "Orta", textColor: "text-yellow-700", badgeVariant: "outline" as const };
+    return { label: "Gelişmeli", textColor: "text-red-700", badgeVariant: "destructive" as const };
   };
 
   const status = getScoreStatus(score);
 
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-200">
+    <Card className="hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border-2">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
-          <div className={`p-3 rounded-lg ${bgColor}`}>
-            <Icon className={`h-6 w-6 ${color}`} />
+          <div className={`p-3.5 rounded-xl shadow-sm ${bgColor}`}>
+            <Icon className={`h-7 w-7 ${color}`} />
           </div>
-          <Badge variant="outline" className={status.textColor}>
+          <Badge variant={status.badgeVariant} className={`${status.textColor} font-semibold`}>
             {status.label}
           </Badge>
         </div>
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{title}</h3>
           <div className="flex items-end gap-2">
-            <span className="text-3xl font-bold">{Math.round(score)}</span>
-            <span className="text-sm text-muted-foreground mb-1">/ 100</span>
+            <span className="text-4xl font-bold tracking-tight">{Math.round(score)}</span>
+            <span className="text-base text-muted-foreground mb-1.5 font-medium">/ 100</span>
           </div>
-          <Progress value={score} className="h-2" />
+          <Progress value={score} className="h-2.5 shadow-sm" />
           {description && (
-            <p className="text-xs text-muted-foreground mt-2">{description}</p>
+            <p className="text-xs text-muted-foreground mt-3 leading-relaxed">{description}</p>
           )}
         </div>
       </CardContent>
@@ -128,7 +128,7 @@ export function ModernDashboard({
     riskSkoru: 0,
   };
 
-  const completenessData = scoresData?.completeness || {
+  const defaultCompletenessData = {
     overall: 0,
     sections: {
       temelBilgiler: 0,
@@ -143,68 +143,86 @@ export function ModernDashboard({
     eksikAlanlar: [],
   };
 
+  const completenessData = {
+    overall: scoresData?.completeness?.overall ?? 0,
+    sections: scoresData?.completeness?.sections || defaultCompletenessData.sections,
+    eksikAlanlar: scoresData?.completeness?.eksikAlanlar || [],
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 md:space-y-8">
       {/* Canlı Profil Kartı - En Üstte, En Dikkat Çekici */}
       <LiveProfileCard studentId={studentId} />
 
       {/* Quick Actions - Hızlı Erişim Butonları */}
-      <Card className="bg-gradient-to-br from-primary/5 to-accent/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Hızlı İşlemler
-          </CardTitle>
-          <CardDescription>
-            En sık kullanılan araçlara hızlı erişim
-          </CardDescription>
+      <Card className="bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 border-2 border-primary/10 shadow-md">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-primary rounded-lg">
+              <Sparkles className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div>
+              <CardTitle className="text-xl font-bold">Hızlı İşlemler</CardTitle>
+              <CardDescription className="text-sm mt-0.5">
+                En sık kullanılan araçlara hızlı erişim
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <Button
               onClick={handleAIChat}
-              className="gap-2 flex-1 min-w-[140px]"
+              className="gap-2 h-auto py-3 md:py-4 shadow-sm hover:shadow-md transition-all w-full"
               variant="default"
+              size="lg"
             >
-              <Bot className="h-4 w-4" />
-              AI ile Konuş
+              <Bot className="h-5 w-5" />
+              <span className="font-semibold">AI ile Konuş</span>
             </Button>
             <Button
               onClick={handleRiskAnalysis}
-              className="gap-2 flex-1 min-w-[140px]"
+              className="gap-2 h-auto py-3 md:py-4 shadow-sm hover:shadow-md transition-all w-full"
               variant="outline"
+              size="lg"
               disabled={analyzingRisk}
             >
               {analyzingRisk ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <Shield className="h-4 w-4" />
+                <Shield className="h-5 w-5" />
               )}
-              Risk Analizi
+              <span className="font-semibold">Risk Analizi</span>
             </Button>
             <Button
               onClick={handleGenerateReport}
-              className="gap-2 flex-1 min-w-[140px]"
+              className="gap-2 h-auto py-3 md:py-4 shadow-sm hover:shadow-md transition-all w-full sm:col-span-2 lg:col-span-1"
               variant="outline"
+              size="lg"
               disabled={generatingReport}
             >
               {generatingReport ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <FileText className="h-4 w-4" />
+                <FileText className="h-5 w-5" />
               )}
-              Rapor Oluştur
+              <span className="font-semibold">Rapor Oluştur</span>
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Önemli Metrikler - 4 Kart Grid */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Activity className="h-5 w-5" />
-          Önemli Göstergeler
-        </h2>
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Activity className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold">Önemli Göstergeler</h2>
+            <p className="text-sm text-muted-foreground">Öğrenci performansının özet analizi</p>
+          </div>
+        </div>
         
         {loadingScores ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -221,7 +239,7 @@ export function ModernDashboard({
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
             <MetricCard
               title="Akademik Performans"
               score={scores.akademikSkor || 0}
@@ -259,23 +277,33 @@ export function ModernDashboard({
       </div>
 
       {/* Detaylı Analiz Kartları - 2 Sütun */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Brain className="h-5 w-5" />
-          Detaylı Analizler
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Brain className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold">Detaylı Analizler</h2>
+            <p className="text-sm text-muted-foreground">AI destekli derinlemesine profil değerlendirmesi</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           <EnhancedRiskCard studentId={studentId} />
           <PersonalizedLearningCard studentId={studentId} />
         </div>
       </div>
 
       {/* Profil Tamlık Göstergesi */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Award className="h-5 w-5" />
-          Profil Durumu
-        </h2>
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Award className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold">Profil Durumu</h2>
+            <p className="text-sm text-muted-foreground">Veri tamlığı ve eksik alanlar</p>
+          </div>
+        </div>
         <ProfileCompletenessIndicator
           overall={completenessData.overall}
           sections={completenessData.sections}
@@ -284,11 +312,16 @@ export function ModernDashboard({
       </div>
 
       {/* Son Güncellemeler - Timeline */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Calendar className="h-5 w-5" />
-          Son Aktiviteler
-        </h2>
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Calendar className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold">Son Aktiviteler</h2>
+            <p className="text-sm text-muted-foreground">Güncel profil değişiklikleri ve olaylar</p>
+          </div>
+        </div>
         <ProfileUpdateTimeline studentId={studentId} />
       </div>
 

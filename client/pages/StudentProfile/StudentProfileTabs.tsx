@@ -5,12 +5,6 @@ import {
   KISISEL_SOSYAL_TABS_NEW,
   REHBERLIK_DESTEK_TABS,
   SISTEM_TABS,
-  // Eski sekmeler - geriye dönük uyumluluk
-  KIMLIK_TABS,
-  RISK_MUDAHALE_TABS,
-  AILE_ILETISIM_TABS,
-  MESLEKI_TABS,
-  AI_TOOLS_TABS,
 } from "./constants";
 import { StudentData } from "@/hooks/student-profile";
 import { Student } from "@/lib/storage";
@@ -81,11 +75,15 @@ export function StudentProfileTabs({
   loadingScores,
 }: StudentProfileTabsProps) {
   return (
-    <Tabs defaultValue="dashboard" className="space-y-4">
+    <Tabs defaultValue="dashboard" className="space-y-6">
       {/* Ana Sekmeler */}
-      <TabsList className="flex flex-wrap gap-1 h-auto w-full justify-start min-h-[2.5rem]">
+      <TabsList className="flex flex-wrap gap-2 h-auto w-full justify-start min-h-[2.5rem] p-1.5 bg-muted/30 rounded-lg border shadow-sm">
         {MAIN_TABS.map(({ value, label, icon: Icon }) => (
-          <TabsTrigger key={value} value={value} className="flex items-center gap-2 shrink-0">
+          <TabsTrigger 
+            key={value} 
+            value={value} 
+            className="flex items-center gap-2 shrink-0 data-[state=active]:bg-background data-[state=active]:shadow-md transition-all px-4 py-2.5 font-semibold"
+          >
             <Icon className="h-4 w-4" /> {label}
           </TabsTrigger>
         ))}
@@ -102,17 +100,17 @@ export function StudentProfileTabs({
       </TabsContent>
 
       {/* AKADEMİK PROFİL - GENİŞLETİLMİŞ (Sınavlar eklendi) */}
-      <TabsContent value="akademik" className="mt-4 min-h-[400px]">
-        <Tabs defaultValue="performans" className="space-y-4">
-          <TabsList className="w-full justify-start bg-muted/50 p-1 flex-wrap h-auto min-h-[2.5rem]">
+      <TabsContent value="akademik" className="mt-6 min-h-[400px]">
+        <Tabs defaultValue="performans" className="space-y-5">
+          <TabsList className="w-full justify-start bg-muted/30 p-1.5 flex-wrap h-auto min-h-[2.5rem] border rounded-lg">
             {AKADEMIK_TABS_NEW.map(({ value, label, icon: Icon }) => (
               <TabsTrigger 
                 key={value} 
                 value={value} 
-                className="flex items-center gap-2 data-[state=active]:bg-background shrink-0"
+                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm shrink-0 px-3 py-2 transition-all"
               >
                 <Icon className="h-4 w-4" />
-                {label}
+                <span className="font-medium">{label}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -149,17 +147,17 @@ export function StudentProfileTabs({
       </TabsContent>
 
       {/* KİŞİSEL & SOSYAL - BİRLEŞTİRİLMİŞ (Kimlik + Sosyal-Duygusal + Yetenek) */}
-      <TabsContent value="kisisel-sosyal" className="mt-4 min-h-[400px]">
-        <Tabs defaultValue="kimlik-bilgiler" className="space-y-4">
-          <TabsList className="w-full justify-start bg-muted/50 p-1 flex-wrap h-auto min-h-[2.5rem]">
+      <TabsContent value="kisisel-sosyal" className="mt-6 min-h-[400px]">
+        <Tabs defaultValue="kimlik-bilgiler" className="space-y-5">
+          <TabsList className="w-full justify-start bg-muted/30 p-1.5 flex-wrap h-auto min-h-[2.5rem] border rounded-lg">
             {KISISEL_SOSYAL_TABS_NEW.map(({ value, label, icon: Icon }) => (
               <TabsTrigger 
                 key={value} 
                 value={value} 
-                className="flex items-center gap-2 data-[state=active]:bg-background shrink-0"
+                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm shrink-0 px-3 py-2 transition-all"
               >
                 <Icon className="h-4 w-4" />
-                {label}
+                <span className="font-medium">{label}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -218,17 +216,17 @@ export function StudentProfileTabs({
       </TabsContent>
 
       {/* REHBERLİK & DESTEK - YENİ BİRLEŞTİRİLMİŞ SEKME */}
-      <TabsContent value="rehberlik-destek" className="mt-4 min-h-[400px]">
-        <Tabs defaultValue="risk-mudahale" className="space-y-4">
-          <TabsList className="w-full justify-start bg-muted/50 p-1 flex-wrap h-auto min-h-[2.5rem]">
+      <TabsContent value="rehberlik-destek" className="mt-6 min-h-[400px]">
+        <Tabs defaultValue="risk-mudahale" className="space-y-5">
+          <TabsList className="w-full justify-start bg-muted/30 p-1.5 flex-wrap h-auto min-h-[2.5rem] border rounded-lg">
             {REHBERLIK_DESTEK_TABS.map(({ value, label, icon: Icon }) => (
               <TabsTrigger 
                 key={value} 
                 value={value} 
-                className="flex items-center gap-2 data-[state=active]:bg-background shrink-0"
+                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm shrink-0 px-3 py-2 transition-all"
               >
                 <Icon className="h-4 w-4" />
-                {label}
+                <span className="font-medium">{label}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -285,17 +283,17 @@ export function StudentProfileTabs({
       </TabsContent>
 
       {/* SİSTEM - TEKNİK ARAÇLAR */}
-      <TabsContent value="sistem" className="mt-4 min-h-[400px]">
-        <Tabs defaultValue="profil-gecmisi" className="space-y-4">
-          <TabsList className="w-full justify-start bg-muted/50 p-1 flex-wrap h-auto min-h-[2.5rem]">
+      <TabsContent value="sistem" className="mt-6 min-h-[400px]">
+        <Tabs defaultValue="profil-gecmisi" className="space-y-5">
+          <TabsList className="w-full justify-start bg-muted/30 p-1.5 flex-wrap h-auto min-h-[2.5rem] border rounded-lg">
             {SISTEM_TABS.map(({ value, label, icon: Icon }) => (
               <TabsTrigger 
                 key={value} 
                 value={value} 
-                className="flex items-center gap-2 data-[state=active]:bg-background shrink-0"
+                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm shrink-0 px-3 py-2 transition-all"
               >
                 <Icon className="h-4 w-4" />
-                {label}
+                <span className="font-medium">{label}</span>
               </TabsTrigger>
             ))}
           </TabsList>
