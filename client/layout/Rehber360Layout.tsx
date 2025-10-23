@@ -222,11 +222,11 @@ export default function Rehber360Layout() {
             sidebarOpen ? "w-64" : "w-16"
           )}
         >
-          <div className="border-b px-3 py-2">
+          <div className="border-b h-14 flex items-center px-4">
             <AppLogo collapsed={!sidebarOpen} />
           </div>
 
-          <ScrollArea className="flex-1 px-2 py-4">
+          <ScrollArea className="flex-1 px-4 py-4">
             <nav className="space-y-1">
               {navigationItems.map((item) => (
                 <NavLink
@@ -246,7 +246,7 @@ export default function Rehber360Layout() {
             </nav>
           </ScrollArea>
 
-          <div className="border-t p-3">
+          <div className="border-t px-4 py-3">
             <AIStatusIndicator />
           </div>
         </aside>
@@ -291,7 +291,7 @@ export default function Rehber360Layout() {
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex h-14 items-center gap-4 px-4">
             {isMobile ? (
               <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
