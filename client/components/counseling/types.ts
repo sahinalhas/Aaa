@@ -163,6 +163,7 @@ export type OutcomeFormValues = z.infer<typeof outcomeSchema>;
 export interface Student {
   id: string;
   name: string;
+  surname: string;
   className: string;
   sinif: string;
 }

@@ -92,7 +92,10 @@ export default function ParticipantStep({
                           <div className="flex items-center gap-2">
                             <Search className="h-4 w-4 opacity-50" />
                             {field.value
-                              ? students.find((s) => s.id === field.value)?.name
+                              ? (() => {
+                                  const student = students.find((s) => s.id === field.value);
+                                  return student ? `${student.name} ${student.surname}` : "Öğrenci ara...";
+                                })()
                               : "Öğrenci ara..."}
                           </div>
                           <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
@@ -108,7 +111,7 @@ export default function ParticipantStep({
                             {students.map((student) => (
                               <CommandItem
                                 key={student.id}
-                                value={`${student.id} ${student.name}`}
+                                value={`${student.id} ${student.name} ${student.surname} ${student.className || student.sinif}`}
                                 onSelect={() => {
                                   field.onChange(student.id);
                                   setStudentSearchOpen(false);
@@ -121,8 +124,8 @@ export default function ParticipantStep({
                                   )}
                                 />
                                 <div>
-                                  <p className="font-medium">{student.name}</p>
-                                  <p className="text-sm text-muted-foreground">No: {student.id} • {student.className}</p>
+                                  <p className="font-medium">{student.name} {student.surname}</p>
+                                  <p className="text-sm text-muted-foreground">No: {student.id} • {student.className || student.sinif}</p>
                                 </div>
                               </CommandItem>
                             ))}
@@ -174,7 +177,7 @@ export default function ParticipantStep({
                               return (
                                 <CommandItem
                                   key={student.id}
-                                  value={`${student.id} ${student.name}`}
+                                  value={`${student.id} ${student.name} ${student.surname} ${student.className || student.sinif}`}
                                   onSelect={() => {
                                     if (!onSelectedStudentsChange) return;
                                     
@@ -193,8 +196,8 @@ export default function ParticipantStep({
                                     )}
                                   />
                                   <div>
-                                    <p className="font-medium">{student.name}</p>
-                                    <p className="text-sm text-muted-foreground">No: {student.id} • {student.className}</p>
+                                    <p className="font-medium">{student.name} {student.surname}</p>
+                                    <p className="text-sm text-muted-foreground">No: {student.id} • {student.className || student.sinif}</p>
                                   </div>
                                 </CommandItem>
                               );
@@ -421,8 +424,8 @@ export default function ParticipantStep({
         {sessionType === 'individual' && selectedStudent && (
           <div className="lg:col-span-1">
             <StudentInsightCard
-              studentName={selectedStudent.name}
-              className={selectedStudent.className}
+              studentName={`${selectedStudent.name} ${selectedStudent.surname}`}
+              className={selectedStudent.className || selectedStudent.sinif}
               totalSessions={0}
             />
           </div>
