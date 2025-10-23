@@ -48,10 +48,7 @@ import UnifiedMeetingsSection from "@/components/student-profile/sections/Unifie
 import AIToolsHub from "@/components/student-profile/sections/AIToolsHub";
 
 // Dashboard bileşenleri
-import LiveProfileCard from "@/components/live-profile/LiveProfileCard";
-import ProfileUpdateTimeline from "@/components/live-profile/ProfileUpdateTimeline";
-import { EnhancedRiskCard } from "@/components/analytics/EnhancedRiskCard";
-import { PersonalizedLearningCard } from "@/components/learning/PersonalizedLearningCard";
+import { ModernDashboard } from "./components/ModernDashboard";
 
 // Sistem bileşenleri
 import ManualCorrectionPanel from "@/components/profile-sync/ManualCorrectionPanel";
@@ -92,16 +89,14 @@ export function StudentProfileTabs({
         ))}
       </TabsList>
 
-      {/* DASHBOARD - SADELEŞTİRİLMİŞ */}
-      <TabsContent value="dashboard" className="mt-4 space-y-4 min-h-[400px]">
-        <LiveProfileCard studentId={studentId} />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <EnhancedRiskCard studentId={studentId} />
-          <PersonalizedLearningCard studentId={studentId} />
-        </div>
-        
-        <ProfileUpdateTimeline studentId={studentId} />
+      {/* DASHBOARD - MODERN SIS STANDARTLARI */}
+      <TabsContent value="dashboard" className="mt-4 min-h-[400px]">
+        <ModernDashboard 
+          student={student}
+          studentId={studentId}
+          scoresData={scoresData}
+          loadingScores={loadingScores}
+        />
       </TabsContent>
 
       {/* KİMLİK & TEMEL BİLGİLER */}
