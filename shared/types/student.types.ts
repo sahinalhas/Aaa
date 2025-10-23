@@ -51,19 +51,21 @@ export interface UnifiedStudent {
 export interface BackendStudent {
   id: string;
   name: string;
+  surname: string;
   email?: string;
   phone?: string;
   birthDate?: string;
   address?: string;
   il?: string;
   ilce?: string;
-  className?: string;
+  class?: string;
   enrollmentDate: string;
   status?: 'active' | 'inactive' | 'graduated';
   avatar?: string;
   parentContact?: string;
   notes?: string;
   gender?: 'K' | 'E';
+  risk?: 'Düşük' | 'Orta' | 'Yüksek';
 }
 
 /**
@@ -72,20 +74,11 @@ export interface BackendStudent {
  */
 
 export function backendToUnified(backend: BackendStudent): UnifiedStudent {
-  const name = backend?.name || '';
-  const nameParts = (typeof name === 'string' ? name : String(name)).split(' ');
-  let ad = nameParts[0] || '';
-  let soyad = nameParts.slice(1).join(' ') || '';
-  
-  // Handle "undefined undefined" case
-  if (ad === 'undefined') ad = '';
-  if (soyad === 'undefined') soyad = '';
-  
   return {
     id: backend.id,
-    ad,
-    soyad,
-    sinif: backend.className,
+    ad: backend.name || '',
+    soyad: backend.surname || '',
+    sinif: backend.class,
     cinsiyet: backend.gender,
     telefon: backend.phone,
     eposta: backend.email,
@@ -97,27 +90,53 @@ export function backendToUnified(backend: BackendStudent): UnifiedStudent {
     kayitTarihi: backend.enrollmentDate || new Date().toISOString().split('T')[0],
     durum: backend.status === 'active' ? 'aktif' : backend.status === 'inactive' ? 'pasif' : backend.status === 'graduated' ? 'mezun' : 'aktif',
     avatar: backend.avatar,
-    notlar: backend.notes
+    notlar: backend.notes,
+    risk: backend.risk
   };
 }
 
 export function unifiedToBackend(unified: UnifiedStudent): BackendStudent {
   return {
     id: unified.id,
-    name: `${unified.ad} ${unified.soyad}`.trim(),
+    name: unified.ad || '',
+    surname: unified.soyad || '',
     email: unified.eposta,
     phone: unified.telefon,
     address: unified.adres,
     il: unified.il,
     ilce: unified.ilce,
-    className: unified.sinif,
+    class: unified.sinif,
     enrollmentDate: unified.kayitTarihi || new Date().toISOString().split('T')[0],
     status: unified.durum === 'aktif' ? 'active' : unified.durum === 'pasif' ? 'inactive' : unified.durum === 'mezun' ? 'graduated' : 'active',
     parentContact: unified.veliTelefon,
     birthDate: unified.dogumTarihi,
     avatar: unified.avatar,
     notes: unified.notlar,
-    gender: unified.cinsiyet
+    gender: unified.cinsiyet,
+    risk: unified.risk
+  };
+}
+
+/**
+ * Frontend to Backend transformation (for API calls)
+ */
+export function frontendToBackend(student: any): BackendStudent {
+  return {
+    id: student.id,
+    name: student.ad || student.name || '',
+    surname: student.soyad || student.surname || '',
+    email: student.eposta || student.email,
+    phone: student.telefon || student.phone,
+    birthDate: student.dogumTarihi || student.birthDate,
+    address: student.adres || student.address,
+    class: student.sinif || student.class,
+    enrollmentDate: student.kayitTarihi || student.enrollmentDate || new Date().toISOString().split('T')[0],
+    status: student.durum === 'aktif' ? 'active' : student.durum === 'pasif' ? 'inactive' : student.durum === 'mezun' ? 'graduated' : student.status || 'active',
+    avatar: student.avatar,
+    parentContact: student.veliTelefon || student.parentContact,
+    notes: student.notlar || student.notes,
+    gender: student.cinsiyet || student.gender || 'K',
+    risk: student.risk || 'Düşük'
   };
 }
 

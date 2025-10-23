@@ -1,71 +1,26 @@
 import * as repository from '../repository/students.repository.js';
 import type { Student, AcademicRecord, Progress } from '../types/students.types.js';
 
-export function normalizeStudentData(student: any): any {
-  const normalized = { ...student };
+export function normalizeStudentData(student: any): Student {
+  const normalized: any = {
+    id: student.id ? String(student.id).trim() : '',
+    name: student.name ? String(student.name).trim() : '',
+    surname: student.surname ? String(student.surname).trim() : '',
+    email: student.email ? String(student.email).trim() : undefined,
+    phone: student.phone ? String(student.phone).trim() : undefined,
+    birthDate: student.birthDate || undefined,
+    address: student.address ? String(student.address).trim() : undefined,
+    class: student.class ? String(student.class).trim() : undefined,
+    enrollmentDate: student.enrollmentDate || new Date().toISOString().split('T')[0],
+    status: student.status || 'active',
+    avatar: student.avatar || undefined,
+    parentContact: student.parentContact ? String(student.parentContact).trim() : undefined,
+    notes: student.notes ? String(student.notes).trim() : undefined,
+    gender: student.gender || 'K',
+    risk: student.risk || 'Düşük',
+  };
   
-  // ID normalization
-  if (normalized.id && typeof normalized.id === 'string') {
-    normalized.id = normalized.id.trim();
-  }
-  
-  // Name handling - support both formats
-  if (normalized.name && typeof normalized.name === 'string') {
-    normalized.name = normalized.name.trim();
-    if (normalized.name.length === 0) {
-      normalized.name = undefined;
-    }
-  }
-  
-  if (!normalized.name && student.ad && student.soyad) {
-    const trimmedAd = typeof student.ad === 'string' ? student.ad.trim() : '';
-    const trimmedSoyad = typeof student.soyad === 'string' ? student.soyad.trim() : '';
-    normalized.name = `${trimmedAd} ${trimmedSoyad}`.trim();
-  }
-  
-  // Turkish to English field mapping
-  if (student.sinif && !normalized.className) {
-    normalized.className = student.sinif;
-  }
-  if (student.cinsiyet && !normalized.gender) {
-    normalized.gender = student.cinsiyet;
-  }
-  if (student.eposta && !normalized.email) {
-    normalized.email = student.eposta;
-  }
-  if (student.telefon && !normalized.phone) {
-    normalized.phone = student.telefon;
-  }
-  if (student.adres && !normalized.address) {
-    normalized.address = student.adres;
-  }
-  if (student.dogumTarihi && !normalized.birthDate) {
-    normalized.birthDate = student.dogumTarihi;
-  }
-  if (student.veliTelefon && !normalized.parentContact) {
-    normalized.parentContact = student.veliTelefon;
-  }
-  
-  // Status field mapping
-  if (student.durum && !normalized.status) {
-    normalized.status = student.durum === 'aktif' ? 'active' : 
-                       student.durum === 'pasif' ? 'inactive' : 
-                       student.durum === 'mezun' ? 'graduated' : 'active';
-  }
-  
-  // Enrollment date with fallback
-  if (!normalized.enrollmentDate && !student.kayitTarihi) {
-    normalized.enrollmentDate = new Date().toISOString().split('T')[0];
-  } else if (student.kayitTarihi && !normalized.enrollmentDate) {
-    normalized.enrollmentDate = student.kayitTarihi;
-  }
-  
-  // Ensure required fields have defaults
-  if (!normalized.status) {
-    normalized.status = 'active';
-  }
-  
-  return normalized;
+  return normalized as Student;
 }
 
 export function validateStudent(student: any): { valid: boolean; error?: string } {
@@ -74,15 +29,15 @@ export function validateStudent(student: any): { valid: boolean; error?: string 
   }
   
   if (!student.id || typeof student.id !== 'string' || student.id.trim().length === 0) {
-    return { valid: false, error: "Öğrenci ID zorunludur ve geçerli bir string olmalıdır" };
+    return { valid: false, error: "Öğrenci ID zorunludur" };
   }
   
-  const hasValidName = student.name && typeof student.name === 'string' && student.name.trim().length > 0;
-  const hasValidAd = student.ad && typeof student.ad === 'string' && student.ad.trim().length > 0;
-  const hasValidSoyad = student.soyad && typeof student.soyad === 'string' && student.soyad.trim().length > 0;
+  if (!student.name || typeof student.name !== 'string' || student.name.trim().length === 0) {
+    return { valid: false, error: "Öğrenci adı zorunludur" };
+  }
   
-  if (!hasValidName && !(hasValidAd && hasValidSoyad)) {
-    return { valid: false, error: "Öğrenci adı (name veya ad+soyad) zorunludur" };
+  if (!student.surname || typeof student.surname !== 'string' || student.surname.trim().length === 0) {
+    return { valid: false, error: "Öğrenci soyadı zorunludur" };
   }
   
   return { valid: true };
@@ -144,7 +99,7 @@ export function removeStudent(id: string, confirmationName?: string): { studentN
   }
   
   if (confirmationName) {
-    const expectedName = `${student.name}`.trim();
+    const expectedName = `${student.name} ${student.surname}`.trim();
     const sanitizedConfirmationName = (confirmationName || '').trim();
     
     if (sanitizedConfirmationName !== expectedName) {
@@ -153,7 +108,7 @@ export function removeStudent(id: string, confirmationName?: string): { studentN
   }
   
   repository.deleteStudent(id);
-  return { studentName: student.name };
+  return { studentName: `${student.name} ${student.surname}` };
 }
 
 export function getStudentAcademics(studentId: string): AcademicRecord[] {

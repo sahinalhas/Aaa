@@ -4,19 +4,19 @@ export function createStudentsTables(db: Database.Database): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS students (
       id TEXT PRIMARY KEY,
-      ad TEXT NOT NULL,
-      soyad TEXT NOT NULL,
+      name TEXT NOT NULL,
+      surname TEXT NOT NULL,
       email TEXT,
       phone TEXT,
       birthDate TEXT,
       address TEXT,
-      sinif TEXT,
+      class TEXT,
       enrollmentDate TEXT NOT NULL,
       status TEXT DEFAULT 'active',
       avatar TEXT,
       parentContact TEXT,
       notes TEXT,
-      cinsiyet TEXT CHECK (cinsiyet IN ('K', 'E')) DEFAULT 'K',
+      gender TEXT CHECK (gender IN ('K', 'E')) DEFAULT 'K',
       risk TEXT CHECK (risk IN ('Düşük', 'Orta', 'Yüksek')) DEFAULT 'Düşük',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP

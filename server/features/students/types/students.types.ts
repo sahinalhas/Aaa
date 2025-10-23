@@ -1,18 +1,18 @@
 export interface Student {
   id: string;
-  ad: string;
-  soyad: string;
+  name: string;
+  surname: string;
   email?: string;
   phone?: string;
   birthDate?: string;
   address?: string;
-  sinif?: string;
+  class?: string;
   enrollmentDate: string;
   status: 'active' | 'inactive' | 'graduated';
   avatar?: string;
   parentContact?: string;
   notes?: string;
-  cinsiyet?: 'K' | 'E';
+  gender?: 'K' | 'E';
   risk?: 'Düşük' | 'Orta' | 'Yüksek';
 }
 

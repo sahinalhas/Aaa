@@ -6,20 +6,13 @@ import { sanitizeString } from "../../../middleware/validation.js";
 export const getStudents: RequestHandler = (req, res) => {
   try {
     const students = studentsService.getAllStudents();
-    const mappedStudents = students.map((s: any) => {
-      const nameParts = s.name ? s.name.trim().split(/\s+/) : ['', ''];
-      const ad = nameParts.length > 1 ? nameParts.slice(0, -1).join(' ') : nameParts[0] || '';
-      const soyad = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
-      
-      return {
-        ...s,
-        ad,
-        soyad,
-        sinif: s.className || '',
-        cinsiyet: s.gender || 'K',
-        risk: s.risk || 'Düşük',
-      };
-    });
+    const mappedStudents = students.map((s: any) => ({
+      ...s,
+      ad: s.name,
+      soyad: s.surname,
+      sinif: s.class,
+      cinsiyet: s.gender,
+    }));
     res.json(mappedStudents);
   } catch (error) {
     console.error('Error fetching students:', error);
@@ -30,7 +23,16 @@ export const getStudents: RequestHandler = (req, res) => {
 export const saveStudentHandler: RequestHandler = (req, res) => {
   try {
     const student = req.body;
-    studentsService.createOrUpdateStudent(student);
+    
+    const mappedStudent = {
+      ...student,
+      name: student.ad || student.name,
+      surname: student.soyad || student.surname,
+      class: student.sinif || student.class,
+      gender: student.cinsiyet || student.gender,
+    };
+    
+    studentsService.createOrUpdateStudent(mappedStudent);
     res.json({ success: true, message: SUCCESS_MESSAGES.STUDENT_SAVED });
   } catch (error) {
     console.error('Error saving student:', error);
@@ -58,7 +60,15 @@ export const saveStudentsHandler: RequestHandler = (req, res) => {
       return res.status(400).json({ error: ERROR_MESSAGES.EXPECTED_ARRAY_OF_STUDENTS });
     }
     
-    studentsService.bulkSaveStudents(students);
+    const mappedStudents = students.map(student => ({
+      ...student,
+      name: student.ad || student.name,
+      surname: student.soyad || student.surname,
+      class: student.sinif || student.class,
+      gender: student.cinsiyet || student.gender,
+    }));
+    
+    studentsService.bulkSaveStudents(mappedStudents);
     res.json({ success: true, message: `${students.length} ${SUCCESS_MESSAGES.STUDENTS_SAVED}` });
   } catch (error) {
     console.error('Error saving students:', error);

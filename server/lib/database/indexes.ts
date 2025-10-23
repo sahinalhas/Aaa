@@ -1,9 +1,9 @@
 import type Database from 'better-sqlite3';
 
 export function setupDatabaseIndexes(db: Database.Database): void {
-  db.exec('CREATE INDEX IF NOT EXISTS idx_students_className ON students(className)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_students_class ON students(class)');
   db.exec('CREATE INDEX IF NOT EXISTS idx_students_gender ON students(gender)');
-  db.exec('CREATE INDEX IF NOT EXISTS idx_students_className_gender ON students(className, gender)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_students_class_gender ON students(class, gender)');
   
   db.exec('CREATE INDEX IF NOT EXISTS idx_meeting_notes_studentId ON meeting_notes(studentId)');
   db.exec('CREATE INDEX IF NOT EXISTS idx_attendance_studentId ON attendance(studentId)');

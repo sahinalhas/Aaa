@@ -62,8 +62,8 @@ export function refreshAnalyticsSnapshot(): number {
     )
     SELECT 
       s.id as student_id,
-      s.name as student_name,
-      s.className as class_name,
+      (s.name || ' ' || s.surname) as student_name,
+      s.class as class_name,
       COALESCE(se.avg_score, 0) as avg_exam_score,
       COALESCE(se.exam_count, 0) as exam_count,
       se.exam_data,
