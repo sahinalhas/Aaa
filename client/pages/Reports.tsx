@@ -535,6 +535,7 @@ export default function Reports() {
           <div className="flex gap-2">
             <Button 
               variant="outline" 
+              size="sm"
               onClick={handleRefresh}
               className="gap-2"
             >
@@ -543,6 +544,7 @@ export default function Reports() {
             </Button>
             <Button 
               variant="outline" 
+              size="sm"
               className="gap-2"
               onClick={() => setFiltersOpen(true)}
             >
@@ -550,6 +552,7 @@ export default function Reports() {
               Filtreler
             </Button>
             <Button 
+              size="sm"
               className="gap-2"
               onClick={handleHeaderExport}
               disabled={!exportPermissions.canExportFiltered && !exportPermissions.canExportAll}
