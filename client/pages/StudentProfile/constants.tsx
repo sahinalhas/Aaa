@@ -90,48 +90,8 @@ export const MAIN_TABS = [
   },
 ] as const;
 
-// KİMLİK & İLETİŞİM ALT SEKMELERİ (Basitleştirilmiş)
-export const KIMLIK_TABS = [
-  {
-    value: "temel-bilgiler",
-    label: "Temel Bilgiler",
-    icon: User,
-  },
-  {
-    value: "iletisim",
-    label: "İletişim & Adres",
-    icon: Mail,
-  },
-  {
-    value: "veli-bilgiler",
-    label: "Veli Bilgileri",
-    icon: Users,
-  },
-  {
-    value: "ozel-gereksinimler",
-    label: "Özel Gereksinimler",
-    icon: Info,
-  },
-] as const;
-
-// SAĞLIK & GÜVENLİK ALT SEKMELERİ
-export const SAGLIK_TABS = [
-  {
-    value: "saglik-profili",
-    label: "Sağlık Profili",
-    icon: Activity,
-  },
-  {
-    value: "acil-durumlar",
-    label: "Acil İletişim",
-    icon: AlertTriangle,
-  },
-  {
-    value: "tibbi-okyu",
-    label: "Tıbbi Öykü",
-    icon: FileText,
-  },
-] as const;
+// NOT: KİMLİK & SAĞLIK sekmelerinde alt sekme yok - tek form yapısı kullanılıyor
+// UnifiedIdentitySection ve EnhancedHealthSection doğrudan tek sayfa gösterir
 
 // AKADEMİK ALT SEKMELERİ
 export const AKADEMIK_TABS = [
@@ -186,29 +146,8 @@ export const GELISIM_TABS = [
   },
 ] as const;
 
-// RİSK & MÜDAHALE ALT SEKMELERİ
-export const RISK_TABS = [
-  {
-    value: "risk-analizi",
-    label: "Risk Analizi",
-    icon: Shield,
-  },
-  {
-    value: "davranis-takibi",
-    label: "Davranış Takibi",
-    icon: AlertTriangle,
-  },
-  {
-    value: "koruyucu-faktorler",
-    label: "Koruyucu Faktörler",
-    icon: Heart,
-  },
-  {
-    value: "mudahale-planlari",
-    label: "Müdahale Planları",
-    icon: Target,
-  },
-] as const;
+// NOT: RİSK sekmesinde UnifiedRiskSection kendi inline tab yapısını kullanıyor
+// RISK_TABS artık kullanılmıyor
 
 // KARİYER & GELECEK ALT SEKMELERİ
 export const KARIYER_TABS = [
@@ -253,29 +192,8 @@ export const ILETISIM_TABS = [
   },
 ] as const;
 
-// AI ARAÇLARI ALT SEKMELERİ
-export const AI_TOOLS_TABS = [
-  {
-    value: "mudahale",
-    label: "Müdahale Önerileri",
-    icon: Sparkles,
-  },
-  {
-    value: "raporlar",
-    label: "Otomatik Raporlar",
-    icon: FileText,
-  },
-  {
-    value: "veli-iletisim",
-    label: "Veli İletişimi",
-    icon: Mail,
-  },
-  {
-    value: "sesli-not",
-    label: "Sesli Not",
-    icon: Activity,
-  },
-] as const;
+// NOT: AI ARAÇLARI sekmesinde AIToolsHub kendi inline tab yapısını kullanıyor
+// AI_TOOLS_TABS artık kullanılmıyor
 
 /**
  * Semantic Color System
