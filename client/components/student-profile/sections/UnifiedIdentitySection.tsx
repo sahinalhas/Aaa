@@ -123,12 +123,12 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
       kardesSayisi: (student as any).kardesSayisi,
       rehberOgretmen: student.rehberOgretmen || "",
       etiketler: (student.etiketler || []).join(", "),
-      anneMeslek: student.anneMeslek || "",
-      babaMeslek: student.babaMeslek || "",
-      dilBecerileri: student.dilBecerileri || "",
-      hobiler: student.hobiler || "",
-      okulDisiAktiviteler: student.okulDisiAktiviteler || "",
-      beklentilerHedefler: student.beklentilerHedefler || "",
+      anneMeslek: (student as any).anneMeslegi || "",
+      babaMeslek: (student as any).babaMeslegi || "",
+      dilBecerileri: (student as any).dilBecerileri || "",
+      hobiler: (student as any).hobilerDetayli || "",
+      okulDisiAktiviteler: (student as any).okulDisiAktiviteler || "",
+      beklentilerHedefler: (student as any).ogrenciBeklentileri || "",
     },
   });
 
@@ -155,15 +155,15 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
       ikinciVeliAdi: (student as any).ikinciVeliAdi || "",
       ikinciVeliTelefon: (student as any).ikinciVeliTelefon || "",
       ikinciVeliYakinlik: (student as any).ikinciVeliYakinlik || "",
-      kardeSayisi: (student as any).kardeSayisi,
+      kardesSayisi: (student as any).kardesSayisi,
       rehberOgretmen: student.rehberOgretmen || "",
       etiketler: (student.etiketler || []).join(", "),
-      anneMeslek: student.anneMeslek || "",
-      babaMeslek: student.babaMeslek || "",
-      dilBecerileri: student.dilBecerileri || "",
-      hobiler: student.hobiler || "",
-      okulDisiAktiviteler: student.okulDisiAktiviteler || "",
-      beklentilerHedefler: student.beklentilerHedefler || "",
+      anneMeslek: (student as any).anneMeslegi || "",
+      babaMeslek: (student as any).babaMeslegi || "",
+      dilBecerileri: (student as any).dilBecerileri || "",
+      hobiler: (student as any).hobilerDetayli || "",
+      okulDisiAktiviteler: (student as any).okulDisiAktiviteler || "",
+      beklentilerHedefler: (student as any).ogrenciBeklentileri || "",
     });
   }, [student, form]);
 
@@ -175,7 +175,7 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
         etiketler: data.etiketler
           ? data.etiketler.split(",").map((s) => s.trim()).filter(Boolean)
           : [],
-        kardesSayisi: data.kardesSayisi === "" ? undefined : Number(data.kardesSayisi),
+        kardesSayisi: typeof data.kardesSayisi === "number" ? data.kardesSayisi : undefined,
       };
 
       await upsertStudent(updatedStudent);

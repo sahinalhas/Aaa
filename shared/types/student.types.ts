@@ -32,6 +32,7 @@ export interface UnifiedStudent {
   acilTelefon?: string;
   anneMeslegi?: string;
   babaMeslegi?: string;
+  kardesSayisi?: number;
   
   // Sistem Bilgileri
   kayitTarihi: string; // enrollmentDate

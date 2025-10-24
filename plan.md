@@ -130,9 +130,12 @@
 ### Faz 1: Planlama ve Kritik Hatalar
 
 - [x] **Adım 1:** Plan dokümanını oluştur (plan.md)
-- [ ] **Adım 2:** LSP hatalarını düzelt
-  - [ ] UnifiedIdentitySection.tsx (11 hata)
-  - [ ] CareerFutureSection.tsx (1 hata)
+- [x] **Adım 2:** LSP hatalarını düzelt ✅
+  - [x] UnifiedIdentitySection.tsx (11 hata → 0)
+    - Typo düzeltmeleri: anneMeslek→anneMeslegi, babaMeslek→babaMeslegi, kardeSayisi→kardesSayisi
+    - Student type'a kardesSayisi alanı eklendi
+  - [x] CareerFutureSection.tsx (1 hata → 0)
+    - CareerGuidanceSection interface'ine onUpdate prop'u eklendi
 - [ ] **Adım 3:** Kariyer sekmesi constants düzeltmesi
   - [ ] `KARIYER_TABS` tanımını 2 sekmeye güncelle (rehberlik, hedefler)
   - [ ] "yol-haritasi" ve "kariyer-analizi" kaldır, "rehberlik" ekle
@@ -324,9 +327,9 @@ export const ILETISIM_TABS = [
 **Başlangıç:** 24 Ekim 2025  
 **Tahmini Tamamlanma:** 24 Ekim 2025  
 **Toplam Adım:** 16  
-**Tamamlanan:** 1/16  
-**Kalan:** 15
+**Tamamlanan:** 2/16  
+**Kalan:** 14
 
 ---
 
-**Son Güncelleme:** 24 Ekim 2025 - Plan dokümanı oluşturuldu ✅
+**Son Güncelleme:** 24 Ekim 2025 - LSP hataları temizlendi (12→0) ✅

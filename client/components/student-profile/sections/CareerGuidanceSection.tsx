@@ -55,6 +55,7 @@ import type {
 interface CareerGuidanceSectionProps {
   studentId: string;
   studentName: string;
+  onUpdate?: () => void;
 }
 
 const CAREER_CATEGORIES: { value: CareerCategory; label: string }[] = [
