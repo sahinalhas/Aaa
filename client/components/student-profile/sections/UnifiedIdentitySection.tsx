@@ -45,13 +45,6 @@ import {
   Home,
   Map,
   Briefcase,
-  BookOpen,
-  Star,
-  Heart,
-  Flame,
-  Wrench,
-  Award,
-  GitCommit,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -82,10 +75,6 @@ const unifiedIdentitySchema = z.object({
   etiketler: z.string().optional(),
   anneMeslek: z.string().optional(),
   babaMeslek: z.string().optional(),
-  dilBecerileri: z.string().optional(),
-  hobiler: z.string().optional(),
-  okulDisiAktiviteler: z.string().optional(),
-  beklentilerHedefler: z.string().optional(),
 });
 
 type UnifiedIdentityFormValues = z.infer<typeof unifiedIdentitySchema>;
@@ -125,10 +114,6 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
       etiketler: (student.etiketler || []).join(", "),
       anneMeslek: (student as any).anneMeslegi || "",
       babaMeslek: (student as any).babaMeslegi || "",
-      dilBecerileri: (student as any).dilBecerileri || "",
-      hobiler: (student as any).hobilerDetayli || "",
-      okulDisiAktiviteler: (student as any).okulDisiAktiviteler || "",
-      beklentilerHedefler: (student as any).ogrenciBeklentileri || "",
     },
   });
 
@@ -160,10 +145,6 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
       etiketler: (student.etiketler || []).join(", "),
       anneMeslek: (student as any).anneMeslegi || "",
       babaMeslek: (student as any).babaMeslegi || "",
-      dilBecerileri: (student as any).dilBecerileri || "",
-      hobiler: (student as any).hobilerDetayli || "",
-      okulDisiAktiviteler: (student as any).okulDisiAktiviteler || "",
-      beklentilerHedefler: (student as any).ogrenciBeklentileri || "",
     });
   }, [student, form]);
 
@@ -523,103 +504,6 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
                   </FormLabel>
                   <FormControl>
                     <Input {...field} type="number" className="h-10" placeholder="Örn: 2" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Akademik ve Sosyal Profil */}
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <BookOpen className="h-5 w-5 text-primary" />
-              Akademik ve Sosyal Profil
-            </CardTitle>
-            <CardDescription>
-              Öğrencinin dil becerileri, hobileri ve okul dışı aktiviteleri
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="dilBecerileri"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1.5">
-                      <Award className="h-3.5 w-3.5" />
-                      Dil Becerileri
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} className="h-10" placeholder="Örn: İngilizce (İleri), Almanca (Orta)" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="hobiler"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1.5">
-                      <Heart className="h-3.5 w-3.5" />
-                      Hobiler ve İlgi Alanları
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} className="h-10" placeholder="Örn: Kitap okumak, yüzme, satranç" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <FormField
-              control={form.control}
-              name="okulDisiAktiviteler"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-1.5">
-                    <Flame className="h-3.5 w-3.5" />
-                    Okul Dışı Aktiviteler
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} className="h-10" placeholder="Örn: Robotik kulübü, gönüllülük faaliyetleri" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Hedefler ve Beklentiler */}
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <GitCommit className="h-5 w-5 text-primary" />
-              Hedefler ve Beklentiler
-            </CardTitle>
-            <CardDescription>
-              Öğrencinin ve ailenin eğitimden beklentileri
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="beklentilerHedefler"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-1.5">
-                    <Star className="h-3.5 w-3.5" />
-                    Beklentiler ve Hedefler
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} className="h-10" placeholder="Örn: Üniversite kazanmak, yurtdışı eğitimi almak" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

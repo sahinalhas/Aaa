@@ -154,10 +154,11 @@
 
 ### Faz 3: Bilgi Taşıma İşlemleri
 
-- [ ] **Adım 6:** UnifiedIdentitySection'dan ekstra alanları kaldır
-  - [ ] hobiler, okulDisiAktiviteler, beklentilerHedefler, dilBecerileri form alanlarını sil
-  - [ ] Schema'dan bu alanları kaldır
-  - [ ] Form defaultValues'dan temizle
+- [x] **Adım 6:** UnifiedIdentitySection'dan ekstra alanları kaldır ✅
+  - [x] hobiler, okulDisiAktiviteler, beklentilerHedefler, dilBecerileri form alanlarını silindi
+  - [x] Schema'dan bu alanlar kaldırıldı
+  - [x] Form defaultValues ve reset'ten temizlendi
+  - [x] UI kartları tamamen kaldırıldı
 
 - [ ] **Adım 7:** StandardizedTalentsSection'a hobiler ve aktiviteler ekle
   - [ ] Form'a hobbiesDetailed ve extracurricularActivities alanlarını göster
@@ -327,9 +328,9 @@ export const ILETISIM_TABS = [
 **Başlangıç:** 24 Ekim 2025  
 **Tahmini Tamamlanma:** 24 Ekim 2025  
 **Toplam Adım:** 16  
-**Tamamlanan:** 5/16  
-**Kalan:** 11
+**Tamamlanan:** 6/16  
+**Kalan:** 10
 
 ---
 
-**Son Güncelleme:** 24 Ekim 2025 - DisciplineSection oluşturuldu ✅
+**Son Güncelleme:** 24 Ekim 2025 - UnifiedIdentitySection temizlendi ✅
