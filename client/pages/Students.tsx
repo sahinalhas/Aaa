@@ -469,8 +469,8 @@ export default function Students() {
 
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                  <Button size="lg" className="gap-2">
-                    <UserPlus className="h-5 w-5" />
+                  <Button size="sm" className="gap-2">
+                    <UserPlus className="h-4 w-4" />
                     Yeni Öğrenci
                   </Button>
                 </DialogTrigger>
