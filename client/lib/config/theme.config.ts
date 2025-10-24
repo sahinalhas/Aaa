@@ -20,6 +20,82 @@ export const GRADIENT_COLORS = {
   ocean: "linear-gradient(135deg, #2e3192 0%, #1bffff 100%)",
 } as const;
 
+// Modern Education Platform Gradients (2025)
+export const MODERN_GRADIENTS = {
+  blue: "bg-gradient-to-br from-blue-500 to-blue-600",
+  green: "bg-gradient-to-br from-green-500 to-green-600",
+  amber: "bg-gradient-to-br from-amber-500 to-amber-600",
+  purple: "bg-gradient-to-br from-purple-500 to-purple-600",
+  indigo: "bg-gradient-to-br from-indigo-500 to-indigo-600",
+  teal: "bg-gradient-to-br from-teal-500 to-teal-600",
+  rose: "bg-gradient-to-br from-rose-500 to-rose-600",
+  cyan: "bg-gradient-to-br from-cyan-500 to-cyan-600",
+} as const;
+
+// Card Background Gradients with Opacity
+export const CARD_GRADIENTS = {
+  blue: "bg-gradient-to-br from-blue-50 to-blue-100",
+  green: "bg-gradient-to-br from-green-50 to-green-100",
+  amber: "bg-gradient-to-br from-amber-50 to-amber-100",
+  purple: "bg-gradient-to-br from-purple-50 to-purple-100",
+  indigo: "bg-gradient-to-br from-indigo-50 to-indigo-100",
+  teal: "bg-gradient-to-br from-teal-50 to-teal-100",
+  rose: "bg-gradient-to-br from-rose-50 to-rose-100",
+  cyan: "bg-gradient-to-br from-cyan-50 to-cyan-100",
+  gray: "bg-gradient-to-br from-gray-50 to-gray-100",
+} as const;
+
+// Modern Shadow System
+export const MODERN_SHADOWS = {
+  sm: "shadow-sm hover:shadow-md transition-shadow",
+  md: "shadow-md hover:shadow-lg transition-shadow",
+  lg: "shadow-lg hover:shadow-xl transition-shadow",
+  none: "shadow-none",
+} as const;
+
+// Animation Variants for Framer Motion
+export const ANIMATION_VARIANTS = {
+  fadeIn: {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 },
+  },
+  fadeInUp: {
+    initial: { opacity: 0, y: 40 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: 40 },
+  },
+  scaleIn: {
+    initial: { opacity: 0, scale: 0.9 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.9 },
+  },
+  slideInRight: {
+    initial: { opacity: 0, x: 100 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 100 },
+  },
+  slideInLeft: {
+    initial: { opacity: 0, x: -100 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -100 },
+  },
+  staggerContainer: {
+    animate: {
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  },
+} as const;
+
+// Stagger Animation Delays
+export const STAGGER_DELAYS = {
+  fast: 0.05,
+  normal: 0.1,
+  slow: 0.15,
+} as const;
+
 export const GLASS_STYLES = {
   light: "bg-white/70 backdrop-blur-md border border-white/20",
   dark: "bg-gray-900/70 backdrop-blur-md border border-gray-700/20",
@@ -78,3 +154,5 @@ export type RiskLevel = keyof typeof RISK_COLORS;
 export type ChartColorKey = keyof typeof CHART_COLORS;
 export type MasteryLevel = keyof typeof MASTERY_COLORS;
 export type DifficultyLevel = keyof typeof DIFFICULTY_COLORS;
+export type ModernGradient = keyof typeof MODERN_GRADIENTS;
+export type CardGradient = keyof typeof CARD_GRADIENTS;
