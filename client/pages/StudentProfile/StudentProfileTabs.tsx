@@ -95,6 +95,7 @@ export function StudentProfileTabs({
           {/* Özel Eğitim Gereksinimi Varsa */}
           <OzelEgitimSection
             studentId={studentId}
+            specialEducation={data.specialEducation || []}
             onUpdate={onUpdate}
           />
         </div>

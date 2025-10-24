@@ -32,6 +32,8 @@ export default function CommunicationCenter({
     familyParticipation: 0,
     lastContact: null as string | null
   });
+  const [homeVisitsData, setHomeVisitsData] = useState<any[]>([]);
+  const [familyParticipationData, setFamilyParticipationData] = useState<any[]>([]);
 
   useEffect(() => {
     loadStats();
@@ -45,6 +47,10 @@ export default function CommunicationCenter({
         getHomeVisitsByStudent(studentId),
         getFamilyParticipationByStudent(studentId)
       ]);
+
+      // State'e kaydet
+      setHomeVisitsData(homeVisits);
+      setFamilyParticipationData(familyParticipation);
 
       const allDates = [
         ...notes.map(n => n.date),
@@ -149,6 +155,7 @@ export default function CommunicationCenter({
         <TabsContent value="ev-ziyaretleri" className="animate-in slide-in-from-left-10 duration-300">
           <EvZiyaretleriSection
             studentId={studentId}
+            homeVisits={homeVisitsData}
             onUpdate={() => {
               onUpdate();
               loadStats();
@@ -159,6 +166,7 @@ export default function CommunicationCenter({
         <TabsContent value="aile-katilimi" className="animate-in slide-in-from-left-10 duration-300">
           <AileKatilimiSection
             studentId={studentId}
+            familyParticipation={familyParticipationData}
             onUpdate={() => {
               onUpdate();
               loadStats();
