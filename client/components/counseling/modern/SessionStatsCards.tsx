@@ -9,7 +9,8 @@ import {
   Activity, 
   Users, 
   Timer,
-  BarChart3
+  BarChart3,
+  TrendingUp // Import TrendingUp icon
 } from 'lucide-react';
 import type { SessionStats } from '@/hooks/counseling/useSessionStats';
 
@@ -71,31 +72,8 @@ export default function SessionStatsCards({ stats, isLoading }: SessionStatsCard
         ))}
       </StatsGrid>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {stats.mostActiveDay !== '-' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card className="relative overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-              <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-blue-500 to-blue-600" />
-              <CardHeader className="pb-3 relative">
-                <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
-                  <BarChart3 className="h-4 w-4" />
-                  En Aktif Gün
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="relative">
-                <div className="text-2xl font-bold capitalize">{stats.mostActiveDay}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Haftalık görüşme dağılımı
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
+      {/* İkinci Satır */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {Object.keys(stats.sessionsByMode).length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
