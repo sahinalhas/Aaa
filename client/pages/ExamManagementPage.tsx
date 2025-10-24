@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ClipboardList, FileText, GraduationCap, BarChart3, LayoutDashboard, Brain, User } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -222,16 +223,12 @@ export default function ExamManagementPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <ClipboardList className="h-6 w-6 text-primary" />
-          Ölçme Değerlendirme
-        </h1>
-        <p className="text-muted-foreground mt-1.5 text-sm">
-          Deneme sınavları, okul notları ve değerlendirme sonuçlarını yönetin
-        </p>
-      </div>
+    <div className="container mx-auto py-6 space-y-6">
+      <PageHeader
+        title="Ölçme Değerlendirme"
+        subtitle="Deneme sınavları, okul notları ve değerlendirme sonuçlarını yönetin"
+        icon={ClipboardList}
+      />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-1">
