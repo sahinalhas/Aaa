@@ -448,7 +448,7 @@ export default function Rehber360Layout() {
         </header>
 
         <main className="flex-1 overflow-auto bg-background">
-          <div className="w-full px-2 py-6 md:px-3 md:py-8">
+          <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8 xl:px-10 2xl:px-12 mx-auto max-w-[1920px]">
             <Outlet />
           </div>
         </main>
