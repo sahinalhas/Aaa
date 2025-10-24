@@ -1,8 +1,10 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ShieldAlert, Bot, Brain, Sparkles, CalendarDays } from 'lucide-react';
 import { AIToolsLoadingState } from '@/components/ai-tools/AIToolsLoadingState';
+import { PageHeader } from '@/components/ui/page-header';
 
 const RiskDashboard = lazy(() => import('./RiskDashboard'));
 const AIAssistant = lazy(() => import('./AIAssistant'));
@@ -73,18 +75,17 @@ export default function AIToolsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Modern Header with Gradient */}
-      <div className="rounded-xl bg-gradient-to-br from-primary/15 via-primary/5 to-accent/15 p-6 border border-primary/20">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-primary">AI Araçları</h1>
-            <p className="text-muted-foreground mt-2">
-              Yapay zeka destekli analiz, raporlama ve asistan araçları
-            </p>
-          </div>
-        </div>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      <PageHeader
+        icon={Brain}
+        title="AI Araçları"
+        subtitle="Yapay zeka destekli analiz, raporlama ve asistan araçları"
+      />
 
       {/* Tabs Container */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
@@ -133,6 +134,6 @@ export default function AIToolsPage() {
           </Suspense>
         </TabsContent>
       </Tabs>
-    </div>
+    </motion.div>
   );
 }

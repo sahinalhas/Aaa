@@ -4,8 +4,9 @@
  * Glassmorphism & Smooth Transitions
  */
 
+import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MAIN_TABS, TAB_COLORS } from "./constants";
+import { MAIN_TABS } from "./constants";
 import { StudentData } from "@/hooks/student-profile";
 import { Student } from "@/lib/storage";
 
@@ -46,125 +47,176 @@ export function StudentProfileTabs({
 
   return (
     <Tabs defaultValue="dashboard" className="space-y-6">
-      {/* Main Navigation - 8 Ana Sekme */}
-      <TabsList className="flex flex-wrap gap-2 md:gap-3 h-auto w-full justify-start min-h-[3rem] p-3 bg-gradient-to-br from-muted/60 via-muted/40 to-background/80 rounded-2xl border-2 border-primary/15 shadow-xl backdrop-blur-md">
-        {MAIN_TABS.map(({ value, label, icon: Icon, description }) => (
-          <TabsTrigger 
-            key={value} 
-            value={value} 
-            title={description}
-            className="flex items-center gap-2.5 shrink-0 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:via-primary/95 data-[state=active]:to-primary/90 data-[state=active]:text-primary-foreground data-[state=active]:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-95 px-5 py-3.5 font-semibold rounded-xl border-2 border-transparent data-[state=active]:border-primary/30 hover:bg-primary/5"
-          >
-            <Icon className="h-5 w-5" />
-            <span className="hidden sm:inline text-sm">{label}</span>
-            <span className="sm:hidden text-xs">{label.split(' ')[0]}</span>
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      {/* Modern Navigation Tabs */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <TabsList className="flex flex-wrap gap-2 h-auto w-full justify-start p-2 bg-gradient-to-br from-background/95 via-muted/40 to-background/95 rounded-xl border border-border/50 shadow-lg">
+          {MAIN_TABS.map(({ value, label, icon: Icon, description }) => (
+            <TabsTrigger 
+              key={value} 
+              value={value} 
+              title={description}
+              className="flex items-center gap-2 shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200 hover:bg-muted px-4 py-2.5 rounded-lg"
+            >
+              <Icon className="h-4 w-4" />
+              <span className="hidden sm:inline text-sm font-medium">{label}</span>
+              <span className="sm:hidden text-xs font-medium">{label.split(' ')[0]}</span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </motion.div>
 
       {/* 1. DASHBOARD - Özet Görünüm */}
-      <TabsContent value="dashboard" className="mt-8 min-h-[400px] animate-in fade-in-50 slide-in-from-bottom-10 duration-500">
-        <ModernDashboard 
-          student={student}
-          studentId={studentId}
-          scoresData={scoresData}
-          loadingScores={loadingScores}
-        />
+      <TabsContent value="dashboard" className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <ModernDashboard 
+            student={student}
+            studentId={studentId}
+            scoresData={scoresData}
+            loadingScores={loadingScores}
+          />
+        </motion.div>
       </TabsContent>
 
-      {/* 2. KİMLİK & İLETİŞİM - Temel Bilgiler */}
-      <TabsContent value="kimlik" className="mt-8 min-h-[400px] animate-in fade-in-50 slide-in-from-right-10 duration-500">
-        <div className={`rounded-2xl border-2 ${TAB_COLORS.kimlik.border} ${TAB_COLORS.kimlik.bg} p-6 shadow-lg backdrop-blur-sm`}>
+      {/* 2. KİMLİK & İLETİŞİM */}
+      <TabsContent value="kimlik" className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
+        >
           <UnifiedIdentitySection
             student={student}
             onUpdate={onUpdate}
           />
-        </div>
+        </motion.div>
       </TabsContent>
 
-      {/* 3. SAĞLIK & GÜVENLİK - Sağlık Profili + Acil İletişim */}
-      <TabsContent value="saglik" className="mt-8 min-h-[400px] animate-in fade-in-50 slide-in-from-right-10 duration-500">
-        <div className="space-y-6">
-          <div className={`rounded-2xl border-2 ${TAB_COLORS.saglik.border} ${TAB_COLORS.saglik.bg} p-6 shadow-lg backdrop-blur-sm`}>
+      {/* 3. SAĞLIK & GÜVENLİK */}
+      <TabsContent value="saglik" className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="space-y-4"
+        >
+          <div className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6">
             <EnhancedHealthSection
               studentId={studentId}
               onUpdate={onUpdate}
             />
           </div>
           
-          {/* Özel Eğitim Gereksinimi Varsa */}
           <OzelEgitimSection
             studentId={studentId}
             specialEducation={data.specialEducation || []}
             onUpdate={onUpdate}
           />
-        </div>
+        </motion.div>
       </TabsContent>
 
-      {/* 4. AKADEMİK - Performans, Sınavlar, Çalışma */}
-      <TabsContent value="akademik" className="mt-8 min-h-[400px] animate-in fade-in-50 slide-in-from-right-10 duration-500">
-        <div className={`rounded-2xl border-2 ${TAB_COLORS.akademik.border} ${TAB_COLORS.akademik.bg} p-6 shadow-lg backdrop-blur-sm`}>
+      {/* 4. AKADEMİK */}
+      <TabsContent value="akademik" className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
+        >
           <SmartAcademicDashboard
             studentId={studentId}
             onUpdate={onUpdate}
           />
-        </div>
+        </motion.div>
       </TabsContent>
 
-      {/* 5. GELİŞİM & KİŞİLİK - Sosyal-Duygusal, Zeka, Yetenekler */}
-      <TabsContent value="gelisim" className="mt-8 min-h-[400px] animate-in fade-in-50 slide-in-from-right-10 duration-500">
-        <div className={`rounded-2xl border-2 ${TAB_COLORS.gelisim.border} ${TAB_COLORS.gelisim.bg} p-6 shadow-lg backdrop-blur-sm`}>
+      {/* 5. GELİŞİM & KİŞİLİK */}
+      <TabsContent value="gelisim" className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
+        >
           <DevelopmentProfileSection
             studentId={studentId}
             multipleIntelligence={data.multipleIntelligence}
             evaluations360={data.evaluations360}
             onUpdate={onUpdate}
           />
-        </div>
+        </motion.div>
       </TabsContent>
 
-      {/* 6. RİSK & MÜDAHALE - Otomatik Risk Analizi */}
-      <TabsContent value="risk" className="mt-8 min-h-[400px] animate-in fade-in-50 slide-in-from-right-10 duration-500">
-        <div className={`rounded-2xl border-2 ${TAB_COLORS.risk.border} ${TAB_COLORS.risk.bg} p-6 shadow-lg backdrop-blur-sm`}>
+      {/* 6. RİSK & MÜDAHALE */}
+      <TabsContent value="risk" className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
+        >
           <EnhancedRiskDashboard
             studentId={studentId}
             student={student}
             onUpdate={onUpdate}
           />
-        </div>
+        </motion.div>
       </TabsContent>
 
-      {/* 7. KARİYER & GELECEK - Kariyer Analizi, Hedefler */}
-      <TabsContent value="kariyer" className="mt-8 min-h-[400px] animate-in fade-in-50 slide-in-from-right-10 duration-500">
-        <div className={`rounded-2xl border-2 ${TAB_COLORS.kariyer.border} ${TAB_COLORS.kariyer.bg} p-6 shadow-lg backdrop-blur-sm`}>
+      {/* 7. KARİYER & GELECEK */}
+      <TabsContent value="kariyer" className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
+        >
           <CareerFutureSection
             studentId={studentId}
             studentName={studentName}
             academicGoals={data.academicGoals}
             onUpdate={onUpdate}
           />
-        </div>
+        </motion.div>
       </TabsContent>
 
-      {/* 8. İLETİŞİM MERKEZİ - Tüm Görüşmeler Tek Yerde */}
-      <TabsContent value="iletisim" className="mt-8 min-h-[400px] animate-in fade-in-50 slide-in-from-right-10 duration-500">
-        <div className={`rounded-2xl border-2 ${TAB_COLORS.iletisim.border} ${TAB_COLORS.iletisim.bg} p-6 shadow-lg backdrop-blur-sm`}>
+      {/* 8. İLETİŞİM MERKEZİ */}
+      <TabsContent value="iletisim" className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
+        >
           <CommunicationCenter
             studentId={studentId}
             onUpdate={onUpdate}
           />
-        </div>
+        </motion.div>
       </TabsContent>
 
-      {/* 9. AI ARAÇLARI - AI Hub */}
-      <TabsContent value="ai-hub" className="mt-8 min-h-[400px] animate-in fade-in-50 slide-in-from-right-10 duration-500">
-        <div className={`rounded-2xl border-2 ${TAB_COLORS.ai.border} ${TAB_COLORS.ai.bg} p-6 shadow-lg backdrop-blur-sm`}>
+      {/* 9. AI ARAÇLARI */}
+      <TabsContent value="ai-hub" className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
+        >
           <AIToolsHub
             studentId={studentId}
             studentName={studentName}
             onUpdate={onUpdate}
           />
-        </div>
+        </motion.div>
       </TabsContent>
     </Tabs>
   );
