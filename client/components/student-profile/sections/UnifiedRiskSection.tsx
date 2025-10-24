@@ -94,17 +94,14 @@ export default function UnifiedRiskSection({ studentId, student, onUpdate }: Uni
     <div className="space-y-6">
       {/* Detaylı Risk Sekmeleri */}
       <Tabs defaultValue="degerlendirme" className="space-y-6">
-        <TabsList className="grid grid-cols-3 gap-2 h-auto min-h-[2.5rem]">
-          <TabsTrigger value="degerlendirme" className="flex items-center gap-2 justify-center">
-            <Shield className="h-4 w-4" />
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3">
+          <TabsTrigger value="degerlendirme">
             Risk Değerlendirme
           </TabsTrigger>
-          <TabsTrigger value="davranis" className="flex items-center gap-2 justify-center">
-            <AlertTriangle className="h-4 w-4" />
+          <TabsTrigger value="davranis">
             Davranış Takibi
           </TabsTrigger>
-          <TabsTrigger value="koruyucu" className="flex items-center gap-2 justify-center">
-            <Info className="h-4 w-4" />
+          <TabsTrigger value="koruyucu">
             Koruyucu Faktörler
           </TabsTrigger>
         </TabsList>

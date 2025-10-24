@@ -11,8 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { 
   Loader2, Send, Bot, User, Settings, Sparkles, Copy, Check, 
   RefreshCw, Edit2, Trash2, Pin, PinOff, Download, Search, 
-  X, StopCircle, FileText, FileJson, FileCode, Clock, Hash,
-  MessageSquare, Calendar, AlertTriangle, BookOpen
+  X, StopCircle, FileText, FileJson, FileCode, Clock, Hash
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -420,21 +419,17 @@ export default function AIAssistant() {
   return (
     <div className="container mx-auto py-6 space-y-6">
       <Tabs defaultValue="chat" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
-          <TabsTrigger value="chat" className="gap-2">
-            <MessageSquare className="h-4 w-4" />
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+          <TabsTrigger value="chat">
             Sohbet
           </TabsTrigger>
-          <TabsTrigger value="meeting-prep" className="gap-2">
-            <Calendar className="h-4 w-4" />
+          <TabsTrigger value="meeting-prep">
             Toplantı Hazırlık
           </TabsTrigger>
-          <TabsTrigger value="priority" className="gap-2">
-            <AlertTriangle className="h-4 w-4" />
+          <TabsTrigger value="priority">
             Öncelikli Öğrenciler
           </TabsTrigger>
-          <TabsTrigger value="resources" className="gap-2">
-            <BookOpen className="h-4 w-4" />
+          <TabsTrigger value="resources">
             Kaynaklar
           </TabsTrigger>
         </TabsList>

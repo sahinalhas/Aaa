@@ -5,7 +5,7 @@ import { StatsGrid } from '@/components/ui/stats-grid';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertTriangle, TrendingUp, Users, Calendar, Brain, FileText, School } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Users, Calendar, Brain, FileText } from 'lucide-react';
 import { MODERN_GRADIENTS } from '@/lib/config/theme.config';
 import BulkAnalysisDashboard from '@/components/ai/BulkAnalysisDashboard';
 import { apiClient } from '@/lib/api/api-client';
@@ -95,13 +95,11 @@ export default function AIInsightsDashboard() {
         icon={Brain}
       >
       <Tabs defaultValue="daily" className="w-full space-y-6">
-        <TabsList className="grid w-full grid-cols-2 max-w-md min-h-[2.5rem]">
-          <TabsTrigger value="daily" className="flex items-center gap-2 justify-center">
-            <Calendar className="h-4 w-4" />
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-2">
+          <TabsTrigger value="daily">
             Günlük Insights
           </TabsTrigger>
-          <TabsTrigger value="bulk" className="flex items-center gap-2 justify-center">
-            <School className="h-4 w-4" />
+          <TabsTrigger value="bulk">
             Toplu Analiz
           </TabsTrigger>
         </TabsList>

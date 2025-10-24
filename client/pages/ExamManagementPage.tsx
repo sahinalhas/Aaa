@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ClipboardList, FileText, GraduationCap, BarChart3, LayoutDashboard, Brain, User } from 'lucide-react';
+import { ClipboardList, User } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -231,29 +231,23 @@ export default function ExamManagementPage() {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-1">
-          <TabsTrigger value="overview" className="flex items-center gap-2 text-sm">
-            <LayoutDashboard className="h-4 w-4" />
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+          <TabsTrigger value="overview">
             Genel Bakış
           </TabsTrigger>
-          <TabsTrigger value="practice-exams" className="flex items-center gap-2 text-sm">
-            <FileText className="h-4 w-4" />
+          <TabsTrigger value="practice-exams">
             Denemeler
           </TabsTrigger>
-          <TabsTrigger value="school-exams" className="flex items-center gap-2 text-sm">
-            <GraduationCap className="h-4 w-4" />
+          <TabsTrigger value="school-exams">
             Okul Sınavları
           </TabsTrigger>
-          <TabsTrigger value="analysis" className="flex items-center gap-2 text-sm">
-            <BarChart3 className="h-4 w-4" />
+          <TabsTrigger value="analysis">
             Analizler
           </TabsTrigger>
-          <TabsTrigger value="advanced" className="flex items-center gap-2 text-sm">
-            <Brain className="h-4 w-4" />
+          <TabsTrigger value="advanced">
             Gelişmiş Analitik
           </TabsTrigger>
-          <TabsTrigger value="student-dashboard" className="flex items-center gap-2 text-sm">
-            <User className="h-4 w-4" />
+          <TabsTrigger value="student-dashboard">
             Öğrenci Panosu
           </TabsTrigger>
         </TabsList>

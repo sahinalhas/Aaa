@@ -193,7 +193,7 @@ export default function Courses() {
       </div>
 
       <Tabs value={cat} onValueChange={(v) => setCat(v as Cat)}>
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           <TabsTrigger value="okul">Okul Dersleri</TabsTrigger>
           <TabsTrigger value="TYT">TYT Dersleri</TabsTrigger>
           <TabsTrigger value="AYT">AYT Dersleri</TabsTrigger>

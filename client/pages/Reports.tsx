@@ -58,11 +58,9 @@ import {
   Users,
   AlertTriangle,
   Award,
-  BookOpen,
   Calendar,
   Download,
   Filter,
-  Eye,
   Settings,
   RefreshCw,
   FileText,
@@ -565,33 +563,26 @@ export default function Reports() {
 
       {/* Ana İçerik */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="overview" className="gap-2">
-            <Eye className="h-4 w-4" />
+        <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+          <TabsTrigger value="overview">
             Genel Bakış
           </TabsTrigger>
-          <TabsTrigger value="predictive" className="gap-2">
-            <TrendingUp className="h-4 w-4" />
+          <TabsTrigger value="predictive">
             Prediktif Analiz
           </TabsTrigger>
-          <TabsTrigger value="comparative" className="gap-2">
-            <BarChart3 className="h-4 w-4" />
+          <TabsTrigger value="comparative">
             Karşılaştırmalı
           </TabsTrigger>
-          <TabsTrigger value="progress" className="gap-2">
-            <BookOpen className="h-4 w-4" />
+          <TabsTrigger value="progress">
             İlerleme
           </TabsTrigger>
-          <TabsTrigger value="warnings" className="gap-2">
-            <AlertTriangle className="h-4 w-4" />
+          <TabsTrigger value="warnings">
             Erken Uyarı
           </TabsTrigger>
-          <TabsTrigger value="ai-analysis" className="gap-2">
-            <Brain className="h-4 w-4" />
+          <TabsTrigger value="ai-analysis">
             AI Analiz
           </TabsTrigger>
-          <TabsTrigger value="settings" className="gap-2">
-            <Settings className="h-4 w-4" />
+          <TabsTrigger value="settings">
             Ayarlar
           </TabsTrigger>
         </TabsList>

@@ -207,7 +207,7 @@ export default function Surveys() {
       <SurveyStats templates={templates} distributions={distributions} />
 
       <Tabs defaultValue="templates" className="space-y-4">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           <TabsTrigger value="templates">Anket Şablonları</TabsTrigger>
           <TabsTrigger value="distributions">Dağıtımlar</TabsTrigger>
           <TabsTrigger value="responses">Yanıtlar</TabsTrigger>

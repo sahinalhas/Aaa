@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Brain, TrendingUp, Clock, Users, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { generateComprehensiveAnalysis } from '../lib/api/advanced-ai-analysis.api';
 
 export default function AdvancedStudentAnalysis() {
@@ -50,17 +50,14 @@ export default function AdvancedStudentAnalysis() {
       </div>
 
       <Tabs defaultValue="psychological" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 min-h-[2.5rem]">
-          <TabsTrigger value="psychological" className="flex items-center gap-2 justify-center">
-            <Brain className="w-4 h-4" />
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3">
+          <TabsTrigger value="psychological">
             Psikolojik Derinlik
           </TabsTrigger>
-          <TabsTrigger value="predictive" className="flex items-center gap-2 justify-center">
-            <TrendingUp className="w-4 h-4" />
+          <TabsTrigger value="predictive">
             Öngörücü Risk
           </TabsTrigger>
-          <TabsTrigger value="timeline" className="flex items-center gap-2 justify-center">
-            <Clock className="w-4 h-4" />
+          <TabsTrigger value="timeline">
             Zaman Çizelgesi
           </TabsTrigger>
         </TabsList>

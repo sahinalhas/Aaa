@@ -159,7 +159,7 @@ export default function SchoolDashboard() {
       </StatsGrid>
       
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3">
           <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
           <TabsTrigger value="classes">Sınıf Karşılaştırma</TabsTrigger>
           <TabsTrigger value="trends">Trend Analizi</TabsTrigger>

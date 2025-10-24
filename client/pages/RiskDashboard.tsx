@@ -68,7 +68,7 @@ export default function RiskDashboard() {
         icon={ShieldAlert}
       >
       <Tabs defaultValue="alerts" className="space-y-6">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-2">
           <TabsTrigger value="alerts">Aktif Uyarılar</TabsTrigger>
           <TabsTrigger value="students">Yüksek Riskli Öğrenciler</TabsTrigger>
         </TabsList>

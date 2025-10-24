@@ -90,15 +90,13 @@ export default function AIToolsPage() {
       {/* Tabs Container */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
         {/* Responsive Tab List */}
-        <TabsList className="flex flex-wrap gap-1 h-auto w-full justify-start min-h-[2.5rem] bg-muted/50 p-1">
-          {AI_TOOLS_TABS.map(({ value, label, icon: Icon }) => (
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+          {AI_TOOLS_TABS.map(({ value, label }) => (
             <TabsTrigger 
               key={value} 
-              value={value} 
-              className="flex items-center gap-2 shrink-0 data-[state=active]:bg-background"
+              value={value}
             >
-              <Icon className="h-4 w-4" />
-              <span className="hidden sm:inline">{label}</span>
+              {label}
             </TabsTrigger>
           ))}
         </TabsList>

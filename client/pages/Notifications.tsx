@@ -183,7 +183,7 @@ export default function Notifications() {
       )}
 
       <Tabs defaultValue="all" onValueChange={setSelectedStatus}>
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
           <TabsTrigger value="all">Tümü</TabsTrigger>
           <TabsTrigger value="PENDING">Bekleyen</TabsTrigger>
           <TabsTrigger value="SENT">Gönderilen</TabsTrigger>

@@ -215,7 +215,7 @@ export default function SettingsPage() {
           });
         }}
       >
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-10">
           <TabsTrigger value="genel">Genel</TabsTrigger>
           <TabsTrigger value="bildirim">Bildirimler</TabsTrigger>
           <TabsTrigger value="veri">Veri</TabsTrigger>
