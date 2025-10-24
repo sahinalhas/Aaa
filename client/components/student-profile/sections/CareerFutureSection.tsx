@@ -11,14 +11,12 @@ import HedeflerPlanlamaSection from "./HedeflerPlanlamaSection";
 interface CareerFutureSectionProps {
   studentId: string;
   studentName: string;
-  academicGoals: any;
   onUpdate: () => void;
 }
 
 export default function CareerFutureSection({
   studentId,
   studentName,
-  academicGoals,
   onUpdate
 }: CareerFutureSectionProps) {
   return (
@@ -42,7 +40,6 @@ export default function CareerFutureSection({
       <TabsContent value="hedefler" className="space-y-4">
         <HedeflerPlanlamaSection
           studentId={studentId}
-          academicGoals={academicGoals}
           onUpdate={onUpdate}
         />
       </TabsContent>
