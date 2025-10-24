@@ -1,8 +1,6 @@
-import { Users, UserCheck, UserX, AlertTriangle, TrendingUp, GraduationCap } from 'lucide-react';
+import { Users, UserCheck, UserX, AlertTriangle } from 'lucide-react';
 import { StatCard } from '@/components/ui/stat-card';
-import { ModernCard } from '@/components/ui/modern-card';
 import { StatsGrid, SkeletonCard } from '@/components/ui/stats-grid';
-import { Badge } from '@/components/ui/badge';
 import { MODERN_GRADIENTS } from '@/lib/config/theme.config';
 import type { StudentStats } from '@/hooks/useStudentStats';
 
@@ -21,8 +19,6 @@ export function StatsCards({ stats, isLoading = false }: StatsCardsProps) {
       </StatsGrid>
     );
   }
-
-  const classEntries = Object.entries(stats.classCounts).sort();
 
   const mainStats = [
     {
@@ -56,63 +52,18 @@ export function StatsCards({ stats, isLoading = false }: StatsCardsProps) {
   ];
 
   return (
-    <div className="space-y-4">
-      <StatsGrid columns={4}>
-        {mainStats.map((stat, index) => (
-          <StatCard
-            key={stat.title}
-            title={stat.title}
-            value={stat.value}
-            subtitle={stat.subtitle}
-            icon={stat.icon}
-            gradient={stat.gradient}
-            delay={index * 0.1}
-          />
-        ))}
-      </StatsGrid>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <ModernCard
-          title="Sınıf Dağılımı"
-          icon={GraduationCap}
-          gradient={MODERN_GRADIENTS.indigo}
-          delay={0.4}
-        >
-          <div className="flex flex-wrap gap-2">
-            {classEntries.length > 0 ? (
-              classEntries.map(([classNum, count]) => (
-                <Badge key={classNum} variant="outline" className="text-sm">
-                  {classNum}. Sınıf: <span className="font-bold ml-1">{count}</span>
-                </Badge>
-              ))
-            ) : (
-              <p className="text-sm text-muted-foreground">Henüz öğrenci yok</p>
-            )}
-          </div>
-        </ModernCard>
-
-        <ModernCard
-          title="Yeni Kayıtlar"
-          icon={TrendingUp}
-          gradient={MODERN_GRADIENTS.purple}
-          delay={0.5}
-        >
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Bu hafta:</span>
-              <Badge variant="secondary" className="text-sm font-bold">
-                {stats.newThisWeek}
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Bu ay:</span>
-              <Badge variant="secondary" className="text-sm font-bold">
-                {stats.newThisMonth}
-              </Badge>
-            </div>
-          </div>
-        </ModernCard>
-      </div>
-    </div>
+    <StatsGrid columns={4}>
+      {mainStats.map((stat, index) => (
+        <StatCard
+          key={stat.title}
+          title={stat.title}
+          value={stat.value}
+          subtitle={stat.subtitle}
+          icon={stat.icon}
+          gradient={stat.gradient}
+          delay={index * 0.1}
+        />
+      ))}
+    </StatsGrid>
   );
 }
