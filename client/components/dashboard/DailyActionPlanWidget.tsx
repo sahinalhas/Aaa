@@ -72,7 +72,7 @@ export default function DailyActionPlanWidget({ onHide }: DailyActionPlanWidgetP
   const priorityStudents = plan.priorityStudents?.slice(0, 3) || [];
 
   return (
-    <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 glass-light">
+    <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <div>
           <CardTitle className="flex items-center gap-2 text-blue-700">
