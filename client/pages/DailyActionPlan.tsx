@@ -82,24 +82,25 @@ export default function DailyActionPlan() {
   if (!plan) return null;
 
   return (
-    <AIToolsLayout
-      title="Günlük Eylem Planı"
-      description={plan.counselorName}
-      icon={Calendar}
-      actions={
-        <div className="flex items-center gap-4">
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-4 py-2 border rounded-md"
-          />
-          <Button onClick={handleRefresh}>
-            Yeni Plan Oluştur
-          </Button>
-        </div>
-      }
-    >
+    <div className="container mx-auto py-6 space-y-6">
+      <AIToolsLayout
+        title="Günlük Eylem Planı"
+        description={plan.counselorName}
+        icon={Calendar}
+        actions={
+          <div className="flex items-center gap-4">
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="px-4 py-2 border rounded-md"
+            />
+            <Button onClick={handleRefresh}>
+              Yeni Plan Oluştur
+            </Button>
+          </div>
+        }
+      >
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-lg border shadow-sm">
@@ -295,6 +296,7 @@ export default function DailyActionPlan() {
         </div>
       )}
       </div>
-    </AIToolsLayout>
+      </AIToolsLayout>
+    </div>
   );
 }

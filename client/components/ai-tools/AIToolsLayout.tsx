@@ -17,7 +17,7 @@ export function AIToolsLayout({
   children,
 }: AIToolsLayoutProps) {
   return (
-    <div className="w-full min-h-[600px] space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -30,7 +30,7 @@ export function AIToolsLayout({
         </div>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
-      <div className="w-full">{children}</div>
+      <div>{children}</div>
     </div>
   );
 }

@@ -418,7 +418,7 @@ export default function AIAssistant() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="container mx-auto py-6 space-y-6">
       <Tabs defaultValue="chat" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
           <TabsTrigger value="chat" className="gap-2">

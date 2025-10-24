@@ -74,11 +74,12 @@ export default function AdvancedAIAnalysis() {
   }
 
   return (
-    <AIToolsLayout
-      title="Gelişmiş AI Karşılaştırmalı Analiz"
-      description="Sınıf ve öğrenci grupları arasında derin AI destekli karşılaştırma"
-      icon={Sparkles}
-    >
+    <div className="container mx-auto py-6 space-y-6">
+      <AIToolsLayout
+        title="Gelişmiş AI Karşılaştırmalı Analiz"
+        description="Sınıf ve öğrenci grupları arasında derin AI destekli karşılaştırma"
+        icon={Sparkles}
+      >
       <Tabs value={analysisMode} onValueChange={(v) => setAnalysisMode(v as any)} className="w-auto space-y-6">
         <TabsList>
           <TabsTrigger value="class" className="flex items-center gap-2">
@@ -353,6 +354,7 @@ export default function AdvancedAIAnalysis() {
           )}
         </div>
       )}
-    </AIToolsLayout>
+      </AIToolsLayout>
+    </div>
   );
 }

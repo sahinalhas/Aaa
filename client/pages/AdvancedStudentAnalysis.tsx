@@ -43,7 +43,7 @@ export default function AdvancedStudentAnalysis() {
   const { psychological, predictive, timeline } = analysis;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="container mx-auto py-6 space-y-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Gelişmiş AI Analizi</h1>
         <p className="text-muted-foreground">{psychological.studentName}</p>

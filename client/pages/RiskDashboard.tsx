@@ -61,11 +61,12 @@ export default function RiskDashboard() {
   }
 
   return (
-    <AIToolsLayout
-      title="Risk Değerlendirme ve Erken Uyarı Sistemi"
-      description="Öğrenci risk analizi, erken uyarılar ve müdahale önerileri"
-      icon={ShieldAlert}
-    >
+    <div className="container mx-auto py-6 space-y-6">
+      <AIToolsLayout
+        title="Risk Değerlendirme ve Erken Uyarı Sistemi"
+        description="Öğrenci risk analizi, erken uyarılar ve müdahale önerileri"
+        icon={ShieldAlert}
+      >
       <Tabs defaultValue="alerts" className="space-y-6">
         <TabsList>
           <TabsTrigger value="alerts">Aktif Uyarılar</TabsTrigger>
@@ -229,6 +230,7 @@ export default function RiskDashboard() {
           </CardContent>
         </Card>
       </div>
-    </AIToolsLayout>
+      </AIToolsLayout>
+    </div>
   );
 }

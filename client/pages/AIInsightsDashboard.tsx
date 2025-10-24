@@ -85,11 +85,12 @@ export default function AIInsightsDashboard() {
   }
 
   return (
-    <AIToolsLayout
-      title="AI Rehber Asistan Dashboard"
-      description="Günlük otomatik analiz ve akıllı öneriler"
-      icon={Brain}
-    >
+    <div className="container mx-auto py-6 space-y-6">
+      <AIToolsLayout
+        title="AI Rehber Asistan Dashboard"
+        description="Günlük otomatik analiz ve akıllı öneriler"
+        icon={Brain}
+      >
       <Tabs defaultValue="daily" className="w-full space-y-6">
         <TabsList className="grid w-full grid-cols-2 max-w-md min-h-[2.5rem]">
           <TabsTrigger value="daily" className="flex items-center gap-2 justify-center">
@@ -299,6 +300,7 @@ export default function AIInsightsDashboard() {
           <BulkAnalysisDashboard />
         </TabsContent>
       </Tabs>
-    </AIToolsLayout>
+      </AIToolsLayout>
+    </div>
   );
 }

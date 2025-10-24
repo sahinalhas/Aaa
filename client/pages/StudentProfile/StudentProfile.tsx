@@ -124,7 +124,7 @@ export default function StudentProfile() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-4 md:space-y-6 px-2 md:px-4 lg:px-0"
+      className="container mx-auto py-6 space-y-6"
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
