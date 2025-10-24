@@ -13,6 +13,7 @@ import { useUnifiedRisk } from "@/hooks/student-profile";
 import { Student } from "@/lib/storage";
 import RiskDegerlendirmeSection from "./RiskDegerlendirmeSection";
 import DavranisTakibiSection from "./DavranisTakibiSection";
+import DisciplineSection from "./DisciplineSection";
 import RiskProtectiveProfileSection from "./RiskProtectiveProfileSection";
 
 interface UnifiedRiskSectionProps {
@@ -114,7 +115,11 @@ export default function UnifiedRiskSection({ studentId, student, onUpdate }: Uni
           />
         </TabsContent>
 
-        <TabsContent value="davranis">
+        <TabsContent value="davranis" className="space-y-6">
+          <DisciplineSection
+            student={student}
+            onUpdate={onUpdate}
+          />
           <DavranisTakibiSection
             studentId={studentId}
             behaviorIncidents={[]} // Will be loaded inside the component

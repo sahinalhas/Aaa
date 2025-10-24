@@ -189,11 +189,11 @@
   - [x] Degerlendirme360Section artık ayrı sekmede gösteriliyor (coklu-zeka'dan ayrıldı)
   - [x] TabsList grid yapısı 4'ten 5'e çıkarıldı
 
-- [ ] **Adım 12:** Risk sekmesine Davranış Takibi alt sekmesi ekle
-  - [ ] EnhancedRiskDashboard'a Tabs yapısı ekle
-  - [ ] `RISK_TABS` constants oluştur
-  - [ ] BehaviorTrackingSection'ı davranış sekmesinde göster
-  - [ ] DisciplineSection'ı bu sekmeye ekle
+- [x] **Adım 12:** Risk sekmesine Davranış Takibi alt sekmesi ekle ✅
+  - [x] UnifiedRiskSection zaten tab yapısına sahipti
+  - [x] DisciplineSection "davranis" sekmesine eklendi
+  - [x] DavranisTakibiSection ile birlikte gösteriliyor
+  - NOT: UnifiedRiskSection kendi internal tab yapısını kullanıyor (degerlendirme, davranis, koruyucu)
 
 ### Faz 5: Ana Yapı Değişiklikleri
 
