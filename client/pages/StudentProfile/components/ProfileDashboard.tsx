@@ -76,28 +76,33 @@ const ScoreCard = ({
   color: string;
 }) => {
   const getScoreLabel = (score: number) => {
-    if (score >= 80) return { label: "Çok İyi", color: "text-green-600" };
-    if (score >= 60) return { label: "İyi", color: "text-blue-600" };
-    if (score >= 40) return { label: "Orta", color: "text-yellow-600" };
-    return { label: "Gelişmeli", color: "text-red-600" };
+    if (score >= 80) return { label: "Çok İyi", color: "text-green-600", gradient: "bg-gradient-to-br from-green-500 to-green-600" };
+    if (score >= 60) return { label: "İyi", color: "text-blue-600", gradient: "bg-gradient-to-br from-blue-500 to-blue-600" };
+    if (score >= 40) return { label: "Orta", color: "text-yellow-600", gradient: "bg-gradient-to-br from-yellow-500 to-yellow-600" };
+    return { label: "Gelişmeli", color: "text-red-600", gradient: "bg-gradient-to-br from-red-500 to-red-600" };
   };
 
   const scoreInfo = getScoreLabel(score);
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg border bg-card">
-      <div className={`p-2 rounded-full ${color}`}>
-        <Icon className="h-5 w-5" />
-      </div>
-      <div className="flex-1">
-        <div className="text-sm font-medium">{title}</div>
-        <div className="flex items-center gap-2 mt-1">
-          <Progress value={score} className="h-2 flex-1" />
-          <span className="text-lg font-bold">{Math.round(score)}</span>
+    <Card className="relative overflow-hidden hover:shadow-lg transition-shadow">
+      <div className={`absolute inset-0 opacity-5 ${scoreInfo.gradient}`} />
+      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {title}
+        </CardTitle>
+        <div className={`p-2 rounded-lg ${color} bg-opacity-10`}>
+          <Icon className="h-4 w-4" />
         </div>
-        <div className={`text-xs ${scoreInfo.color} mt-0.5`}>{scoreInfo.label}</div>
-      </div>
-    </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{Math.round(score)}</div>
+        <div className="flex items-center gap-2 mt-2">
+          <Progress value={score} className="h-2 flex-1" />
+        </div>
+        <div className={`text-xs ${scoreInfo.color} mt-1 font-medium`}>{scoreInfo.label}</div>
+      </CardContent>
+    </Card>
   );
 };
 

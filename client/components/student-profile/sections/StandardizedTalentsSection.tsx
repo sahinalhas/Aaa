@@ -66,8 +66,9 @@ export default function StandardizedTalentsSection({
   });
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="relative overflow-hidden hover:shadow-lg transition-shadow">
+      <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-purple-500 to-purple-600" />
+      <CardHeader className="relative">
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5" />
           Standartlaştırılmış Yetenek & İlgi Profili
@@ -76,7 +77,7 @@ export default function StandardizedTalentsSection({
           Kategorize edilmiş yetenekler ve ilgi alanları
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField

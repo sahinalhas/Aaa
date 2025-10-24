@@ -98,68 +98,38 @@ const MetricCard = ({ title, score, icon: Icon, color, bgGradient, description, 
   };
 
   return (
-    <Card className="group relative overflow-hidden border-2 transition-all duration-500 hover:shadow-2xl hover:scale-[1.03] hover:-translate-y-1">
-      {/* Glassmorphism Background */}
-      <div className={`absolute inset-0 ${bgGradient} opacity-10 group-hover:opacity-20 transition-opacity duration-500`}></div>
+    <Card className="relative overflow-hidden hover:shadow-lg transition-shadow">
+      {/* Gradient Background - Görüşmeler sayfası stili */}
+      <div className={`absolute inset-0 ${bgGradient} opacity-5`}></div>
       
-      {/* Animated Gradient Border on Hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-      
-      <CardContent className="relative p-6">
-        <div className="flex items-start justify-between mb-5">
-          {/* Icon with Animated Background */}
-          <div className={`relative p-4 rounded-2xl ${bgGradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-            <Icon className={`h-8 w-8 ${color}`} />
-            <div className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </div>
-          
-          {/* Status Badge */}
-          <Badge 
-            className={`${status.textColor} ${status.bgColor} font-bold px-3 py-1.5 border-2 ${status.borderColor} shadow-sm`}
-          >
-            {status.label}
-          </Badge>
+      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {title}
+        </CardTitle>
+        <div className={`p-2 rounded-lg ${bgGradient} bg-opacity-10`}>
+          <Icon className="h-4 w-4" />
         </div>
-
-        <div className="space-y-4">
-          {/* Title */}
-          <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
-            {title}
-          </h3>
-          
-          {/* Score Display */}
-          <div className="flex items-end justify-between">
-            <div className="flex items-end gap-2">
-              <span className="text-5xl font-black tracking-tighter bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-                {Math.round(score)}
-              </span>
-              <span className="text-lg text-muted-foreground mb-2 font-semibold">/ 100</span>
-            </div>
-            
-            {/* Trend Indicator */}
-            {trend && trendValue && (
-              <div className="flex items-center gap-1 text-sm font-semibold">
-                {getTrendIcon()}
-                <span className={trend === 'up' ? 'text-emerald-600' : 'text-red-600'}>
-                  {trendValue}%
-                </span>
-              </div>
-            )}
+      </CardHeader>
+      <CardContent className="relative">
+        <div className="text-2xl font-bold">{Math.round(score)}</div>
+        {description && (
+          <p className="text-xs text-muted-foreground mt-1">
+            {description}
+          </p>
+        )}
+        <Badge 
+          className={`${status.textColor} ${status.bgColor} font-semibold px-2 py-1 border ${status.borderColor} shadow-sm mt-2 inline-block`}
+        >
+          {status.label}
+        </Badge>
+        {trend && trendValue && (
+          <div className="flex items-center gap-1 mt-2">
+            {getTrendIcon()}
+            <span className={`text-xs font-medium ${trend === 'up' ? 'text-emerald-600' : 'text-red-600'}`}>
+              {trend === 'up' ? '+' : ''}{trendValue}%
+            </span>
           </div>
-          
-          {/* Progress Bar */}
-          <Progress 
-            value={score} 
-            className="h-3 shadow-inner bg-muted/50"
-          />
-          
-          {/* Description */}
-          {description && (
-            <p className="text-sm text-muted-foreground leading-relaxed font-medium">
-              {description}
-            </p>
-          )}
-        </div>
+        )}
       </CardContent>
     </Card>
   );

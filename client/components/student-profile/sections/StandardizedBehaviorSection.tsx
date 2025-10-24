@@ -136,8 +136,9 @@ export default function StandardizedBehaviorSection({
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
+      <Card className="relative overflow-hidden hover:shadow-lg transition-shadow">
+        <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-amber-500 to-amber-600" />
+        <CardHeader className="relative">
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5" />
             Standartlaştırılmış Davranış Takibi (ABC Modeli)

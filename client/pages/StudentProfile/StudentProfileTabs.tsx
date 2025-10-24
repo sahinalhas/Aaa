@@ -87,17 +87,20 @@ export function StudentProfileTabs({
 
       {/* 2. KİMLİK & İLETİŞİM */}
       <TabsContent value="kimlik" className="mt-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
-        >
+        <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6">
+          <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-blue-500 to-blue-600" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="relative"
+          >
           <UnifiedIdentitySection
             student={student}
             onUpdate={onUpdate}
           />
-        </motion.div>
+          </motion.div>
+        </div>
       </TabsContent>
 
       {/* 3. SAĞLIK & GÜVENLİK */}
@@ -108,12 +111,13 @@ export function StudentProfileTabs({
           transition={{ duration: 0.4 }}
           className="space-y-4"
         >
-          <div className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6">
+          <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6">
+            <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-green-500 to-green-600" />
             <EnhancedHealthSection
               studentId={studentId}
               onUpdate={onUpdate}
             />
-          </div>
+            </div>
           
           <OzelEgitimSection
             studentId={studentId}
@@ -125,92 +129,109 @@ export function StudentProfileTabs({
 
       {/* 4. AKADEMİK */}
       <TabsContent value="akademik" className="mt-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
-        >
+        <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6">
+          <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-blue-500 to-blue-600" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="relative"
+          >
           <SmartAcademicDashboard
             studentId={studentId}
             onUpdate={onUpdate}
           />
-        </motion.div>
+          </motion.div>
+        </div>
       </TabsContent>
 
       {/* 5. GELİŞİM & KİŞİLİK */}
       <TabsContent value="gelisim" className="mt-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
-        >
+        <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6">
+          <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-purple-500 to-purple-600" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="relative"
+          >
           <DevelopmentProfileSection
             studentId={studentId}
             multipleIntelligence={data.multipleIntelligence}
             evaluations360={data.evaluations360}
             onUpdate={onUpdate}
           />
-        </motion.div>
+          </motion.div>
+        </div>
       </TabsContent>
 
       {/* 6. RİSK & MÜDAHALE */}
       <TabsContent value="risk" className="mt-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
-        >
+        <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6">
+          <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-red-500 to-red-600" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="relative"
+          >
           <EnhancedRiskDashboard
             studentId={studentId}
             student={student}
             onUpdate={onUpdate}
           />
-        </motion.div>
+          </motion.div>
+        </div>
       </TabsContent>
 
       {/* 7. KARİYER & GELECEK */}
       <TabsContent value="kariyer" className="mt-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
-        >
+        <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6">
+          <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-amber-500 to-amber-600" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="relative"
+          >
           <CareerFutureSection
             studentId={studentId}
             studentName={studentName}
             academicGoals={data.academicGoals}
             onUpdate={onUpdate}
           />
-        </motion.div>
+          </motion.div>
+        </div>
       </TabsContent>
 
       {/* 8. İLETİŞİM MERKEZİ */}
       <TabsContent value="iletisim" className="mt-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
-        >
+        <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6">
+          <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-cyan-500 to-cyan-600" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="relative"
+          >
           <CommunicationCenter
             studentId={studentId}
             onUpdate={onUpdate}
           />
-        </motion.div>
+          </motion.div>
+        </div>
       </TabsContent>
 
       {/* 9. AI ARAÇLARI */}
       <TabsContent value="ai-hub" className="mt-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6"
-        >
+        <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card shadow-md hover:shadow-lg transition-shadow p-6">
+          <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-violet-500 to-violet-600" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="relative"
+          >
           <AIToolsHub
             studentId={studentId}
             studentName={studentName}
