@@ -87,7 +87,7 @@ export function UnifiedScoreDashboard({ scores, studentName }: UnifiedScoreDashb
   return (
     <div className="space-y-4">
       {/* Genel Durum Kartı */}
-      <Card className="border-2">
+      <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -166,7 +166,7 @@ export function UnifiedScoreDashboard({ scores, studentName }: UnifiedScoreDashb
       </div>
 
       {/* Risk Değerlendirmesi */}
-      <Card className={`border-2 ${scores.riskSkoru < 40 ? 'border-red-500' : scores.riskSkoru < 60 ? 'border-yellow-500' : 'border-green-500'}`}>
+      <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
