@@ -130,6 +130,11 @@ export const GELISIM_TABS = [
     icon: Brain,
   },
   {
+    value: "degerlendirme-360",
+    label: "360 Derece Değerlendirme",
+    icon: Users,
+  },
+  {
     value: "yetenekler",
     label: "Yetenekler & İlgiler",
     icon: Sparkles,

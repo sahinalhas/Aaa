@@ -97,7 +97,7 @@ export default function HedeflerPlanlamaSection({
                       <EnhancedTextarea 
                         {...field} 
                         rows={4} 
-                        aiContext="career"
+                        aiContext="counseling"
                         placeholder="Öğrencinin okuldan, eğitimden ve gelecekten beklentileri..."
                       />
                     </FormControl>
@@ -116,7 +116,7 @@ export default function HedeflerPlanlamaSection({
                       <EnhancedTextarea 
                         {...field} 
                         rows={3} 
-                        aiContext="career"
+                        aiContext="counseling"
                         placeholder="Bu dönem veya yıl içindeki hedefler..."
                       />
                     </FormControl>
@@ -135,7 +135,7 @@ export default function HedeflerPlanlamaSection({
                       <EnhancedTextarea 
                         {...field} 
                         rows={3} 
-                        aiContext="career"
+                        aiContext="counseling"
                         placeholder="Mezuniyet sonrası ve gelecek hedefler..."
                       />
                     </FormControl>
@@ -161,7 +161,7 @@ export default function HedeflerPlanlamaSection({
                       <EnhancedTextarea 
                         {...field} 
                         rows={4} 
-                        aiContext="career"
+                        aiContext="counseling"
                         placeholder="Ailenin öğrencinin eğitimi ve geleceği hakkındaki beklentileri..."
                       />
                     </FormControl>
@@ -187,7 +187,7 @@ export default function HedeflerPlanlamaSection({
                       <EnhancedTextarea 
                         {...field} 
                         rows={3} 
-                        aiContext="career"
+                        aiContext="counseling"
                         placeholder="İlgilendiği meslekler, sektörler..."
                       />
                     </FormControl>
@@ -206,7 +206,7 @@ export default function HedeflerPlanlamaSection({
                       <EnhancedTextarea 
                         {...field} 
                         rows={3} 
-                        aiContext="career"
+                        aiContext="counseling"
                         placeholder="Hedeflediği üniversiteler, bölümler..."
                       />
                     </FormControl>
@@ -226,7 +226,7 @@ export default function HedeflerPlanlamaSection({
                     <EnhancedTextarea 
                       {...field} 
                       rows={3} 
-                      aiContext="career"
+                      aiContext="counseling"
                       placeholder="Diğer önemli notlar..."
                     />
                   </FormControl>

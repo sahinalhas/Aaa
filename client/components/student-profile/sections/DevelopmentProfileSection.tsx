@@ -26,7 +26,7 @@ export default function DevelopmentProfileSection({
 }: DevelopmentProfileSectionProps) {
   return (
     <Tabs defaultValue="sosyal-duygusal" className="space-y-4">
-      <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+      <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
         {GELISIM_TABS.map(({ value, label }) => (
           <TabsTrigger key={value} value={value}>
             {label}
@@ -47,6 +47,9 @@ export default function DevelopmentProfileSection({
           multipleIntelligence={multipleIntelligence}
           onUpdate={onUpdate}
         />
+      </TabsContent>
+
+      <TabsContent value="degerlendirme-360" className="space-y-4">
         <Degerlendirme360Section
           studentId={studentId}
           evaluations360={evaluations360}
