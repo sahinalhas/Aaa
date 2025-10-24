@@ -17,6 +17,7 @@ import EnhancedRiskDashboard from "@/components/student-profile/sections/Enhance
 import CareerFutureSection from "@/components/student-profile/sections/CareerFutureSection";
 import CommunicationCenter from "@/components/student-profile/sections/CommunicationCenter";
 import AIToolsHub from "@/components/student-profile/sections/AIToolsHub";
+import AdditionalInfoSection from "@/components/student-profile/sections/AdditionalInfoSection"; // Import AdditionalInfoSection
 
 // Dashboard
 import { ModernDashboard } from "./components/ModernDashboard";
@@ -47,9 +48,9 @@ export function StudentProfileTabs({
     <Tabs defaultValue="dashboard" className="space-y-4">
       <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-9">
         {MAIN_TABS.map(({ value, label, description }) => (
-          <TabsTrigger 
-            key={value} 
-            value={value} 
+          <TabsTrigger
+            key={value}
+            value={value}
             title={description}
           >
             {label}
@@ -59,7 +60,7 @@ export function StudentProfileTabs({
 
       {/* 1. DASHBOARD - Özet Görünüm */}
       <TabsContent value="dashboard" className="space-y-4">
-        <ModernDashboard 
+        <ModernDashboard
           student={student}
           studentId={studentId}
           scoresData={scoresData}
@@ -70,6 +71,10 @@ export function StudentProfileTabs({
       {/* 2. KİMLİK & İLETİŞİM */}
       <TabsContent value="kimlik" className="space-y-4">
         <UnifiedIdentitySection
+          student={student}
+          onUpdate={onUpdate}
+        />
+        <AdditionalInfoSection
           student={student}
           onUpdate={onUpdate}
         />

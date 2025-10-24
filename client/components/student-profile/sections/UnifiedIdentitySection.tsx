@@ -1,4 +1,3 @@
-replit_final_file>
 /**
  * Unified Identity Section
  * Temel kimlik bilgileri, veli iletişim, adres bilgileri
@@ -59,12 +58,12 @@ import { Badge } from "@/components/ui/badge";
 const unifiedIdentitySchema = z.object({
   ad: z.string().min(1, "Ad zorunludur"),
   soyad: z.string().min(1, "Soyad zorunludur"),
+  tcKimlikNo: z.string().optional(),
   okulNo: z.string().optional(),
   class: z.string().optional(),
   cinsiyet: z.enum(["K", "E"]).optional(),
   dogumTarihi: z.string().optional(),
   dogumYeri: z.string().optional(),
-  tcKimlikNo: z.string().optional().transform(val => val === "" ? undefined : val),
   telefon: z.string().optional(),
   eposta: z.string().email("Geçerli bir e-posta giriniz").optional().or(z.literal("")),
   il: z.string().optional(),
@@ -72,11 +71,17 @@ const unifiedIdentitySchema = z.object({
   adres: z.string().optional(),
   veliAdi: z.string().optional(),
   veliTelefon: z.string().optional(),
+  veliEposta: z.string().email("Geçerli bir e-posta giriniz").optional().or(z.literal("")),
+  veliMeslek: z.string().optional(),
+  veliEgitimDurumu: z.string().optional(),
+  ikinciVeliAdi: z.string().optional(),
+  ikinciVeliTelefon: z.string().optional(),
+  ikinciVeliYakinlik: z.string().optional(),
+  kardesSayisi: z.number().optional(),
   rehberOgretmen: z.string().optional(),
   etiketler: z.string().optional(),
   anneMeslek: z.string().optional(),
   babaMeslek: z.string().optional(),
-  kardesSayisi: z.number().optional().or(z.literal("")),
   dilBecerileri: z.string().optional(),
   hobiler: z.string().optional(),
   okulDisiAktiviteler: z.string().optional(),
@@ -96,12 +101,12 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
     defaultValues: {
       ad: student.ad || "",
       soyad: student.soyad || "",
+      tcKimlikNo: (student as any).tcKimlikNo || "",
       okulNo: student.okulNo || "",
       class: student.class || "",
       cinsiyet: student.cinsiyet,
       dogumTarihi: student.dogumTarihi || "",
-      dogumYeri: student.dogumYeri || "",
-      tcKimlikNo: student.tcKimlikNo,
+      dogumYeri: (student as any).dogumYeri || "",
       telefon: student.telefon || "",
       eposta: student.eposta || "",
       il: student.il || "",
@@ -109,11 +114,17 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
       adres: student.adres || "",
       veliAdi: student.veliAdi || "",
       veliTelefon: student.veliTelefon || "",
+      veliEposta: (student as any).veliEposta || "",
+      veliMeslek: (student as any).veliMeslek || "",
+      veliEgitimDurumu: (student as any).veliEgitimDurumu || "",
+      ikinciVeliAdi: (student as any).ikinciVeliAdi || "",
+      ikinciVeliTelefon: (student as any).ikinciVeliTelefon || "",
+      ikinciVeliYakinlik: (student as any).ikinciVeliYakinlik || "",
+      kardesSayisi: (student as any).kardesSayisi,
       rehberOgretmen: student.rehberOgretmen || "",
       etiketler: (student.etiketler || []).join(", "),
       anneMeslek: student.anneMeslek || "",
       babaMeslek: student.babaMeslek || "",
-      kardesSayisi: student.kardesSayisi || "",
       dilBecerileri: student.dilBecerileri || "",
       hobiler: student.hobiler || "",
       okulDisiAktiviteler: student.okulDisiAktiviteler || "",
@@ -125,12 +136,12 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
     form.reset({
       ad: student.ad || "",
       soyad: student.soyad || "",
+      tcKimlikNo: (student as any).tcKimlikNo || "",
       okulNo: student.okulNo || "",
       class: student.class || "",
       cinsiyet: student.cinsiyet,
       dogumTarihi: student.dogumTarihi || "",
-      dogumYeri: student.dogumYeri || "",
-      tcKimlikNo: student.tcKimlikNo,
+      dogumYeri: (student as any).dogumYeri || "",
       telefon: student.telefon || "",
       eposta: student.eposta || "",
       il: student.il || "",
@@ -138,11 +149,17 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
       adres: student.adres || "",
       veliAdi: student.veliAdi || "",
       veliTelefon: student.veliTelefon || "",
+      veliEposta: (student as any).veliEposta || "",
+      veliMeslek: (student as any).veliMeslek || "",
+      veliEgitimDurumu: (student as any).veliEgitimDurumu || "",
+      ikinciVeliAdi: (student as any).ikinciVeliAdi || "",
+      ikinciVeliTelefon: (student as any).ikinciVeliTelefon || "",
+      ikinciVeliYakinlik: (student as any).ikinciVeliYakinlik || "",
+      kardeSayisi: (student as any).kardeSayisi,
       rehberOgretmen: student.rehberOgretmen || "",
       etiketler: (student.etiketler || []).join(", "),
       anneMeslek: student.anneMeslek || "",
       babaMeslek: student.babaMeslek || "",
-      kardesSayisi: student.kardesSayisi || "",
       dilBecerileri: student.dilBecerileri || "",
       hobiler: student.hobiler || "",
       okulDisiAktiviteler: student.okulDisiAktiviteler || "",
@@ -222,6 +239,25 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
 
               <FormField
                 control={form.control}
+                name="tcKimlikNo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1.5">
+                      <Hash className="h-3.5 w-3.5" />
+                      TC Kimlik No
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} className="h-10" placeholder="11 haneli TC kimlik no" maxLength={11} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
                 name="okulNo"
                 render={({ field }) => (
                   <FormItem>
@@ -236,9 +272,7 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
                   </FormItem>
                 )}
               />
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="class"
@@ -277,7 +311,9 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
                   </FormItem>
                 )}
               />
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="dogumTarihi"
@@ -294,9 +330,7 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
                   </FormItem>
                 )}
               />
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="dogumYeri"
@@ -308,30 +342,6 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
                     </FormLabel>
                     <FormControl>
                       <Input {...field} className="h-10" placeholder="İl/İlçe" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="tcKimlikNo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1.5">
-                      <Hash className="h-3.5 w-3.5" />
-                      TC Kimlik No
-                      <Badge variant="outline" className="text-xs">Gizli</Badge>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="●●●●●●●●●●●"
-                        maxLength={11}
-                        {...field}
-                        className="h-10"
-                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -623,42 +633,199 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Users className="h-5 w-5 text-primary" />
-              Veli Bilgileri
+              Aile Bilgileri
             </CardTitle>
             <CardDescription>
-              Birincil veli iletişim bilgileri
+              Birincil veli ve aile yapısı bilgileri
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="space-y-6">
+            <div>
+              <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Birincil Veli (Anne/Baba)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="veliAdi"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5" />
+                        Veli Adı Soyadı
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} className="h-10" placeholder="Anne/baba adı soyadı" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="veliTelefon"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1.5">
+                        <Phone className="h-3.5 w-3.5" />
+                        Veli Telefon
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} type="tel" className="h-10" placeholder="+90 5XX XXX XX XX" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="veliEposta"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1.5">
+                        <Mail className="h-3.5 w-3.5" />
+                        Veli E-posta
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} type="email" className="h-10" placeholder="ornek@email.com" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="veliMeslek"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1.5">
+                        <GraduationCap className="h-3.5 w-3.5" />
+                        Meslek
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} className="h-10" placeholder="Meslek" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="veliEgitimDurumu"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Eğitim Durumu</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="h-10">
+                            <SelectValue placeholder="Seçiniz" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="İlkokul">İlkokul</SelectItem>
+                          <SelectItem value="Ortaokul">Ortaokul</SelectItem>
+                          <SelectItem value="Lise">Lise</SelectItem>
+                          <SelectItem value="Ön Lisans">Ön Lisans</SelectItem>
+                          <SelectItem value="Lisans">Lisans</SelectItem>
+                          <SelectItem value="Yüksek Lisans">Yüksek Lisans</SelectItem>
+                          <SelectItem value="Doktora">Doktora</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <h3 className="text-sm font-semibold mb-3 text-muted-foreground">İkinci Veli / Acil Durum İletişim</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="ikinciVeliAdi"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5" />
+                        Adı Soyadı
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} className="h-10" placeholder="İkinci veli/acil kişi" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="ikinciVeliTelefon"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1.5">
+                        <Phone className="h-3.5 w-3.5" />
+                        Telefon
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} type="tel" className="h-10" placeholder="+90 5XX XXX XX XX" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="ikinciVeliYakinlik"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Yakınlık Derecesi</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="h-10">
+                            <SelectValue placeholder="Seçiniz" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Anne">Anne</SelectItem>
+                          <SelectItem value="Baba">Baba</SelectItem>
+                          <SelectItem value="Büyükanne">Büyükanne</SelectItem>
+                          <SelectItem value="Büyükbaba">Büyükbaba</SelectItem>
+                          <SelectItem value="Teyze/Hala">Teyze/Hala</SelectItem>
+                          <SelectItem value="Amca/Dayı">Amca/Dayı</SelectItem>
+                          <SelectItem value="Diğer">Diğer</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Aile Yapısı</h3>
               <FormField
                 control={form.control}
-                name="veliAdi"
+                name="kardesSayisi"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1.5">
                       <Users className="h-3.5 w-3.5" />
-                      Veli Adı Soyadı
+                      Kardeş Sayısı
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} className="h-10" placeholder="Anne/baba adı soyadı" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="veliTelefon"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1.5">
-                      <Phone className="h-3.5 w-3.5" />
-                      Veli Telefon
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} type="tel" className="h-10" placeholder="+90 5XX XXX XX XX" />
+                      <Input
+                        type="number"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                        className="h-10 w-32"
+                        placeholder="0"
+                        min="0"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -728,4 +895,3 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
     </Form>
   );
 }
-</replit_final_file>
