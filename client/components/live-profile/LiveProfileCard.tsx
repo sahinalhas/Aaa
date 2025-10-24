@@ -82,48 +82,69 @@ export default function LiveProfileCard({ studentId, compact = false }: LiveProf
   const PriorityIcon = priorityIcons[identity.interventionPriority];
 
   return (
-    <Card className={cn(
-      "relative overflow-hidden border-2 transition-all duration-300 shadow-lg hover:shadow-xl",
-      identity.interventionPriority === 'critical' ? 'border-red-400/50' : 
-      identity.interventionPriority === 'high' ? 'border-orange-400/50' :
-      'border-blue-400/50'
-    )}>
-      {/* Gradient Background */}
-      <div className={cn(
-        "absolute inset-0 opacity-5",
-        identity.interventionPriority === 'critical' ? 'bg-gradient-to-br from-red-500 to-orange-500' : 
-        identity.interventionPriority === 'high' ? 'bg-gradient-to-br from-orange-500 to-yellow-500' :
-        'bg-gradient-to-br from-blue-500 to-purple-500'
-      )} />
+    <Card className="relative overflow-hidden border border-border/50 shadow-lg bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Subtle Background Accent */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl -z-10"></div>
       
-      <CardHeader className="relative">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 shadow-md">
-                <User className="h-5 w-5 text-white" />
+      <CardHeader className="p-4 md:p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              <div className={cn(
+                "p-2 rounded-lg flex-shrink-0",
+                identity.interventionPriority === 'critical' ? 'bg-red-500/10' : 
+                identity.interventionPriority === 'high' ? 'bg-orange-500/10' :
+                'bg-primary/10'
+              )}>
+                <User className={cn(
+                  "h-4 w-4",
+                  identity.interventionPriority === 'critical' ? 'text-red-600' : 
+                  identity.interventionPriority === 'high' ? 'text-orange-600' :
+                  'text-primary'
+                )} />
               </div>
-              Canlı Öğrenci Profili
-            </CardTitle>
-            <CardDescription className="mt-2 text-sm">
-              Son güncelleme: {new Date(identity.lastUpdated).toLocaleString('tr-TR')}
-            </CardDescription>
+              <CardTitle className="text-lg md:text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent truncate">
+                Canlı Öğrenci Profili
+              </CardTitle>
+            </div>
+            
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">
+                {new Date(identity.lastUpdated).toLocaleString('tr-TR', { 
+                  day: 'numeric', 
+                  month: 'short', 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </span>
+            </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            <Badge className={cn("border font-semibold shadow-sm", priorityColors[identity.interventionPriority])}>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <Badge className={cn(
+              "text-xs font-medium px-2 py-0.5",
+              priorityColors[identity.interventionPriority]
+            )}>
               <PriorityIcon className="h-3 w-3 mr-1" />
-              {identity.interventionPriority === 'critical' ? 'KRİTİK' :
-               identity.interventionPriority === 'high' ? 'YÜKSEK ÖNCELİK' :
-               identity.interventionPriority === 'medium' ? 'ORTA' : 'NORMAL'}
+              <span className="hidden sm:inline">
+                {identity.interventionPriority === 'critical' ? 'KRİTİK' :
+                 identity.interventionPriority === 'high' ? 'YÜKSEK' :
+                 identity.interventionPriority === 'medium' ? 'ORTA' : 'NORMAL'}
+              </span>
+              <span className="sm:hidden">
+                {identity.interventionPriority === 'critical' ? 'K' :
+                 identity.interventionPriority === 'high' ? 'Y' :
+                 identity.interventionPriority === 'medium' ? 'O' : 'N'}
+              </span>
             </Badge>
             
             <Button 
-              variant="outline" 
+              variant="ghost" 
               size="sm" 
               onClick={() => refresh()}
               disabled={isRefreshing}
-              className="shadow-sm hover:shadow-md transition-shadow"
+              className="h-8 w-8 p-0"
             >
               <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
             </Button>
@@ -131,25 +152,25 @@ export default function LiveProfileCard({ studentId, compact = false }: LiveProf
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 p-4 md:p-6">
         {/* Kim Bu Öğrenci? */}
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
-          <div className="flex items-start gap-3">
-            <Brain className="h-6 w-6 text-blue-600 mt-1" />
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg mb-2">Kim Bu Öğrenci?</h3>
-              <p className="text-gray-700 leading-relaxed">{identity.summary}</p>
+        <div className="bg-muted/30 rounded-lg p-3 md:p-4">
+          <div className="flex items-start gap-2">
+            <Brain className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-sm mb-1.5">Kim Bu Öğrenci?</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{identity.summary}</p>
             </div>
           </div>
         </div>
 
         {/* Anlık Durum */}
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
-          <div className="flex items-start gap-3">
-            <Activity className="h-6 w-6 text-green-600 mt-1" />
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg mb-2">Şu Anki Durum</h3>
-              <p className="text-gray-700">{identity.currentState}</p>
+        <div className="bg-muted/30 rounded-lg p-3 md:p-4">
+          <div className="flex items-start gap-2">
+            <Activity className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-sm mb-1.5">Şu Anki Durum</h3>
+              <p className="text-sm text-muted-foreground">{identity.currentState}</p>
             </div>
           </div>
         </div>
@@ -157,79 +178,79 @@ export default function LiveProfileCard({ studentId, compact = false }: LiveProf
         {!compact && (
           <>
             {/* Profil Skorları */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium flex items-center gap-1">
-                    <BookOpen className="h-4 w-4 text-blue-600" />
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-medium flex items-center gap-1 text-muted-foreground">
+                    <BookOpen className="h-3 w-3" />
                     Akademik
                   </span>
-                  <span className="text-sm font-bold text-blue-600">{identity.academicScore}%</span>
+                  <span className="text-xs font-bold">{identity.academicScore}%</span>
                 </div>
-                <Progress value={identity.academicScore} className="h-2" />
+                <Progress value={identity.academicScore} className="h-1.5" />
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium flex items-center gap-1">
-                    <Heart className="h-4 w-4 text-pink-600" />
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-medium flex items-center gap-1 text-muted-foreground">
+                    <Heart className="h-3 w-3" />
                     Sosyal-Duygusal
                   </span>
-                  <span className="text-sm font-bold text-pink-600">{identity.socialEmotionalScore}%</span>
+                  <span className="text-xs font-bold">{identity.socialEmotionalScore}%</span>
                 </div>
-                <Progress value={identity.socialEmotionalScore} className="h-2" />
+                <Progress value={identity.socialEmotionalScore} className="h-1.5" />
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium flex items-center gap-1">
-                    <Target className="h-4 w-4 text-purple-600" />
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-medium flex items-center gap-1 text-muted-foreground">
+                    <Target className="h-3 w-3" />
                     Motivasyon
                   </span>
-                  <span className="text-sm font-bold text-purple-600">{identity.motivationScore}%</span>
+                  <span className="text-xs font-bold">{identity.motivationScore}%</span>
                 </div>
-                <Progress value={identity.motivationScore} className="h-2" />
+                <Progress value={identity.motivationScore} className="h-1.5" />
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium flex items-center gap-1">
-                    <AlertTriangle className="h-4 w-4 text-orange-600" />
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-medium flex items-center gap-1 text-muted-foreground">
+                    <AlertTriangle className="h-3 w-3" />
                     Risk Seviyesi
                   </span>
-                  <span className="text-sm font-bold text-orange-600">{identity.riskLevel}%</span>
+                  <span className="text-xs font-bold">{identity.riskLevel}%</span>
                 </div>
-                <Progress value={identity.riskLevel} className="h-2" />
+                <Progress value={identity.riskLevel} className="h-1.5" />
               </div>
             </div>
 
             {/* Güçlü Yönler & Zorluklar */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <h4 className="font-semibold text-sm text-green-700 mb-2 flex items-center gap-1">
-                  <TrendingUp className="h-4 w-4" />
+                <h4 className="font-semibold text-xs mb-1.5 flex items-center gap-1">
+                  <TrendingUp className="h-3 w-3 text-primary" />
                   Güçlü Yönler
                 </h4>
                 <ul className="space-y-1">
                   {identity.strengths.slice(0, 3).map((strength, idx) => (
-                    <li key={idx} className="text-sm text-gray-600 flex items-start gap-1">
-                      <span className="text-green-600">•</span>
-                      {strength}
+                    <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1">
+                      <span className="text-primary">•</span>
+                      <span className="flex-1">{strength}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               <div>
-                <h4 className="font-semibold text-sm text-orange-700 mb-2 flex items-center gap-1">
-                  <AlertTriangle className="h-4 w-4" />
+                <h4 className="font-semibold text-xs mb-1.5 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3 text-orange-600" />
                   Zorluklar
                 </h4>
                 <ul className="space-y-1">
                   {identity.challenges.slice(0, 3).map((challenge, idx) => (
-                    <li key={idx} className="text-sm text-gray-600 flex items-start gap-1">
+                    <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1">
                       <span className="text-orange-600">•</span>
-                      {challenge}
+                      <span className="flex-1">{challenge}</span>
                     </li>
                   ))}
                 </ul>
@@ -238,16 +259,16 @@ export default function LiveProfileCard({ studentId, compact = false }: LiveProf
 
             {/* AI Önerileri */}
             {identity.recommendedActions.length > 0 && (
-              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-lg p-4 border border-amber-200">
-                <h4 className="font-semibold text-sm text-amber-800 mb-3 flex items-center gap-1">
-                  <Lightbulb className="h-4 w-4" />
+              <div className="bg-muted/30 rounded-lg p-3">
+                <h4 className="font-semibold text-xs mb-2 flex items-center gap-1">
+                  <Lightbulb className="h-3 w-3 text-primary" />
                   AI Önerileri
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-1.5">
                   {identity.recommendedActions.slice(0, 3).map((action, idx) => (
-                    <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
-                      <span className="text-amber-600 font-bold">{idx + 1}.</span>
-                      {action}
+                    <li key={idx} className="text-xs text-muted-foreground flex items-start gap-2">
+                      <span className="text-primary font-bold flex-shrink-0">{idx + 1}.</span>
+                      <span className="flex-1">{action}</span>
                     </li>
                   ))}
                 </ul>
