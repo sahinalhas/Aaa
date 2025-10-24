@@ -83,25 +83,35 @@ export default function LiveProfileCard({ studentId, compact = false }: LiveProf
 
   return (
     <Card className={cn(
-      "border-2 transition-all duration-300",
-      identity.interventionPriority === 'critical' ? 'border-red-400 shadow-lg shadow-red-100' : 
-      identity.interventionPriority === 'high' ? 'border-orange-400 shadow-lg shadow-orange-100' :
-      'border-blue-400 shadow-lg shadow-blue-100'
+      "relative overflow-hidden border-2 transition-all duration-300 shadow-lg hover:shadow-xl",
+      identity.interventionPriority === 'critical' ? 'border-red-400/50' : 
+      identity.interventionPriority === 'high' ? 'border-orange-400/50' :
+      'border-blue-400/50'
     )}>
-      <CardHeader>
+      {/* Gradient Background */}
+      <div className={cn(
+        "absolute inset-0 opacity-5",
+        identity.interventionPriority === 'critical' ? 'bg-gradient-to-br from-red-500 to-orange-500' : 
+        identity.interventionPriority === 'high' ? 'bg-gradient-to-br from-orange-500 to-yellow-500' :
+        'bg-gradient-to-br from-blue-500 to-purple-500'
+      )} />
+      
+      <CardHeader className="relative">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <User className="h-6 w-6 text-blue-600" />
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 shadow-md">
+                <User className="h-5 w-5 text-white" />
+              </div>
               Canlı Öğrenci Profili
             </CardTitle>
-            <CardDescription className="mt-1">
+            <CardDescription className="mt-2 text-sm">
               Son güncelleme: {new Date(identity.lastUpdated).toLocaleString('tr-TR')}
             </CardDescription>
           </div>
           
           <div className="flex items-center gap-2">
-            <Badge className={cn("border-2", priorityColors[identity.interventionPriority])}>
+            <Badge className={cn("border font-semibold shadow-sm", priorityColors[identity.interventionPriority])}>
               <PriorityIcon className="h-3 w-3 mr-1" />
               {identity.interventionPriority === 'critical' ? 'KRİTİK' :
                identity.interventionPriority === 'high' ? 'YÜKSEK ÖNCELİK' :
@@ -113,6 +123,7 @@ export default function LiveProfileCard({ studentId, compact = false }: LiveProf
               size="sm" 
               onClick={() => refresh()}
               disabled={isRefreshing}
+              className="shadow-sm hover:shadow-md transition-shadow"
             >
               <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
             </Button>

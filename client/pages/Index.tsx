@@ -9,7 +9,6 @@ import {
 import { StatCard } from "@/components/ui/stat-card";
 import { StatsGrid } from "@/components/ui/stats-grid";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/page-header";
 import {
   ChartContainer,
@@ -21,7 +20,6 @@ import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import {
   Bell,
-  Search,
   Users2,
   CalendarDays,
   MessageSquare,
@@ -80,7 +78,6 @@ interface CounselingSession {
 
 export default function Index() {
   const navigate = useNavigate();
-  const [q, setQ] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   
   const [stats, setStats] = useState<DashboardStats>({
@@ -280,22 +277,6 @@ export default function Index() {
           </Badge>
         }
       />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="relative"
-      >
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
-        <Input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Öğrenci ara: No / ad / soyad"
-          className="pl-12 h-12 text-base bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-colors"
-          aria-label="Öğrenci arama"
-        />
-      </motion.div>
 
       <StatsGrid columns={4}>
         {displayStats.map((stat, i) => (

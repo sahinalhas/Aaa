@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
 
 interface EnhancedRiskCardProps {
   studentId: string;
@@ -104,15 +105,35 @@ export function EnhancedRiskCard({ studentId }: EnhancedRiskCardProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="relative overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+      {/* Gradient Background */}
+      <div className={cn(
+        "absolute inset-0 opacity-5",
+        riskScore.riskLevel === 'KRİTİK' ? 'bg-gradient-to-br from-red-500 to-orange-500' :
+        riskScore.riskLevel === 'YÜKSEK' ? 'bg-gradient-to-br from-orange-500 to-yellow-500' :
+        riskScore.riskLevel === 'ORTA' ? 'bg-gradient-to-br from-yellow-500 to-amber-500' :
+        'bg-gradient-to-br from-green-500 to-emerald-500'
+      )} />
+      
+      <CardHeader className="relative">
         <div className="flex items-center justify-between">
-          <CardTitle>Gelişmiş Risk Değerlendirmesi</CardTitle>
-          <Badge className={getRiskColor(riskScore.riskLevel)}>
+          <CardTitle className="flex items-center gap-2">
+            <div className={cn(
+              "p-2 rounded-lg shadow-md",
+              riskScore.riskLevel === 'KRİTİK' ? 'bg-gradient-to-br from-red-500 to-orange-500' :
+              riskScore.riskLevel === 'YÜKSEK' ? 'bg-gradient-to-br from-orange-500 to-yellow-500' :
+              riskScore.riskLevel === 'ORTA' ? 'bg-gradient-to-br from-yellow-500 to-amber-500' :
+              'bg-gradient-to-br from-green-500 to-emerald-500'
+            )}>
+              <Shield className="h-5 w-5 text-white" />
+            </div>
+            Gelişmiş Risk Değerlendirmesi
+          </CardTitle>
+          <Badge className={cn("font-semibold shadow-sm", getRiskColor(riskScore.riskLevel), "text-white")}>
             {riskScore.riskLevel}
           </Badge>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground mt-2">
           Güven Skoru: {riskScore.confidence.toFixed(0)}%
         </p>
       </CardHeader>
