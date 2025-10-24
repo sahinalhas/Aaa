@@ -1,11 +1,13 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { useAuth, PermissionGuard, getExportPermissions } from "@/lib/auth-context";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageHeader } from "@/components/ui/page-header";
 import { 
   Select, 
   SelectContent, 
@@ -518,19 +520,18 @@ export default function Reports() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="rounded-xl bg-gradient-to-br from-primary/15 via-primary/5 to-accent/15 p-6 border border-primary/20">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold text-primary">Analiz & Raporlama</h1>
-              <Badge variant="outline">{user.role === 'admin' ? 'Yönetici' : user.role === 'counselor' ? 'Rehber Öğretmen' : user.role === 'teacher' ? 'Öğretmen' : 'Gözlemci'}</Badge>
-            </div>
-            <p className="text-muted-foreground mt-1">
-              Öğrenci başarı analizleri, karşılaştırmalı raporlar ve erken uyarı sistemi
-            </p>
-          </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      <PageHeader
+        icon={BarChart3}
+        title="Analiz & Raporlama"
+        subtitle="Öğrenci başarı analizleri, karşılaştırmalı raporlar ve erken uyarı sistemi"
+        badge={<Badge variant="outline">{user.role === 'admin' ? 'Yönetici' : user.role === 'counselor' ? 'Rehber Öğretmen' : user.role === 'teacher' ? 'Öğretmen' : 'Gözlemci'}</Badge>}
+        actions={
           <div className="flex gap-2">
             <Button 
               variant="outline" 
@@ -557,8 +558,8 @@ export default function Reports() {
               Rapor İndir
             </Button>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Ana İçerik */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
@@ -739,6 +740,6 @@ export default function Reports() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </motion.div>
   );
 }

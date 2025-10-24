@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/auth-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { PageHeader } from '@/components/ui/page-header';
 import { 
   Users, 
   GraduationCap, 
@@ -103,17 +105,23 @@ export default function SchoolDashboard() {
   }
   
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Okul Geneli Dashboard</h1>
-          <p className="text-muted-foreground">Okul performans ve istatistiklerine genel bakış</p>
-        </div>
-        <Button onClick={handleExportExcel} className="gap-2">
-          <Download className="h-4 w-4" />
-          Excel İndir
-        </Button>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="container mx-auto p-6 space-y-6"
+    >
+      <PageHeader
+        icon={GraduationCap}
+        title="Okul Geneli Dashboard"
+        subtitle="Okul performans ve istatistiklerine genel bakış"
+        actions={
+          <Button onClick={handleExportExcel} className="gap-2">
+            <Download className="h-4 w-4" />
+            Excel İndir
+          </Button>
+        }
+      />
       
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -208,7 +216,7 @@ export default function SchoolDashboard() {
           )}
         </TabsContent>
       </Tabs>
-    </div>
+    </motion.div>
   );
 }
 
