@@ -147,10 +147,10 @@
   - [x] Sadece servis ve burs bilgileri kaldı
   - [x] Kullanılmayan import'lar temizlendi (Award, AlertTriangle, EnhancedTextarea)
   
-- [ ] **Adım 5:** DisciplineSection component'i oluştur
-  - [ ] `client/components/student-profile/sections/DisciplineSection.tsx` oluştur
-  - [ ] Disiplin cezaları form alanları ekle
-  - [ ] Student nesnesinden disiplinCezalari oku/yaz
+- [x] **Adım 5:** DisciplineSection component'i oluştur ✅
+  - [x] `client/components/student-profile/sections/DisciplineSection.tsx` oluşturuldu
+  - [x] Disiplin cezaları form alanı eklendi
+  - [x] Student nesnesinden disiplinCezalari oku/yaz (Risk sekmesinde kullanılacak)
 
 ### Faz 3: Bilgi Taşıma İşlemleri
 
@@ -327,9 +327,9 @@ export const ILETISIM_TABS = [
 **Başlangıç:** 24 Ekim 2025  
 **Tahmini Tamamlanma:** 24 Ekim 2025  
 **Toplam Adım:** 16  
-**Tamamlanan:** 4/16  
-**Kalan:** 12
+**Tamamlanan:** 5/16  
+**Kalan:** 11
 
 ---
 
-**Son Güncelleme:** 24 Ekim 2025 - AdditionalInfoSection parçalandı ✅
+**Son Güncelleme:** 24 Ekim 2025 - DisciplineSection oluşturuldu ✅
