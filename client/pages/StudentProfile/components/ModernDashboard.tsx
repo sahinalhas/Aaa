@@ -31,7 +31,8 @@ import {
   Loader2,
   ArrowRight,
   TrendingDown,
-  Zap
+  Zap,
+  User
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -160,12 +161,21 @@ export function ModernDashboard({
 
   return (
     <div className="space-y-8">
-      {/* AI-Powered Living Profile - Hero Card */}
-      <div className="relative">
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary via-purple-500 to-primary rounded-2xl opacity-20 blur-xl"></div>
-        <div className="relative">
-          <LiveProfileCard studentId={studentId} />
+      {/* AI-Powered Living Profile */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+              <User className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">Canlı Öğrenci Profili</h2>
+              <p className="text-sm text-muted-foreground">AI destekli gerçek zamanlı profil özeti</p>
+            </div>
+          </div>
         </div>
+        
+        <LiveProfileCard studentId={studentId} />
       </div>
 
       {/* Performance Metrics - Modern Grid */}
@@ -258,8 +268,8 @@ export function ModernDashboard({
       {/* AI-Powered Deep Analysis */}
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-gradient-to-br from-purple-500/10 to-pink-500/5 rounded-xl border border-purple-200">
-            <Brain className="h-6 w-6 text-purple-600" />
+          <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+            <Brain className="h-6 w-6 text-primary" />
           </div>
           <div>
             <h2 className="text-2xl font-bold">AI Destekli Analizler</h2>
@@ -268,27 +278,16 @@ export function ModernDashboard({
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="relative">
-            <div className="absolute -inset-1 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-2xl opacity-10 blur-xl"></div>
-            <div className="relative">
-              <EnhancedRiskCard studentId={studentId} />
-            </div>
-          </div>
-          
-          <div className="relative">
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-10 blur-xl"></div>
-            <div className="relative">
-              <PersonalizedLearningCard studentId={studentId} />
-            </div>
-          </div>
+          <EnhancedRiskCard studentId={studentId} />
+          <PersonalizedLearningCard studentId={studentId} />
         </div>
       </div>
 
       {/* Profile Completeness */}
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-gradient-to-br from-amber-500/10 to-yellow-500/5 rounded-xl border border-amber-200">
-            <Award className="h-6 w-6 text-amber-600" />
+          <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+            <Award className="h-6 w-6 text-primary" />
           </div>
           <div>
             <h2 className="text-2xl font-bold">Profil Tamlığı</h2>
@@ -306,8 +305,8 @@ export function ModernDashboard({
       {/* Recent Activity Timeline */}
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-gradient-to-br from-cyan-500/10 to-blue-500/5 rounded-xl border border-cyan-200">
-            <Calendar className="h-6 w-6 text-cyan-600" />
+          <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+            <Calendar className="h-6 w-6 text-primary" />
           </div>
           <div>
             <h2 className="text-2xl font-bold">Son Aktiviteler</h2>
@@ -320,43 +319,39 @@ export function ModernDashboard({
 
       {/* High Risk Alert */}
       {scores.riskSkoru > 60 && (
-        <Card className="relative overflow-hidden border-4 border-red-500 bg-gradient-to-br from-red-50 to-orange-50 shadow-2xl">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl"></div>
-          
-          <CardHeader className="relative">
-            <CardTitle className="flex items-center gap-3 text-red-700 text-xl">
-              <div className="p-3 bg-red-500 rounded-xl animate-pulse">
-                <AlertTriangle className="h-6 w-6 text-white" />
+        <Card className="border-2 border-red-500/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-2 bg-red-500/10 rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
               </div>
               Yüksek Risk Uyarısı - Acil Müdahale Gerekli
             </CardTitle>
           </CardHeader>
           
-          <CardContent className="relative">
-            <p className="text-red-700 mb-6 text-base leading-relaxed">
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
               Bu öğrenci için risk skoru kritik seviyede ({Math.round(scores.riskSkoru)}/100). 
-              Derhal müdahale planı oluşturulması ve yakın takip yapılması önerilir. 
-              AI asistanı ile detaylı risk analizi yapabilir ve öneriler alabilirsiniz.
+              Derhal müdahale planı oluşturulması ve yakın takip yapılması önerilir.
             </p>
             
             <div className="flex gap-3">
               <Button 
                 onClick={handleRiskAnalysis}
-                className="gap-2 bg-red-600 hover:bg-red-700 shadow-lg"
-                size="lg"
+                className="gap-2"
+                variant="destructive"
               >
-                <Shield className="h-5 w-5" />
-                Acil Müdahale Planı Oluştur
+                <Shield className="h-4 w-4" />
+                Müdahale Planı Oluştur
               </Button>
               
               <Button 
                 onClick={handleAIChat}
                 variant="outline"
-                className="gap-2 border-red-500 text-red-700 hover:bg-red-50"
-                size="lg"
+                className="gap-2"
               >
-                <Bot className="h-5 w-5" />
-                AI Danışman ile Görüş
+                <Bot className="h-4 w-4" />
+                AI Danışman
               </Button>
             </div>
           </CardContent>
