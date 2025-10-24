@@ -44,10 +44,17 @@ export default function CareerFutureSection({
       </TabsContent>
 
       <TabsContent value="yol-haritasi" className="animate-in slide-in-from-left-10 duration-300">
-        <CareerGuidanceSection
-          studentId={studentId}
-          studentName={studentName}
-        />
+        <div className="rounded-lg border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 p-8 text-center">
+          <h3 className="text-xl font-semibold text-amber-900 dark:text-amber-100 mb-2">
+            🗺️ Kariyer Yol Haritası
+          </h3>
+          <p className="text-amber-700 dark:text-amber-300 mb-4">
+            Öğrencinin kariyer hedeflerine ulaşması için adım adım planlanmış yol haritası
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Bu özellik yakında eklenecek - şu anda kariyer analizi sekmesini kullanabilirsiniz
+          </p>
+        </div>
       </TabsContent>
 
       <TabsContent value="hedefler" className="animate-in slide-in-from-left-10 duration-300">

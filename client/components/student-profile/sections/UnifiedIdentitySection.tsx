@@ -6,7 +6,8 @@
  */
 
 import { useEffect } from "react";
-import { Student, upsertStudent } from "@/lib/storage";
+import type { Student } from "@/lib/types/student.types";
+import { upsertStudent } from "@/lib/api/students.api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
