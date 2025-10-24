@@ -66,26 +66,22 @@ const MetricCard = ({ title, score, icon: Icon, color, bgGradient, description, 
     if (score >= 80) return { 
       label: "Mükemmel", 
       textColor: "text-emerald-700", 
-      bgColor: "bg-emerald-50",
-      borderColor: "border-emerald-200"
+      bgColor: "bg-emerald-50"
     };
     if (score >= 60) return { 
       label: "İyi", 
       textColor: "text-blue-700", 
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200"
+      bgColor: "bg-blue-50"
     };
     if (score >= 40) return { 
       label: "Orta", 
       textColor: "text-amber-700", 
-      bgColor: "bg-amber-50",
-      borderColor: "border-amber-200"
+      bgColor: "bg-amber-50"
     };
     return { 
       label: "Gelişmeli", 
       textColor: "text-red-700", 
-      bgColor: "bg-red-50",
-      borderColor: "border-red-200"
+      bgColor: "bg-red-50"
     };
   };
 
@@ -118,7 +114,7 @@ const MetricCard = ({ title, score, icon: Icon, color, bgGradient, description, 
           </p>
         )}
         <Badge 
-          className={`${status.textColor} ${status.bgColor} font-semibold px-2 py-1 border ${status.borderColor} shadow-sm mt-2 inline-block`}
+          className={`${status.textColor} ${status.bgColor} font-semibold px-2 py-1 shadow-sm mt-2 inline-block`}
         >
           {status.label}
         </Badge>
