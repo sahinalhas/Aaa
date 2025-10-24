@@ -530,7 +530,6 @@ export default function Reports() {
         icon={BarChart3}
         title="Analiz & Raporlama"
         subtitle="Öğrenci başarı analizleri, karşılaştırmalı raporlar ve erken uyarı sistemi"
-        badge={<Badge variant="outline">{user.role === 'admin' ? 'Yönetici' : user.role === 'counselor' ? 'Rehber Öğretmen' : user.role === 'teacher' ? 'Öğretmen' : 'Gözlemci'}</Badge>}
         actions={
           <div className="flex gap-2">
             <Button 
