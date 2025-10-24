@@ -80,9 +80,9 @@ export default function SessionStatsCards({ stats, isLoading }: SessionStatsCard
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <Card className="relative overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+            <Card className="relative overflow-hidden shadow-md hover:shadow-lg transition-shadow h-full">
               <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-purple-500 to-purple-600" />
-              <CardHeader className="pb-3 relative">
+              <CardHeader className="pb-2 relative">
                 <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
                   <Users className="h-4 w-4" />
                   Görüşme Modları
@@ -109,17 +109,17 @@ export default function SessionStatsCards({ stats, isLoading }: SessionStatsCard
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <Card className="relative overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+          <Card className="relative overflow-hidden shadow-md hover:shadow-lg transition-shadow h-full">
             <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-green-500 to-green-600" />
-            <CardHeader className="pb-3 relative">
+            <CardHeader className="pb-2 relative">
               <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
                 <Timer className="h-4 w-4" />
                 Bu Hafta
               </CardTitle>
             </CardHeader>
             <CardContent className="relative">
-              <div className="text-2xl font-bold">{stats.completedThisWeek}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-2xl font-bold mb-1">{stats.completedThisWeek}</div>
+              <p className="text-xs text-muted-foreground">
                 Tamamlanan görüşme
               </p>
               {stats.completedToday > 0 && (
