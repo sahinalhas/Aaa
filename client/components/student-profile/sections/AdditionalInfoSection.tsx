@@ -1,24 +1,40 @@
 
+/**
+ * Additional Info Section
+ * Kimlik sekmesinden taşınan ek bilgiler:
+ * - Dil Becerileri (Akademik → Performans'a da eklenmeli)
+ * - Hobiler & İlgi Alanları (Gelişim → Yetenekler'e taşındı)
+ * - Okul Dışı Aktiviteler (Gelişim → Yetenekler'e taşındı)
+ * - Beklentiler & Hedefler (Kariyer → Hedefler'e taşındı)
+ */
+
 import { useEffect } from "react";
 import type { Student } from "@/lib/types/student.types";
 import { upsertStudent } from "@/lib/api/students.api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Bus, DollarSign } from "lucide-react";
+import { Info, Users, Briefcase } from "lucide-react";
 
 const additionalInfoSchema = z.object({
-  servisKullanimDurumu: z.string().optional(),
-  servisFirma: z.string().optional(),
-  bursYardimDurumu: z.string().optional(),
-  bursKurumu: z.string().optional(),
-  bursYiliMiktari: z.string().optional(),
+  anneMeslek: z.string().optional(),
+  babaMeslek: z.string().optional(),
+  kardesSayisi: z.number().optional(),
+  notlar: z.string().optional(),
 });
 
 type AdditionalInfoFormValues = z.infer<typeof additionalInfoSchema>;
@@ -32,21 +48,19 @@ export default function AdditionalInfoSection({ student, onUpdate }: AdditionalI
   const form = useForm<AdditionalInfoFormValues>({
     resolver: zodResolver(additionalInfoSchema),
     defaultValues: {
-      servisKullanimDurumu: (student as any).servisKullanimDurumu || "",
-      servisFirma: (student as any).servisFirma || "",
-      bursYardimDurumu: (student as any).bursYardimDurumu || "",
-      bursKurumu: (student as any).bursKurumu || "",
-      bursYiliMiktari: (student as any).bursYiliMiktari || "",
+      anneMeslek: (student as any).anneMeslegi || "",
+      babaMeslek: (student as any).babaMeslegi || "",
+      kardesSayisi: (student as any).kardesSayisi,
+      notlar: student.notlar || "",
     },
   });
 
   useEffect(() => {
     form.reset({
-      servisKullanimDurumu: (student as any).servisKullanimDurumu || "",
-      servisFirma: (student as any).servisFirma || "",
-      bursYardimDurumu: (student as any).bursYardimDurumu || "",
-      bursKurumu: (student as any).bursKurumu || "",
-      bursYiliMiktari: (student as any).bursYiliMiktari || "",
+      anneMeslek: (student as any).anneMeslegi || "",
+      babaMeslek: (student as any).babaMeslegi || "",
+      kardesSayisi: (student as any).kardesSayisi,
+      notlar: student.notlar || "",
     });
   }, [student, form]);
 
@@ -54,9 +68,12 @@ export default function AdditionalInfoSection({ student, onUpdate }: AdditionalI
     try {
       const updatedStudent: Student = {
         ...student,
-        ...data,
-      };
-      
+        anneMeslegi: data.anneMeslek,
+        babaMeslegi: data.babaMeslek,
+        kardesSayisi: typeof data.kardesSayisi === "number" ? data.kardesSayisi : undefined,
+        notlar: data.notlar,
+      } as any;
+
       await upsertStudent(updatedStudent);
       toast.success("Ek bilgiler kaydedildi");
       onUpdate();
@@ -69,37 +86,31 @@ export default function AdditionalInfoSection({ student, onUpdate }: AdditionalI
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Ulaşım Bilgileri */}
+        {/* Aile Bilgileri */}
         <Card>
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Bus className="h-5 w-5 text-primary" />
-              Ulaşım Bilgileri
+              <Users className="h-5 w-5 text-primary" />
+              Aile Bilgileri
             </CardTitle>
             <CardDescription>
-              Okul servisi ve ulaşım detayları
+              Anne/baba meslek ve kardeş sayısı bilgileri
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="servisKullanimDurumu"
+                name="anneMeslek"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Servis Kullanım Durumu</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="h-10">
-                          <SelectValue placeholder="Seçiniz" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Kullanıyor">Kullanıyor</SelectItem>
-                        <SelectItem value="Kullanmıyor">Kullanmıyor</SelectItem>
-                        <SelectItem value="Zaman Zaman">Zaman Zaman</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel className="flex items-center gap-1.5">
+                      <Briefcase className="h-3.5 w-3.5" />
+                      Anne Mesleği
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} className="h-10" placeholder="Anne mesleği" />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -107,93 +118,79 @@ export default function AdditionalInfoSection({ student, onUpdate }: AdditionalI
 
               <FormField
                 control={form.control}
-                name="servisFirma"
+                name="babaMeslek"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1.5">
-                      <Bus className="h-3.5 w-3.5" />
-                      Servis Firma/Plaka
+                      <Briefcase className="h-3.5 w-3.5" />
+                      Baba Mesleği
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} className="h-10" placeholder="Firma adı veya plaka" />
+                      <Input {...field} className="h-10" placeholder="Baba mesleği" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Finansal Destek */}
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <DollarSign className="h-5 w-5 text-primary" />
-              Burs ve Finansal Destek
-            </CardTitle>
-            <CardDescription>
-              Alınan burs, yardım ve destekler
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
             <FormField
               control={form.control}
-              name="bursYardimDurumu"
+              name="kardesSayisi"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Burs/Yardım Durumu</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="h-10">
-                        <SelectValue placeholder="Seçiniz" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Yok">Almıyor</SelectItem>
-                      <SelectItem value="Devlet Bursu">Devlet Bursu</SelectItem>
-                      <SelectItem value="Özel Burs">Özel Kuruluş Bursu</SelectItem>
-                      <SelectItem value="Okul Bursu">Okul Bursu</SelectItem>
-                      <SelectItem value="Sosyal Yardım">Sosyal Yardım</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormLabel className="flex items-center gap-1.5">
+                    <Users className="h-3.5 w-3.5" />
+                    Kardeş Sayısı
+                  </FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      {...field} 
+                      onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                      className="h-10 w-32" 
+                      placeholder="Örn: 2" 
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </CardContent>
+        </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="bursKurumu"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1.5">
-                      <DollarSign className="h-3.5 w-3.5" />
-                      Burs Veren Kurum
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} className="h-10" placeholder="Kurum adı" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="bursYiliMiktari"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Yıllık Miktar</FormLabel>
-                    <FormControl>
-                      <Input {...field} className="h-10" placeholder="Örn: Tam burs, 50% indirim" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+        {/* Genel Notlar */}
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Info className="h-5 w-5 text-primary" />
+              Genel Notlar
+            </CardTitle>
+            <CardDescription>
+              Öğrenci hakkında önemli notlar ve gözlemler
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FormField
+              control={form.control}
+              name="notlar"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notlar</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      className="min-h-[100px]"
+                      placeholder="Öğrenci hakkında genel notlar, özel durumlar, dikkat edilmesi gerekenler..."
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Bu notlar tüm profil görünümlerinde erişilebilir
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
         </Card>
 

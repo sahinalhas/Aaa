@@ -446,73 +446,7 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
           </CardContent>
         </Card>
 
-        {/* Aile Bilgileri */}
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Users className="h-5 w-5 text-primary" />
-              Aile Bilgileri
-            </CardTitle>
-            <CardDescription>
-              Öğrencinin aile yapısı ve meslek bilgileri
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="anneMeslek"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1.5">
-                      <Briefcase className="h-3.5 w-3.5" />
-                      Anne Meslek
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} className="h-10" placeholder="Anne mesleği" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="babaMeslek"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1.5">
-                      <Briefcase className="h-3.5 w-3.5" />
-                      Baba Meslek
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} className="h-10" placeholder="Baba mesleği" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <FormField
-              control={form.control}
-              name="kardesSayisi"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-1.5">
-                    <Users className="h-3.5 w-3.5" />
-                    Kardeş Sayısı
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} type="number" className="h-10" placeholder="Örn: 2" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Veli Bilgileri (Mevcut) */}
+        {/* Veli Bilgileri */}
         <Card>
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-lg">
