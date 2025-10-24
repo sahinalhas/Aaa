@@ -71,7 +71,7 @@ export interface GroupDynamics {
 export interface ComparativeAnalysisReport {
   analysisDate: string;
   classId?: string;
-  className?: string;
+  class?: string;
   studentCount: number;
   
   studentComparisons: StudentComparison[];
@@ -131,9 +131,9 @@ class ComparativeMultiStudentAnalysisService {
 
   async analyzeClass(classId: string): Promise<ComparativeAnalysisReport> {
     const students = this.db.prepare(`
-      SELECT id, name, className
+      SELECT id, name, class
       FROM students
-      WHERE className = ?
+      WHERE class = ?
       ORDER BY name
     `).all(classId) as any[];
 

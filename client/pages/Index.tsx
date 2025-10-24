@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PageHeader } from "@/components/ui/page-header";
 import {
   ChartContainer,
   ChartTooltip,
@@ -276,47 +277,37 @@ export default function Index() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      <PageHeader
+        title="Rehber360"
+        subtitle={new Date().toLocaleDateString('tr-TR', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })}
+        icon={Sparkles}
+        actions={
+          <Badge variant="secondary" className="text-sm px-4 py-2 h-fit gap-2 bg-primary/10 text-primary border-primary/20">
+            <Clock className="h-4 w-4" />
+            Gerçek Zamanlı
+          </Badge>
+        }
+      />
+
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.3 }}
+        className="relative"
       >
-        <div className="bg-gradient-to-br from-primary/5 via-background to-chart-2/5 rounded-xl border border-border/50 shadow-lg backdrop-blur-sm">
-          <div className="p-6 md:p-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3">
-                  <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Sparkles className="h-6 w-6 text-primary" />
-                  </div>
-                  Rehber360
-                </h1>
-                <p className="text-muted-foreground mt-2 text-sm md:text-base">
-                  {new Date().toLocaleDateString('tr-TR', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </p>
-              </div>
-              <Badge variant="secondary" className="text-sm px-4 py-2 h-fit gap-2 bg-primary/10 text-primary border-primary/20">
-                <Clock className="h-4 w-4" />
-                Gerçek Zamanlı
-              </Badge>
-            </div>
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Öğrenci ara: No / ad / soyad"
-                className="pl-12 h-12 text-base bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-colors"
-                aria-label="Öğrenci arama"
-              />
-            </div>
-          </div>
-        </div>
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Öğrenci ara: No / ad / soyad"
+          className="pl-12 h-12 text-base bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-colors"
+          aria-label="Öğrenci arama"
+        />
       </motion.div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

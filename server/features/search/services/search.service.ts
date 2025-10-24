@@ -4,7 +4,7 @@ export interface SearchResults {
   students: Array<{
     id: number;
     name: string;
-    className?: string;
+    class?: string;
     type: 'student';
   }>;
   counselingSessions: Array<{
@@ -34,10 +34,10 @@ export async function performGlobalSearch(query: string): Promise<SearchResults>
   
   // Search students
   const students = db.prepare(`
-    SELECT id, name, className
+    SELECT id, name, class
     FROM students
     WHERE LOWER(name) LIKE ? 
-       OR LOWER(className) LIKE ?
+       OR LOWER(class) LIKE ?
        OR CAST(id AS TEXT) LIKE ?
     LIMIT 10
   `).all(`%${lowerQuery}%`, `%${lowerQuery}%`, `%${lowerQuery}%`) as any[];

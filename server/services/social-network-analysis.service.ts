@@ -3,7 +3,7 @@ import { getDatabase } from '../lib/database/connection';
 export interface SocialNetworkAnalysis {
   studentId: string;
   studentName: string;
-  className: string;
+  class: string;
   analysisDate: string;
   networkMetrics: {
     centralityScore: number;
@@ -40,7 +40,7 @@ export interface SocialNetworkAnalysis {
 }
 
 export interface ClassSocialNetwork {
-  className: string;
+  class: string;
   analysisDate: string;
   totalStudents: number;
   networkDensity: number;
@@ -82,15 +82,15 @@ export class SocialNetworkAnalysisService {
     }
 
     const relationships = await this.getStudentRelationships(studentId);
-    const metrics = await this.calculateNetworkMetrics(studentId, student.className);
+    const metrics = await this.calculateNetworkMetrics(studentId, student.class);
     const peerGroups = await this.getStudentGroups(studentId);
     const insights = await this.generateSocialInsights(studentId, relationships, metrics);
-    const classPositioning = await this.calculateClassPositioning(studentId, student.className);
+    const classPositioning = await this.calculateClassPositioning(studentId, student.class);
 
     return {
       studentId,
       studentName: student.name,
-      className: student.className,
+      class: student.class,
       analysisDate: new Date().toISOString(),
       networkMetrics: metrics,
       relationships,
@@ -101,7 +101,7 @@ export class SocialNetworkAnalysisService {
   }
 
   async analyzeClassNetwork(className: string): Promise<ClassSocialNetwork> {
-    const students = this.db.prepare('SELECT * FROM students WHERE className = ?').all(className) as any[];
+    const students = this.db.prepare('SELECT * FROM students WHERE class = ?').all(className) as any[];
     
     const networkDensity = await this.calculateNetworkDensity(className);
     const clusters = await this.identifyClusters(className);
@@ -110,7 +110,7 @@ export class SocialNetworkAnalysisService {
     const conflictPairs = await this.identifyConflicts(className);
 
     return {
-      className,
+      class: className,
       analysisDate: new Date().toISOString(),
       totalStudents: students.length,
       networkDensity,
@@ -155,7 +155,7 @@ export class SocialNetworkAnalysisService {
     const classSize = this.db.prepare(`
       SELECT COUNT(*) as count
       FROM students
-      WHERE className = ?
+      WHERE class = ?
     `).get(className) as any;
 
     const centralityScore = classSize.count > 1 
@@ -208,7 +208,7 @@ export class SocialNetworkAnalysisService {
       JOIN peer_relationships r2 ON r1.peerId = r2.studentId
       JOIN students s1 ON r1.studentId = s1.id
       JOIN students s2 ON r2.peerId = s2.id
-      WHERE s1.className = ? AND s2.className = ?
+      WHERE s1.class = ? AND s2.class = ?
       AND r1.relationshipType != 'CONFLICT'
       AND r2.relationshipType != 'CONFLICT'
       AND r1.studentId != ?
@@ -314,7 +314,7 @@ export class SocialNetworkAnalysisService {
     const allStudentMetrics = this.db.prepare(`
       SELECT studentId, degreeCount
       FROM social_network_metrics
-      WHERE className = ?
+      WHERE class = ?
       ORDER BY degreeCount DESC
     `).all(className) as any[];
 
@@ -342,14 +342,14 @@ export class SocialNetworkAnalysisService {
 
   private async calculateNetworkDensity(className: string): Promise<number> {
     const students = this.db.prepare(
-      'SELECT COUNT(*) as count FROM students WHERE className = ?'
+      'SELECT COUNT(*) as count FROM students WHERE class = ?'
     ).get(className) as any;
 
     const relationships = this.db.prepare(`
       SELECT COUNT(*) as count
       FROM peer_relationships pr
       JOIN students s ON pr.studentId = s.id
-      WHERE s.className = ? AND pr.relationshipType != 'CONFLICT'
+      WHERE s.class = ? AND pr.relationshipType != 'CONFLICT'
     `).get(className) as any;
 
     const possibleConnections = students.count * (students.count - 1);
@@ -362,7 +362,7 @@ export class SocialNetworkAnalysisService {
       FROM peer_relationships pr
       JOIN students s1 ON pr.studentId = s1.id
       JOIN students s2 ON pr.peerId = s2.id
-      WHERE s1.className = ? 
+      WHERE s1.class = ? 
       AND pr.relationshipType IN ('FRIEND', 'CLOSE_FRIEND')
       AND pr.relationshipStrength >= 5
     `).all(className) as any[];
@@ -428,7 +428,7 @@ export class SocialNetworkAnalysisService {
       SELECT s.id as studentId, s.name as studentName, snm.isolationRisk
       FROM students s
       LEFT JOIN social_network_metrics snm ON s.id = snm.studentId
-      WHERE s.className = ?
+      WHERE s.class = ?
       AND (snm.degreeCount = 0 OR snm.degreeCount IS NULL OR snm.isolationRisk IN ('HIGH', 'CRITICAL'))
     `).all(className) as any[];
 
@@ -441,7 +441,7 @@ export class SocialNetworkAnalysisService {
              snm.socialRole as role, snm.influenceScore as influence
       FROM students s
       JOIN social_network_metrics snm ON s.id = snm.studentId
-      WHERE s.className = ?
+      WHERE s.class = ?
       AND snm.socialRole IN ('LEADER', 'BRIDGE')
       ORDER BY snm.influenceScore DESC
       LIMIT 5
@@ -459,7 +459,7 @@ export class SocialNetworkAnalysisService {
       FROM peer_relationships pr
       JOIN students s1 ON pr.studentId = s1.id
       JOIN students s2 ON pr.peerId = s2.id
-      WHERE s1.className = ?
+      WHERE s1.class = ?
       AND pr.relationshipType = 'CONFLICT'
       ORDER BY pr.relationshipStrength DESC
     `).all(className) as any[];
