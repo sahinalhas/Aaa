@@ -387,7 +387,7 @@ export default function CareerGuidanceSection({ studentId, studentName }: Career
             </ScrollArea>
 
             {selectedCareer && (
-              <Card className="border-2 border-primary">
+              <Card>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
@@ -449,7 +449,7 @@ export default function CareerGuidanceSection({ studentId, studentName }: Career
           <TabsContent value="roadmap" className="space-y-4 mt-4">
             {roadmap ? (
               <div className="space-y-4">
-                <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
+                <Card>
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
@@ -563,7 +563,7 @@ export default function CareerGuidanceSection({ studentId, studentName }: Career
                 </div>
 
                 {roadmap.aiRecommendations && (roadmap.aiRecommendations || []).length > 0 && (
-                  <Card className="border-2 border-primary/20">
+                  <Card>
                     <CardHeader>
                       <CardTitle className="text-sm flex items-center gap-2">
                         <Sparkles className="h-4 w-4" />
@@ -795,7 +795,7 @@ export default function CareerGuidanceSection({ studentId, studentName }: Career
 
               {comparison && (
                 <div className="space-y-4">
-                  <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
+                  <Card>
                     <CardHeader>
                       <CardTitle className="text-sm">En İyi Eşleşme</CardTitle>
                     </CardHeader>

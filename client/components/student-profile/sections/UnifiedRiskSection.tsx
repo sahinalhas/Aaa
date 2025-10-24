@@ -134,12 +134,7 @@ export default function UnifiedRiskSection({ studentId, student, onUpdate }: Uni
       </Tabs>
 
       {/* Risk Özeti */}
-      <Card className={`border-2 ${
-        riskData.riskCategory === "critical" ? "border-red-400" :
-        riskData.riskCategory === "high" ? "border-orange-400" :
-        riskData.riskCategory === "medium" ? "border-yellow-400" :
-        "border-green-400"
-      }`}>
+      <Card>
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
