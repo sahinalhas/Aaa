@@ -350,3 +350,272 @@ export const ILETISIM_TABS = [
 - ✅ Ana sekme yapısı 9'dan 8'e düşürüldü
 - ✅ LSP hataları temizlendi
 - ✅ Architect review PASS
+# 📋 Öğrenci Profili Sekme Reorganizasyonu Planı
+
+**Tarih:** 24 Ekim 2025  
+**Hedef:** Öğrenci profili sayfasını modern SIS standartlarına göre optimize etmek  
+**Durum:** 🚧 Devam Ediyor
+
+---
+
+## 🎯 GENEL HEDEFLER
+
+1. ✅ **Bilgi Tekrarını Önle:** Her bilgi sadece bir yerde olmalı
+2. ✅ **Sezgisel Navigasyon:** Kullanıcı neyin nerede olduğunu tahmin edebilmeli
+3. ✅ **Modern SIS Standartları:** ASCA çerçevesi ve modern öğrenci bilgi sistemlerine uyum
+4. ✅ **Temiz Kod:** Modüler, bakımı kolay component yapısı
+5. ✅ **Geriye Dönük Uyumluluk:** Veritabanı değişikliği yok, mevcut veriler korunur
+
+---
+
+## 🔍 MEVCUT DURUM ANALİZİ
+
+### Güçlü Yönler ✅
+- Akademik sekme çok iyi organize (5 alt sekme)
+- Gelişim & Kişilik mantıklı yapılandırılmış
+- İletişim Merkezi modern yaklaşıma uygun
+- AI araçları ayrı bir hub olarak iyi
+
+### Kritik Sorunlar 🔴
+
+1. **Bilgiler Yanlış Yerlerde**
+   - `disiplinCezalari` → Kimlik & İletişim'de (Risk & Müdahale'de olmalı)
+   - `odulBasarilar` → Kimlik & İletişim'de (Akademik → İlerleme'de olmalı)
+   - `hobiler, okulDisiAktiviteler` → Kimlik & İletişim'de (Gelişim → Yetenekler'de olmalı)
+   - `beklentilerHedefler` → Kimlik & İletişim'de (Kariyer & Gelecek'te olmalı)
+   - `dilBecerileri` → Kimlik & İletişim'de (Akademik'te olmalı)
+
+2. **Kimlik & İletişim Karmaşık**
+   - 7 farklı kart içeriyor (çok fazla!)
+   - Temel kimlik + veli + adres + servis + burs + disiplin + ödüller
+   - Mantıksal olarak farklı kategorilere ayrılmalı
+
+3. **Gelişim & Kişilik Alt Sekmesi Karmaşık**
+   - "Çoklu Zeka" sekmesinde 2 farklı component var (KisilikProfili + Degerlendirme360)
+   - Bunlar ayrı alt sekmelerde olmalı
+
+---
+
+## 📊 TAŞINACAK BİLGİLER
+
+| Bilgi | Şu An | Olması Gereken | Sebep |
+|-------|-------|----------------|-------|
+| **Disiplin Cezaları** | Kimlik & İletişim | Risk & Müdahale → Davranış Takibi | Davranışsal sorunlar risk sekmesinde mantıklı |
+| **Ödül ve Başarılar** | Kimlik & İletişim | Akademik → İlerleme & Başarılar | Akademik başarılar akademik sekmede olmalı |
+| **Hobiler** | Kimlik & İletişim | Gelişim → Yetenekler & İlgiler | Kişisel gelişim ve ilgi alanları |
+| **Okul Dışı Aktiviteler** | Kimlik & İletişim | Gelişim → Yetenekler & İlgiler | Ekstraküriküler aktiviteler gelişim sekmesinde |
+| **Beklentiler & Hedefler** | Kimlik & İletişim | Kariyer & Gelecek → Hedefler | Gelecek hedefleri kariyer planlamasında |
+| **Dil Becerileri** | Kimlik & İletişim | Akademik → Performans | Akademik beceri olarak değerlendirilmeli |
+| **360 Derece Değerlendirme** | Gelişim → Çoklu Zeka (alt) | Gelişim → 360 Derece (yeni alt) | Ayrı bir değerlendirme yöntemi |
+| **AI Araçları** | Ana Sekme | İletişim & Raporlar (alt) | Raporlama ve iletişim araçları olarak |
+
+---
+
+## 🏗️ YENİ SEKME YAPISI (9 → 8 SEKME)
+
+### 1. 📊 Özet (Dashboard)
+- Alt sekme yok
+- AI destekli özet, risk durumu, hızlı aksiyonlar
+
+### 2. 👤 Kimlik Bilgileri
+- **Alt sekme yok** - Tek form yapısı
+- **İçerik:**
+  - ✅ Temel Kimlik (Ad, soyad, TC, okul no, sınıf, cinsiyet, doğum bilgileri)
+  - ✅ İletişim (Telefon, e-posta, il, ilçe, adres)
+  - ✅ Veli Bilgileri (Ana/baba adı, telefon, e-posta, meslek, eğitim durumu)
+  - ✅ Okul Bilgileri (Servis, burs, rehber öğretmen, kardeş sayısı)
+- **Çıkarılanlar:** hobiler, okulDisiAktiviteler, beklentilerHedefler, dilBecerileri, disiplinCezalari, odulBasarilar
+
+### 3. 🏥 Sağlık & Güvenlik
+- **Alt sekme yok** - Tek sayfa
+- Sağlık profili, acil durumlar, özel eğitim
+
+### 4. 🎓 Akademik
+- **Alt sekmeler (5):**
+  1. ✅ Performans Profili ⭐ (dil becerileri eklenecek)
+  2. ✅ Sınavlar & Değerlendirme
+  3. ✅ Çalışma Programı
+  4. ✅ İlerleme & Başarılar ⭐ (ödüller eklenecek)
+  5. ✅ Anketler
+
+### 5. 💡 Gelişim & Kişilik
+- **Alt sekmeler (5):**
+  1. ✅ Sosyal-Duygusal
+  2. ✅ Çoklu Zeka
+  3. ⭐ **360 Derece Değerlendirme** (yeni ayrı alt sekme)
+  4. ✅ Yetenekler & İlgiler ⭐ (hobiler, aktiviteler eklenecek)
+  5. ✅ Motivasyon
+
+### 6. ⚠️ Risk & Müdahale
+- **Alt sekmeler (4):**
+  1. ✅ Risk Analizi (otomatik)
+  2. ⭐ **Davranış Takibi** (yeni - disiplin cezaları burada)
+  3. ✅ Koruyucu Faktörler
+  4. ✅ Müdahale Planları
+
+### 7. 💼 Kariyer & Gelecek
+- **Alt sekmeler (2):**
+  1. ✅ Kariyer Rehberliği
+  2. ✅ Hedefler & Planlama ⭐ (beklentiler eklenecek)
+
+### 8. 💬 İletişim & Raporlar
+- **Alt sekmeler (5):**
+  1. ✅ Tüm Görüşmeler
+  2. ✅ Ev Ziyaretleri
+  3. ✅ Aile Katılımı
+  4. ✅ İletişim Geçmişi
+  5. ⭐ **AI Araçları** (taşındı - müdahale önerileri, otomatik raporlar, veli iletişimi, sesli not)
+
+---
+
+## ✅ UYGULAMA ADIMLARI
+
+### Faz 1: Bilgi Taşıma İşlemleri (Backend değişikliği yok)
+
+- [ ] **Adım 1:** UnifiedIdentitySection'dan ekstra alanları kaldır
+  - [ ] hobiler, okulDisiAktiviteler, beklentilerHedefler, dilBecerileri form alanlarını sil
+  - [ ] Schema'dan bu alanları kaldır
+  - [ ] Form defaultValues ve reset'ten temizle
+
+- [ ] **Adım 2:** AdditionalInfoSection'ı parçala
+  - [ ] Disiplin/ödül bilgilerini kaldır (ayrı component'e taşınacak)
+  - [ ] Sadece servis ve burs bilgileri kalsın
+
+- [ ] **Adım 3:** StandardizedTalentsSection'a hobiler ve aktiviteler ekle
+  - [ ] Form'a hobbiesDetailed ve extracurricularActivities alanlarını göster
+  - [ ] UI'da uygun şekilde yerleştir
+
+- [ ] **Adım 4:** HedeflerPlanlamaSection oluştur (Kariyer sekmesinde)
+  - [ ] Yeni component: HedeflerPlanlamaSection.tsx
+  - [ ] studentExpectations ve familyExpectations form alanları
+  - [ ] Kısa/uzun vadeli hedefler
+
+- [ ] **Adım 5:** StandardizedAcademicSection'a dil becerileri ekle
+  - [ ] languageSkills alanını form'da görünür yap
+  - [ ] UI'da uygun bölüme yerleştir
+
+- [ ] **Adım 6:** IlerlemeTakibiSection'a ödüller bölümü ekle
+  - [ ] Ödüller ve başarılar bölümü ekle
+  - [ ] Achievement sistemi ile backend entegrasyonu
+
+### Faz 2: Alt Sekme Reorganizasyonu
+
+- [ ] **Adım 7:** Gelişim sekmesi alt tab reorganizasyonu
+  - [ ] constants.tsx'te GELISIM_TABS dizisine 'degerlendirme-360' ekle
+  - [ ] DevelopmentProfileSection'da yeni TabsContent ekle
+  - [ ] Degerlendirme360Section'ı ayrı sekmede göster
+
+- [ ] **Adım 8:** Risk sekmesine Davranış Takibi alt sekmesi ekle
+  - [ ] Yeni component: DavranisTakibiSection.tsx
+  - [ ] Disiplin cezaları form alanı
+  - [ ] Student nesnesinden disiplinCezalari oku/yaz
+
+- [ ] **Adım 9:** EnhancedRiskDashboard'u tab yapısına çevir
+  - [ ] constants.tsx'te RISK_TABS dizisi oluştur (4 alt sekme)
+  - [ ] EnhancedRiskDashboard'a Tabs yapısı ekle
+  - [ ] DavranisTakibiSection'ı "davranis-takibi" sekmesine yerleştir
+
+### Faz 3: Ana Yapı Değişiklikleri
+
+- [ ] **Adım 10:** İletişim & Raporlar birleştirmesi
+  - [ ] Ana sekme ismini "İletişim & Raporlar" yap
+  - [ ] CommunicationCenter'a AI Araçları alt sekmesi ekle
+  - [ ] AIToolsHub'ı bu sekmeye taşı
+
+- [ ] **Adım 11:** Ana sekme yapısını güncelle
+  - [ ] constants.tsx'te MAIN_TABS dizisini 8 sekmeye düşür
+  - [ ] "ai-hub" sekmesini kaldır
+  - [ ] StudentProfileTabs.tsx'de TabsList'i güncelle
+
+### Faz 4: Test ve Review
+
+- [ ] **Adım 12:** Test
+  - [ ] Tarayıcıda tüm sekmeleri aç
+  - [ ] Alt sekmelerin çalıştığını kontrol et
+  - [ ] Bilgilerin doğru yerlerde olduğunu doğrula
+
+- [ ] **Adım 13:** Kod temizliği
+  - [ ] Kullanılmayan import'ları temizle
+  - [ ] Console.log'ları kaldır
+  - [ ] TypeScript hatalarını düzelt
+
+---
+
+## 📝 DETAYLI ADIM AÇIKLAMALARI
+
+### Adım 8: DavranisTakibiSection Component'i
+
+**Yeni dosya:** `client/components/student-profile/sections/DavranisTakibiSection.tsx`
+
+```tsx
+- Disiplin cezaları form alanı
+- Davranış olayları listesi
+- Müdahale geçmişi
+- Davranış trend analizi
+```
+
+### Adım 9: Risk Sekmesi Alt Tab Yapısı
+
+**Güncellenecek:** `client/pages/StudentProfile/constants.tsx`
+
+```tsx
+export const RISK_TABS = [
+  { value: 'risk-analizi', label: 'Risk Analizi' },
+  { value: 'davranis-takibi', label: 'Davranış Takibi' },
+  { value: 'koruyucu-faktorler', label: 'Koruyucu Faktörler' },
+  { value: 'mudahale-planlari', label: 'Müdahale Planları' }
+]
+```
+
+---
+
+## 🎨 BEKLENEN SONUÇ
+
+### Öncesi (9 Ana Sekme)
+```
+1. Özet
+2. Kimlik & İletişim (7 kart - karmaşık)
+3. Sağlık & Güvenlik
+4. Akademik (5 alt)
+5. Gelişim & Kişilik (4 alt)
+6. Risk & Müdahale (alt yok)
+7. Kariyer & Gelecek (2 alt)
+8. İletişim Merkezi (4 alt)
+9. AI Araçları (4 alt)
+```
+
+### Sonrası (8 Ana Sekme)
+```
+1. Özet
+2. Kimlik Bilgileri (4 kart - temiz)
+3. Sağlık & Güvenlik
+4. Akademik (5 alt - dil becerileri, ödüller eklendi)
+5. Gelişim & Kişilik (5 alt - 360 derece ayrıldı, hobiler eklendi)
+6. Risk & Müdahale (4 alt - davranış takibi eklendi)
+7. Kariyer & Gelecek (2 alt - beklentiler eklendi)
+8. İletişim & Raporlar (5 alt - AI araçları eklendi)
+```
+
+---
+
+## 📌 ÖNEMLİ NOTLAR
+
+1. **Veritabanı Değişikliği YOK:** Tüm alanlar Student nesnesinde zaten mevcut
+2. **Geriye Dönük Uyumlu:** Eski veriler korunur
+3. **Modüler Yapı:** Her component bağımsız çalışır
+4. **Backend Safe:** API endpoints değişmiyor
+5. **Test Edilecek:** Her adımda çalıştığı doğrulanacak
+
+---
+
+## 🏁 İLERLEME TAKİBİ
+
+**Başlangıç:** 24 Ekim 2025  
+**Hedef Tamamlanma:** 27 Ekim 2025  
+**Toplam Adım:** 13  
+**Tamamlanan:** 0/13  
+**Durum:** 🚧 Hazırlanıyor
+
+---
+
+**Son Güncelleme:** 24 Ekim 2025 - Plan oluşturuldu
