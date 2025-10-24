@@ -147,14 +147,9 @@ export const GELISIM_TABS = [
 // KARİYER & GELECEK ALT SEKMELERİ
 export const KARIYER_TABS = [
   {
-    value: "kariyer-analizi",
-    label: "Kariyer Analizi",
+    value: "rehberlik",
+    label: "Kariyer Rehberliği",
     icon: Briefcase,
-  },
-  {
-    value: "yol-haritasi",
-    label: "Yol Haritası",
-    icon: TrendingUp,
   },
   {
     value: "hedefler",

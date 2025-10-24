@@ -136,9 +136,9 @@
     - Student type'a kardesSayisi alanı eklendi
   - [x] CareerFutureSection.tsx (1 hata → 0)
     - CareerGuidanceSection interface'ine onUpdate prop'u eklendi
-- [ ] **Adım 3:** Kariyer sekmesi constants düzeltmesi
-  - [ ] `KARIYER_TABS` tanımını 2 sekmeye güncelle (rehberlik, hedefler)
-  - [ ] "yol-haritasi" ve "kariyer-analizi" kaldır, "rehberlik" ekle
+- [x] **Adım 3:** Kariyer sekmesi constants düzeltmesi ✅
+  - [x] `KARIYER_TABS` tanımını 2 sekmeye güncellendi (rehberlik, hedefler)
+  - [x] "yol-haritasi" ve "kariyer-analizi" kaldırıldı
 
 ### Faz 2: Component Oluşturma ve Parçalama
 
@@ -327,9 +327,9 @@ export const ILETISIM_TABS = [
 **Başlangıç:** 24 Ekim 2025  
 **Tahmini Tamamlanma:** 24 Ekim 2025  
 **Toplam Adım:** 16  
-**Tamamlanan:** 2/16  
-**Kalan:** 14
+**Tamamlanan:** 3/16  
+**Kalan:** 13
 
 ---
 
-**Son Güncelleme:** 24 Ekim 2025 - LSP hataları temizlendi (12→0) ✅
+**Son Güncelleme:** 24 Ekim 2025 - Kariyer sekmesi düzeltildi ✅
