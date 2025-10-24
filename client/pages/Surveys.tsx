@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus } from "lucide-react";
+import { Plus, ClipboardList } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { useSurveyTemplates, useSurveyDistributions, useTemplateQuestions } from "@/hooks/surveys";
 import { surveyService } from "@/services/surveyService";
 import { useToast } from "@/hooks/use-toast";
@@ -188,23 +189,20 @@ export default function Surveys() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl bg-gradient-to-br from-primary/15 via-primary/5 to-accent/15 p-6 border border-primary/20">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-primary">Anket & Test Modülü</h1>
-            <p className="text-muted-foreground mt-1">
-              Anket oluşturun, sınıflara dağıtın ve sonuçları analiz edin
-            </p>
-          </div>
+    <div className="container mx-auto py-6 space-y-6">
+      <PageHeader
+        title="Anket & Test Modülü"
+        subtitle="Anket oluşturun, sınıflara dağıtın ve sonuçları analiz edin"
+        icon={ClipboardList}
+        actions={
           <SurveyCreationDialog onSurveyCreated={refreshAllData}>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
+            <Button size="lg" className="gap-2">
+              <Plus className="h-5 w-5" />
               Yeni Anket
             </Button>
           </SurveyCreationDialog>
-        </div>
-      </div>
+        }
+      />
 
       <SurveyStats templates={templates} distributions={distributions} />
 

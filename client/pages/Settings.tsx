@@ -4,6 +4,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Settings as SettingsIcon } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { useToast } from "@/hooks/use-toast";
 import {
   loadSettings,
@@ -191,20 +193,17 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-xl bg-gradient-to-br from-primary/15 via-primary/5 to-accent/15 p-6 border border-primary/20">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-primary">Sistem Ayarları</h1>
-            <p className="text-muted-foreground mt-1">
-              Uygulama genel tercihleri
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button onClick={form.handleSubmit(onSave as any)}>Kaydet</Button>
-          </div>
-        </div>
-      </div>
+    <div className="container mx-auto py-6 space-y-6">
+      <PageHeader
+        title="Sistem Ayarları"
+        subtitle="Uygulama genel tercihleri"
+        icon={SettingsIcon}
+        actions={
+          <Button size="lg" onClick={form.handleSubmit(onSave as any)}>
+            Kaydet
+          </Button>
+        }
+      />
       <Tabs
         value={tab}
         onValueChange={(v) => {
