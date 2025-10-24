@@ -1,3 +1,4 @@
+replit_final_file>
 /**
  * Unified Identity Section
  * Temel kimlik bilgileri, veli iletişim, adres bilgileri
@@ -43,7 +44,17 @@ import {
   UserCheck,
   Tag,
   Home,
+  Map,
+  Briefcase,
+  BookOpen,
+  Star,
+  Heart,
+  Flame,
+  Wrench,
+  Award,
+  GitCommit,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const unifiedIdentitySchema = z.object({
   ad: z.string().min(1, "Ad zorunludur"),
@@ -52,6 +63,8 @@ const unifiedIdentitySchema = z.object({
   class: z.string().optional(),
   cinsiyet: z.enum(["K", "E"]).optional(),
   dogumTarihi: z.string().optional(),
+  dogumYeri: z.string().optional(),
+  tcKimlikNo: z.string().optional().transform(val => val === "" ? undefined : val),
   telefon: z.string().optional(),
   eposta: z.string().email("Geçerli bir e-posta giriniz").optional().or(z.literal("")),
   il: z.string().optional(),
@@ -61,6 +74,13 @@ const unifiedIdentitySchema = z.object({
   veliTelefon: z.string().optional(),
   rehberOgretmen: z.string().optional(),
   etiketler: z.string().optional(),
+  anneMeslek: z.string().optional(),
+  babaMeslek: z.string().optional(),
+  kardesSayisi: z.number().optional().or(z.literal("")),
+  dilBecerileri: z.string().optional(),
+  hobiler: z.string().optional(),
+  okulDisiAktiviteler: z.string().optional(),
+  beklentilerHedefler: z.string().optional(),
 });
 
 type UnifiedIdentityFormValues = z.infer<typeof unifiedIdentitySchema>;
@@ -80,6 +100,8 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
       class: student.class || "",
       cinsiyet: student.cinsiyet,
       dogumTarihi: student.dogumTarihi || "",
+      dogumYeri: student.dogumYeri || "",
+      tcKimlikNo: student.tcKimlikNo,
       telefon: student.telefon || "",
       eposta: student.eposta || "",
       il: student.il || "",
@@ -89,6 +111,13 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
       veliTelefon: student.veliTelefon || "",
       rehberOgretmen: student.rehberOgretmen || "",
       etiketler: (student.etiketler || []).join(", "),
+      anneMeslek: student.anneMeslek || "",
+      babaMeslek: student.babaMeslek || "",
+      kardesSayisi: student.kardesSayisi || "",
+      dilBecerileri: student.dilBecerileri || "",
+      hobiler: student.hobiler || "",
+      okulDisiAktiviteler: student.okulDisiAktiviteler || "",
+      beklentilerHedefler: student.beklentilerHedefler || "",
     },
   });
 
@@ -100,6 +129,8 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
       class: student.class || "",
       cinsiyet: student.cinsiyet,
       dogumTarihi: student.dogumTarihi || "",
+      dogumYeri: student.dogumYeri || "",
+      tcKimlikNo: student.tcKimlikNo,
       telefon: student.telefon || "",
       eposta: student.eposta || "",
       il: student.il || "",
@@ -109,6 +140,13 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
       veliTelefon: student.veliTelefon || "",
       rehberOgretmen: student.rehberOgretmen || "",
       etiketler: (student.etiketler || []).join(", "),
+      anneMeslek: student.anneMeslek || "",
+      babaMeslek: student.babaMeslek || "",
+      kardesSayisi: student.kardesSayisi || "",
+      dilBecerileri: student.dilBecerileri || "",
+      hobiler: student.hobiler || "",
+      okulDisiAktiviteler: student.okulDisiAktiviteler || "",
+      beklentilerHedefler: student.beklentilerHedefler || "",
     });
   }, [student, form]);
 
@@ -120,8 +158,9 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
         etiketler: data.etiketler
           ? data.etiketler.split(",").map((s) => s.trim()).filter(Boolean)
           : [],
+        kardesSayisi: data.kardesSayisi === "" ? undefined : Number(data.kardesSayisi),
       };
-      
+
       await upsertStudent(updatedStudent);
       toast.success("Öğrenci bilgileri kaydedildi");
       onUpdate();
@@ -163,7 +202,7 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="soyad"
@@ -250,6 +289,49 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
                     </FormLabel>
                     <FormControl>
                       <Input type="date" {...field} className="h-10" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
+                name="dogumYeri"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5" />
+                      Doğum Yeri
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} className="h-10" placeholder="İl/İlçe" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="tcKimlikNo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1.5">
+                      <Hash className="h-3.5 w-3.5" />
+                      TC Kimlik No
+                      <Badge variant="outline" className="text-xs">Gizli</Badge>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="●●●●●●●●●●●"
+                        maxLength={11}
+                        {...field}
+                        className="h-10"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -373,7 +455,170 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
           </CardContent>
         </Card>
 
-        {/* Veli Bilgileri */}
+        {/* Aile Bilgileri */}
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Users className="h-5 w-5 text-primary" />
+              Aile Bilgileri
+            </CardTitle>
+            <CardDescription>
+              Öğrencinin aile yapısı ve meslek bilgileri
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="anneMeslek"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1.5">
+                      <Briefcase className="h-3.5 w-3.5" />
+                      Anne Meslek
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} className="h-10" placeholder="Anne mesleği" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="babaMeslek"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1.5">
+                      <Briefcase className="h-3.5 w-3.5" />
+                      Baba Meslek
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} className="h-10" placeholder="Baba mesleği" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="kardesSayisi"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1.5">
+                    <Users className="h-3.5 w-3.5" />
+                    Kardeş Sayısı
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} type="number" className="h-10" placeholder="Örn: 2" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Akademik ve Sosyal Profil */}
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <BookOpen className="h-5 w-5 text-primary" />
+              Akademik ve Sosyal Profil
+            </CardTitle>
+            <CardDescription>
+              Öğrencinin dil becerileri, hobileri ve okul dışı aktiviteleri
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="dilBecerileri"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1.5">
+                      <Award className="h-3.5 w-3.5" />
+                      Dil Becerileri
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} className="h-10" placeholder="Örn: İngilizce (İleri), Almanca (Orta)" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="hobiler"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1.5">
+                      <Heart className="h-3.5 w-3.5" />
+                      Hobiler ve İlgi Alanları
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} className="h-10" placeholder="Örn: Kitap okumak, yüzme, satranç" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="okulDisiAktiviteler"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1.5">
+                    <Flame className="h-3.5 w-3.5" />
+                    Okul Dışı Aktiviteler
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} className="h-10" placeholder="Örn: Robotik kulübü, gönüllülük faaliyetleri" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Hedefler ve Beklentiler */}
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <GitCommit className="h-5 w-5 text-primary" />
+              Hedefler ve Beklentiler
+            </CardTitle>
+            <CardDescription>
+              Öğrencinin ve ailenin eğitimden beklentileri
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="beklentilerHedefler"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1.5">
+                    <Star className="h-3.5 w-3.5" />
+                    Beklentiler ve Hedefler
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} className="h-10" placeholder="Örn: Üniversite kazanmak, yurtdışı eğitimi almak" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Veli Bilgileri (Mevcut) */}
         <Card>
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -483,3 +728,4 @@ export default function UnifiedIdentitySection({ student, onUpdate }: UnifiedIde
     </Form>
   );
 }
+</replit_final_file>

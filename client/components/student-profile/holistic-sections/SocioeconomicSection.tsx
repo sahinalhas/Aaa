@@ -80,6 +80,20 @@ export default function SocioeconomicSection({ studentId, onUpdate }: { studentI
                   <FormControl><Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))} /></FormControl>
                 </FormItem>
               )} />
+              
+              <FormField control={form.control} name="fatherOccupation" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Baba Mesleği</FormLabel>
+                  <FormControl><Input placeholder="Meslek bilgisi" {...field} /></FormControl>
+                </FormItem>
+              )} />
+              
+              <FormField control={form.control} name="motherOccupation" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Anne Mesleği</FormLabel>
+                  <FormControl><Input placeholder="Meslek bilgisi" {...field} /></FormControl>
+                </FormItem>
+              )} />
               <FormField control={form.control} name="studySpaceAvailability" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Çalışma Alanı</FormLabel>

@@ -9,12 +9,14 @@ import { EnhancedTextarea } from "@/components/ui/enhanced-textarea";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { TagInput } from "@/components/ui/tag-input";
 import { Sparkles } from "lucide-react";
-import { 
-  CREATIVE_TALENTS, 
+import {
+  CREATIVE_TALENTS,
   PHYSICAL_TALENTS,
-  INTEREST_AREAS 
+  INTEREST_AREAS
 } from "@shared/constants/student-profile-taxonomy";
 import { useStandardizedProfileSection } from "@/hooks/useStandardizedProfileSection";
+import { Textarea } from "@/components/ui/textarea";
+
 
 const talentsInterestsSchema = z.object({
   assessmentDate: z.string(),
@@ -26,6 +28,8 @@ const talentsInterestsSchema = z.object({
   clubMemberships: z.array(z.string()).default([]),
   competitionsParticipated: z.array(z.string()).default([]),
   additionalNotes: z.string().optional(),
+  hobbiesDetailed: z.string().optional(),
+  extracurricularActivities: z.string().optional(),
 });
 
 type TalentsInterestsFormValues = z.infer<typeof talentsInterestsSchema>;
@@ -36,10 +40,10 @@ interface StandardizedTalentsSectionProps {
   onUpdate: () => void;
 }
 
-export default function StandardizedTalentsSection({ 
-  studentId, 
+export default function StandardizedTalentsSection({
+  studentId,
   talentsData,
-  onUpdate 
+  onUpdate
 }: StandardizedTalentsSectionProps) {
   const form = useForm<TalentsInterestsFormValues>({
     resolver: zodResolver(talentsInterestsSchema),
@@ -53,6 +57,8 @@ export default function StandardizedTalentsSection({
       clubMemberships: [],
       competitionsParticipated: [],
       additionalNotes: "",
+      hobbiesDetailed: "",
+      extracurricularActivities: "",
     },
   });
 
@@ -178,12 +184,50 @@ export default function StandardizedTalentsSection({
               name="weeklyEngagementHours"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Haftalık Aktivite Saati</FormLabel>
+                  <FormLabel>Haftalık Katılım Saati</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
-                      {...field} 
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder="0"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="hobbiesDetailed"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Hobiler (Detaylı)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Öğrencinin düzenli yaptığı aktiviteler, hobiler..."
+                      className="min-h-[80px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="extracurricularActivities"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Okul Dışı Aktiviteler</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Kurslar, spor kulübü, gönüllü çalışmalar..."
+                      className="min-h-[80px]"
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />

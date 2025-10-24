@@ -1,3 +1,4 @@
+
 /**
  * Unified Student Data Model
  * Birleşik Öğrenci Veri Modeli - Tüm sistemde tutarlı kullanım için
@@ -14,6 +15,8 @@ export interface UnifiedStudent {
   okulNo?: string;
   cinsiyet?: 'K' | 'E';
   dogumTarihi?: string;
+  dogumYeri?: string;
+  tcKimlikNo?: string; // Gizli alan
   
   // İletişim Bilgileri
   telefon?: string;
@@ -27,6 +30,8 @@ export interface UnifiedStudent {
   veliTelefon?: string;
   acilKisi?: string;
   acilTelefon?: string;
+  anneMeslegi?: string;
+  babaMeslegi?: string;
   
   // Sistem Bilgileri
   kayitTarihi: string; // enrollmentDate
@@ -43,6 +48,13 @@ export interface UnifiedStudent {
   ilgiAlanlari?: string[];
   saglikNotu?: string;
   kanGrubu?: string;
+  
+  // Ek Profil Bilgileri (2025 SIS Standartları)
+  dilBecerileri?: string;
+  hobilerDetayli?: string;
+  okulDisiAktiviteler?: string;
+  ogrenciBeklentileri?: string;
+  aileBeklentileri?: string;
 }
 
 /**
@@ -55,6 +67,8 @@ export interface BackendStudent {
   email?: string;
   phone?: string;
   birthDate?: string;
+  birthPlace?: string;
+  tcIdentityNo?: string;
   address?: string;
   il?: string;
   ilce?: string;
@@ -66,6 +80,13 @@ export interface BackendStudent {
   notes?: string;
   gender?: 'K' | 'E';
   risk?: 'Düşük' | 'Orta' | 'Yüksek';
+  motherOccupation?: string;
+  fatherOccupation?: string;
+  languageSkills?: string;
+  hobbiesDetailed?: string;
+  extracurricularActivities?: string;
+  studentExpectations?: string;
+  familyExpectations?: string;
 }
 
 /**
@@ -86,12 +107,21 @@ export function backendToUnified(backend: BackendStudent): UnifiedStudent {
     il: backend.il,
     ilce: backend.ilce,
     dogumTarihi: backend.birthDate,
+    dogumYeri: backend.birthPlace,
+    tcKimlikNo: backend.tcIdentityNo,
     veliTelefon: backend.parentContact,
     kayitTarihi: backend.enrollmentDate || new Date().toISOString().split('T')[0],
     durum: backend.status === 'active' ? 'aktif' : backend.status === 'inactive' ? 'pasif' : backend.status === 'graduated' ? 'mezun' : 'aktif',
     avatar: backend.avatar,
     notlar: backend.notes,
-    risk: backend.risk
+    risk: backend.risk,
+    anneMeslegi: backend.motherOccupation,
+    babaMeslegi: backend.fatherOccupation,
+    dilBecerileri: backend.languageSkills,
+    hobilerDetayli: backend.hobbiesDetailed,
+    okulDisiAktiviteler: backend.extracurricularActivities,
+    ogrenciBeklentileri: backend.studentExpectations,
+    aileBeklentileri: backend.familyExpectations
   };
 }
 
@@ -110,10 +140,19 @@ export function unifiedToBackend(unified: UnifiedStudent): BackendStudent {
     status: unified.durum === 'aktif' ? 'active' : unified.durum === 'pasif' ? 'inactive' : unified.durum === 'mezun' ? 'graduated' : 'active',
     parentContact: unified.veliTelefon,
     birthDate: unified.dogumTarihi,
+    birthPlace: unified.dogumYeri,
+    tcIdentityNo: unified.tcKimlikNo,
     avatar: unified.avatar,
     notes: unified.notlar,
     gender: unified.cinsiyet,
-    risk: unified.risk
+    risk: unified.risk,
+    motherOccupation: unified.anneMeslegi,
+    fatherOccupation: unified.babaMeslegi,
+    languageSkills: unified.dilBecerileri,
+    hobbiesDetailed: unified.hobilerDetayli,
+    extracurricularActivities: unified.okulDisiAktiviteler,
+    studentExpectations: unified.ogrenciBeklentileri,
+    familyExpectations: unified.aileBeklentileri
   };
 }
 
@@ -128,6 +167,8 @@ export function frontendToBackend(student: any): BackendStudent {
     email: student.eposta || student.email,
     phone: student.telefon || student.phone,
     birthDate: student.dogumTarihi || student.birthDate,
+    birthPlace: student.dogumYeri || student.birthPlace,
+    tcIdentityNo: student.tcKimlikNo || student.tcIdentityNo,
     address: student.adres || student.address,
     class: student.class,
     enrollmentDate: student.kayitTarihi || student.enrollmentDate || new Date().toISOString().split('T')[0],
@@ -136,7 +177,14 @@ export function frontendToBackend(student: any): BackendStudent {
     parentContact: student.veliTelefon || student.parentContact,
     notes: student.notlar || student.notes,
     gender: student.cinsiyet || student.gender || 'K',
-    risk: student.risk || 'Düşük'
+    risk: student.risk || 'Düşük',
+    motherOccupation: student.anneMeslegi || student.motherOccupation,
+    fatherOccupation: student.babaMeslegi || student.fatherOccupation,
+    languageSkills: student.dilBecerileri || student.languageSkills,
+    hobbiesDetailed: student.hobilerDetayli || student.hobbiesDetailed,
+    extracurricularActivities: student.okulDisiAktiviteler || student.extracurricularActivities,
+    studentExpectations: student.ogrenciBeklentileri || student.studentExpectations,
+    familyExpectations: student.aileBeklentileri || student.familyExpectations
   };
 }
 
@@ -206,7 +254,8 @@ export const STUDENT_VALIDATION_RULES = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   phone: /^[0-9]{10,11}$/,
   minAge: 5,
-  maxAge: 25
+  maxAge: 25,
+  tcIdentityNo: /^[1-9][0-9]{10}$/
 } as const;
 
 /**

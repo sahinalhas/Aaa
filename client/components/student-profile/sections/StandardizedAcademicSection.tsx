@@ -16,6 +16,7 @@ import {
   LEARNING_STYLES 
 } from "@shared/constants/student-profile-taxonomy";
 import { useStandardizedProfileSection } from "@/hooks/useStandardizedProfileSection";
+import { Textarea } from "@/components/ui/textarea";
 
 const academicProfileSchema = z.object({
   assessmentDate: z.string(),
@@ -29,6 +30,7 @@ const academicProfileSchema = z.object({
   studyHoursPerWeek: z.number().min(0).default(0),
   homeworkCompletionRate: z.number().min(0).max(100).default(50),
   additionalNotes: z.string().optional(),
+  languageSkills: z.string().optional(),
 });
 
 type AcademicProfileFormValues = z.infer<typeof academicProfileSchema>;
@@ -58,6 +60,7 @@ export default function StandardizedAcademicSection({
       studyHoursPerWeek: 0,
       homeworkCompletionRate: 50,
       additionalNotes: "",
+      languageSkills: "",
     },
   });
 
@@ -278,7 +281,7 @@ export default function StandardizedAcademicSection({
                 name="homeworkCompletionRate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Ödev Tamamlama Oranı (%): {field.value}%</FormLabel>
+                    <FormLabel>Ödev Tamamlama Oranı: {field.value}%</FormLabel>
                     <FormControl>
                       <Slider
                         min={0}
@@ -286,6 +289,24 @@ export default function StandardizedAcademicSection({
                         step={5}
                         value={[field.value]}
                         onValueChange={(vals) => field.onChange(vals[0])}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="languageSkills"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Dil Becerileri</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Örn: İngilizce (B2), Almanca (A1)..." 
+                        className="min-h-[60px]"
+                        {...field} 
                       />
                     </FormControl>
                     <FormMessage />

@@ -26,6 +26,8 @@ const motivationProfileSchema = z.object({
   obstacles: z.string().optional(),
   supportNeeds: z.string().optional(),
   additionalNotes: z.string().optional(),
+  studentExpectations: z.string().optional(),
+  familyExpectations: z.string().optional(),
 });
 
 type MotivationProfileFormValues = z.infer<typeof motivationProfileSchema>;
@@ -58,6 +60,8 @@ export default function MotivationProfileSection({
       obstacles: "",
       supportNeeds: "",
       additionalNotes: "",
+      studentExpectations: "",
+      familyExpectations: "",
     },
   });
 
@@ -387,7 +391,7 @@ export default function MotivationProfileSection({
                       <FormLabel>Destek İhtiyaçları</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Hedeflere ulaşmak için gereken destekler..." 
+                          placeholder="Öğrencinin hedeflerine ulaşması için gerekli destekler..." 
                           className="min-h-[80px]"
                           {...field} 
                         />
@@ -397,6 +401,55 @@ export default function MotivationProfileSection({
                   )}
                 />
               </div>
+            </div>
+
+            <div className="space-y-4 border-t pt-6">
+              <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                <Target className="h-4 w-4" />
+                Beklentiler ve Hedefler
+              </h3>
+
+              <FormField
+                control={form.control}
+                name="studentExpectations"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Öğrenci Beklentileri</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Öğrencinin kendi eğitim ve gelecek hedefleri, beklentileri..." 
+                        className="min-h-[100px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Öğrencinin kendi ifadeleriyle gelecek planları
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="familyExpectations"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Aile Beklentileri</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Ailenin öğrenciden beklentileri, eğitim hedefleri..." 
+                        className="min-h-[100px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Velilerin çocuklarından akademik ve sosyal beklentileri
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <FormField
