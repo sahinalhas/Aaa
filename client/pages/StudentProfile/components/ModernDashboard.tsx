@@ -62,31 +62,6 @@ interface MetricCardProps {
 }
 
 const MetricCard = ({ title, score, icon: Icon, color, bgGradient, description, trend, trendValue }: MetricCardProps) => {
-  const getScoreStatus = (score: number) => {
-    if (score >= 80) return { 
-      label: "Mükemmel", 
-      textColor: "text-emerald-700", 
-      bgColor: "bg-emerald-50"
-    };
-    if (score >= 60) return { 
-      label: "İyi", 
-      textColor: "text-blue-700", 
-      bgColor: "bg-blue-50"
-    };
-    if (score >= 40) return { 
-      label: "Orta", 
-      textColor: "text-amber-700", 
-      bgColor: "bg-amber-50"
-    };
-    return { 
-      label: "Gelişmeli", 
-      textColor: "text-red-700", 
-      bgColor: "bg-red-50"
-    };
-  };
-
-  const status = getScoreStatus(score);
-
   const getTrendIcon = () => {
     if (trend === 'up') return <TrendingUp className="h-3 w-3 text-emerald-600" />;
     if (trend === 'down') return <TrendingDown className="h-3 w-3 text-red-600" />;
@@ -113,11 +88,6 @@ const MetricCard = ({ title, score, icon: Icon, color, bgGradient, description, 
             {description}
           </p>
         )}
-        <Badge 
-          className={`${status.textColor} ${status.bgColor} font-semibold px-2 py-1 shadow-sm mt-2 inline-block`}
-        >
-          {status.label}
-        </Badge>
         {trend && trendValue && (
           <div className="flex items-center gap-1 mt-2">
             {getTrendIcon()}
