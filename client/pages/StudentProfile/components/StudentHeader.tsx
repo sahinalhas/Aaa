@@ -39,110 +39,96 @@ export function StudentHeader({ student }: StudentHeaderProps) {
         </Link>
       </Button>
 
-      {/* Hero Section with Glassmorphism */}
-      <Card className="relative overflow-hidden border-2 border-primary/20 shadow-2xl bg-gradient-to-br from-primary/5 via-background to-accent/5">
-        {/* Decorative Background Elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl -z-10 opacity-30"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-accent/20 to-transparent rounded-full blur-3xl -z-10 opacity-20"></div>
+      {/* Minimal Modern Header */}
+      <Card className="relative overflow-hidden border border-border/50 shadow-lg bg-gradient-to-br from-background via-background to-primary/5">
+        {/* Subtle Background Accent */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl -z-10"></div>
         
-        <CardHeader className="pb-4">
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-            {/* Avatar Section */}
-            <div className="flex flex-col items-center lg:items-start gap-3">
-              <Avatar className={`h-28 w-28 md:h-32 md:w-32 lg:h-36 lg:w-36 border-4 border-white shadow-2xl bg-gradient-to-br ${getGenderColor(student.cinsiyet)}`}>
-                <AvatarFallback className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm shadow-md border border-primary/10">
-                <ShieldAlert className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-muted-foreground">Risk:</span>
-                <RiskPill risk={student.risk} />
-              </div>
-            </div>
+        <CardHeader className="p-4 md:p-6">
+          <div className="flex items-start gap-4">
+            {/* Compact Avatar */}
+            <Avatar className={`h-16 w-16 md:h-20 md:w-20 border-2 border-white shadow-lg bg-gradient-to-br ${getGenderColor(student.cinsiyet)} flex-shrink-0`}>
+              <AvatarFallback className="text-xl md:text-2xl font-bold text-white">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
 
-            {/* Student Info Section */}
-            <div className="flex-1 space-y-4">
-              {/* Name and Primary Info */}
-              <div>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                  {fullName}
-                </h1>
-                
-                {/* Quick Info Badges */}
-                <div className="flex flex-wrap items-center gap-2 md:gap-3">
-                  <Badge 
-                    variant="secondary" 
-                    className="text-sm md:text-base font-semibold py-1.5 px-3 md:px-4 shadow-sm hover:shadow-md transition-all bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20"
-                  >
-                    <GraduationCap className="h-4 w-4 md:h-5 md:w-5 mr-1.5" />
-                    {student.class}
-                  </Badge>
-                  
-                  <Badge 
-                    variant="outline" 
-                    className="text-sm md:text-base font-medium py-1.5 px-3 md:px-4 shadow-sm hover:shadow-md transition-all"
-                  >
-                    {student.cinsiyet}
-                  </Badge>
-                  
-                  <Badge 
-                    variant="outline" 
-                    className="text-sm md:text-base font-medium py-1.5 px-3 md:px-4 shadow-sm hover:shadow-md transition-all"
-                  >
-                    <Calendar className="h-4 w-4 md:h-5 md:w-5 mr-1.5" />
-                    {age} yaşında
-                  </Badge>
-
-                  {student.okulNo && (
-                    <Badge 
-                      variant="outline" 
-                      className="text-sm md:text-base font-medium py-1.5 px-3 md:px-4 shadow-sm hover:shadow-md transition-all"
-                    >
-                      <User className="h-4 w-4 md:h-5 md:w-5 mr-1.5" />
-                      No: {student.okulNo}
-                    </Badge>
-                  )}
+            {/* Student Info - Compact */}
+            <div className="flex-1 min-w-0">
+              {/* Name and Risk */}
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl md:text-2xl font-bold tracking-tight mb-1 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent truncate">
+                    {fullName}
+                  </h1>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <ShieldAlert className="h-3.5 w-3.5 flex-shrink-0" />
+                    <span className="font-medium">Risk:</span>
+                    <RiskPill risk={student.risk} />
+                  </div>
                 </div>
+                
+                {/* Action Button - Compact */}
+                <Button 
+                  asChild 
+                  size="sm"
+                  className="gap-1.5 shadow-md hover:shadow-lg transition-all flex-shrink-0"
+                >
+                  <Link to={`/ogrenci/${student.id}/gelismis-analiz`}>
+                    <Sparkles className="h-4 w-4" />
+                    <span className="hidden sm:inline">Gelişmiş Analiz</span>
+                    <span className="sm:hidden">Analiz</span>
+                  </Link>
+                </Button>
+              </div>
+              
+              {/* Compact Badges */}
+              <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                <Badge variant="secondary" className="text-xs font-medium px-2 py-0.5">
+                  <GraduationCap className="h-3 w-3 mr-1" />
+                  {student.class}
+                </Badge>
+                
+                <Badge variant="outline" className="text-xs font-medium px-2 py-0.5">
+                  {student.cinsiyet === "K" ? "Kız" : "Erkek"}
+                </Badge>
+                
+                <Badge variant="outline" className="text-xs font-medium px-2 py-0.5">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  {age} yaş
+                </Badge>
+
+                {student.okulNo && (
+                  <Badge variant="outline" className="text-xs font-medium px-2 py-0.5">
+                    <User className="h-3 w-3 mr-1" />
+                    {student.okulNo}
+                  </Badge>
+                )}
               </div>
 
-              {/* Contact Information (if available) */}
+              {/* Contact Info - Compact Grid */}
               {(student.eposta || student.telefon || student.adres) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3 pt-2">
+                <div className="flex flex-wrap gap-2 text-xs">
                   {student.eposta && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground bg-white/50 backdrop-blur-sm rounded-lg px-3 py-2 border border-primary/10">
-                      <Mail className="h-4 w-4 text-primary" />
-                      <span className="truncate">{student.eposta}</span>
+                    <div className="flex items-center gap-1.5 text-muted-foreground bg-muted/30 rounded px-2 py-1">
+                      <Mail className="h-3 w-3 text-primary flex-shrink-0" />
+                      <span className="truncate max-w-[150px]">{student.eposta}</span>
                     </div>
                   )}
                   {student.telefon && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground bg-white/50 backdrop-blur-sm rounded-lg px-3 py-2 border border-primary/10">
-                      <Phone className="h-4 w-4 text-primary" />
+                    <div className="flex items-center gap-1.5 text-muted-foreground bg-muted/30 rounded px-2 py-1">
+                      <Phone className="h-3 w-3 text-primary flex-shrink-0" />
                       <span>{student.telefon}</span>
                     </div>
                   )}
                   {student.adres && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground bg-white/50 backdrop-blur-sm rounded-lg px-3 py-2 border border-primary/10 md:col-span-2 lg:col-span-1">
-                      <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                    <div className="flex items-center gap-1.5 text-muted-foreground bg-muted/30 rounded px-2 py-1 max-w-full">
+                      <MapPin className="h-3 w-3 text-primary flex-shrink-0" />
                       <span className="truncate">{student.adres}</span>
                     </div>
                   )}
                 </div>
               )}
-            </div>
-
-            {/* Action Button */}
-            <div className="flex lg:flex-col gap-3 lg:justify-start">
-              <Button 
-                asChild 
-                size="lg" 
-                className="flex-1 lg:flex-none gap-2 shadow-lg hover:shadow-xl transition-all bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-              >
-                <Link to={`/ogrenci/${student.id}/gelismis-analiz`}>
-                  <Sparkles className="h-5 w-5" />
-                  Gelişmiş Analiz
-                </Link>
-              </Button>
             </div>
           </div>
         </CardHeader>
