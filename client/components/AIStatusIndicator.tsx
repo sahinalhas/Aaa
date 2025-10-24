@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, Brain, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AIStatusIndicatorProps {
@@ -52,7 +52,7 @@ export default function AIStatusIndicator({ className, collapsed = false }: AISt
     <Badge
       className={cn("gap-1.5 border-green-500 bg-green-50 text-green-700 transition-all duration-200", className)}
     >
-      <CheckCircle2 className="h-3 w-3 shrink-0" />
+      <Brain className="h-3 w-3 shrink-0" />
       {!collapsed && (
         <span className="hidden md:inline whitespace-nowrap overflow-hidden transition-all duration-200 delay-150">
           AI: {status.providerName || status.provider || 'Aktif'}
