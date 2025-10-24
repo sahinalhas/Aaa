@@ -142,10 +142,10 @@
 
 ### Faz 2: Component Oluşturma ve Parçalama
 
-- [ ] **Adım 4:** AdditionalInfoSection'ı parçala
-  - [ ] `SchoolServicesSection.tsx` oluştur (servis, burs bilgileri)
-  - [ ] Disiplin/ödül bilgilerini kaldır
-  - [ ] UnifiedIdentitySection'a SchoolServicesSection'ı ekle
+- [x] **Adım 4:** AdditionalInfoSection'ı parçala ✅
+  - [x] Disiplin/ödül bilgilerini kaldırıldı (schema, defaultValues, form, UI)
+  - [x] Sadece servis ve burs bilgileri kaldı
+  - [x] Kullanılmayan import'lar temizlendi (Award, AlertTriangle, EnhancedTextarea)
   
 - [ ] **Adım 5:** DisciplineSection component'i oluştur
   - [ ] `client/components/student-profile/sections/DisciplineSection.tsx` oluştur
@@ -327,9 +327,9 @@ export const ILETISIM_TABS = [
 **Başlangıç:** 24 Ekim 2025  
 **Tahmini Tamamlanma:** 24 Ekim 2025  
 **Toplam Adım:** 16  
-**Tamamlanan:** 3/16  
-**Kalan:** 13
+**Tamamlanan:** 4/16  
+**Kalan:** 12
 
 ---
 
-**Son Güncelleme:** 24 Ekim 2025 - Kariyer sekmesi düzeltildi ✅
+**Son Güncelleme:** 24 Ekim 2025 - AdditionalInfoSection parçalandı ✅

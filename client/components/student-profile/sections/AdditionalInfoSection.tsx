@@ -11,8 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Bus, DollarSign, Award, AlertTriangle } from "lucide-react";
-import { EnhancedTextarea } from "@/components/ui/enhanced-textarea";
+import { Bus, DollarSign } from "lucide-react";
 
 const additionalInfoSchema = z.object({
   servisKullanimDurumu: z.string().optional(),
@@ -20,8 +19,6 @@ const additionalInfoSchema = z.object({
   bursYardimDurumu: z.string().optional(),
   bursKurumu: z.string().optional(),
   bursYiliMiktari: z.string().optional(),
-  disiplinCezalari: z.string().optional(),
-  odulBasarilar: z.string().optional(),
 });
 
 type AdditionalInfoFormValues = z.infer<typeof additionalInfoSchema>;
@@ -40,8 +37,6 @@ export default function AdditionalInfoSection({ student, onUpdate }: AdditionalI
       bursYardimDurumu: (student as any).bursYardimDurumu || "",
       bursKurumu: (student as any).bursKurumu || "",
       bursYiliMiktari: (student as any).bursYiliMiktari || "",
-      disiplinCezalari: (student as any).disiplinCezalari || "",
-      odulBasarilar: (student as any).odulBasarilar || "",
     },
   });
 
@@ -52,8 +47,6 @@ export default function AdditionalInfoSection({ student, onUpdate }: AdditionalI
       bursYardimDurumu: (student as any).bursYardimDurumu || "",
       bursKurumu: (student as any).bursKurumu || "",
       bursYiliMiktari: (student as any).bursYiliMiktari || "",
-      disiplinCezalari: (student as any).disiplinCezalari || "",
-      odulBasarilar: (student as any).odulBasarilar || "",
     });
   }, [student, form]);
 
@@ -201,64 +194,6 @@ export default function AdditionalInfoSection({ student, onUpdate }: AdditionalI
                 )}
               />
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Disiplin ve Başarılar */}
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Award className="h-5 w-5 text-primary" />
-              Disiplin Geçmişi ve Başarılar
-            </CardTitle>
-            <CardDescription>
-              Aldığı cezalar, ödüller ve başarılar
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="disiplinCezalari"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-1.5">
-                    <AlertTriangle className="h-3.5 w-3.5" />
-                    Disiplin Cezaları
-                  </FormLabel>
-                  <FormControl>
-                    <EnhancedTextarea 
-                      {...field} 
-                      className="min-h-[100px]" 
-                      placeholder="Tarih, ceza türü ve açıklama..."
-                      aiContext="notes"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="odulBasarilar"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-1.5">
-                    <Award className="h-3.5 w-3.5" />
-                    Ödüller ve Başarılar
-                  </FormLabel>
-                  <FormControl>
-                    <EnhancedTextarea 
-                      {...field} 
-                      className="min-h-[100px]" 
-                      placeholder="Aldığı ödüller, başarılar, yarışma dereceleri..."
-                      aiContext="notes"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </CardContent>
         </Card>
 
