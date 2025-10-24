@@ -30,27 +30,27 @@ export function StudentStats({
   const riskLevel = student?.risk || (devamsiz30 >= 2 ? "Orta" : "Düşük");
 
   return (
-    <Card>
-      <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="rounded-md border p-3">
-          <div className="text-xs text-muted-foreground">Risk</div>
-          <div className="mt-1">
+    <Card className="shadow-md hover:shadow-lg transition-shadow">
+      <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-6">
+        <div className="rounded-lg border border-border/50 p-4 bg-gradient-to-br from-background to-muted/20 hover:border-primary/30 transition-colors">
+          <div className="text-xs font-medium text-muted-foreground">Risk</div>
+          <div className="mt-2">
             <RiskPill risk={riskLevel} />
           </div>
         </div>
-        <div className="rounded-md border p-3">
-          <div className="text-xs text-muted-foreground">Son Anket</div>
-          <div className="mt-1 text-sm">
+        <div className="rounded-lg border border-border/50 p-4 bg-gradient-to-br from-background to-muted/20 hover:border-primary/30 transition-colors">
+          <div className="text-xs font-medium text-muted-foreground">Son Anket</div>
+          <div className="mt-2 text-lg font-bold">
             {typeof lastSurvey?.score === "number" ? `${lastSurvey.score}` : "-"}
           </div>
         </div>
-        <div className="rounded-md border p-3">
-          <div className="text-xs text-muted-foreground">30 Günde Devamsız</div>
-          <div className="mt-1 text-sm">{devamsiz30}</div>
+        <div className="rounded-lg border border-border/50 p-4 bg-gradient-to-br from-background to-muted/20 hover:border-primary/30 transition-colors">
+          <div className="text-xs font-medium text-muted-foreground">30 Günde Devamsız</div>
+          <div className="mt-2 text-lg font-bold">{devamsiz30}</div>
         </div>
-        <div className="rounded-md border p-3">
-          <div className="text-xs text-muted-foreground">Müdahaleler</div>
-          <div className="mt-1 text-sm">{interventions.length}</div>
+        <div className="rounded-lg border border-border/50 p-4 bg-gradient-to-br from-background to-muted/20 hover:border-primary/30 transition-colors">
+          <div className="text-xs font-medium text-muted-foreground">Müdahaleler</div>
+          <div className="mt-2 text-lg font-bold">{interventions.length}</div>
         </div>
       </CardContent>
     </Card>

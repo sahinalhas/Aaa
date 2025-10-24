@@ -3,10 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/auth-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatCard } from '@/components/ui/stat-card';
+import { StatsGrid } from '@/components/ui/stats-grid';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PageHeader } from '@/components/ui/page-header';
+import { MODERN_GRADIENTS } from '@/lib/config/theme.config';
 import { 
   Users, 
   GraduationCap, 
@@ -124,31 +127,36 @@ export default function SchoolDashboard() {
       />
       
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <StatsGrid columns={4}>
         <StatCard
           title="Toplam Öğrenci"
           value={schoolStats?.totalStudents || 0}
-          icon={<Users className="h-5 w-5" />}
-          trend="+5%"
+          icon={Users}
+          gradient={MODERN_GRADIENTS.blue}
+          delay={0}
         />
         <StatCard
           title="Toplam Sınıf"
           value={schoolStats?.totalClasses || 0}
-          icon={<GraduationCap className="h-5 w-5" />}
+          icon={GraduationCap}
+          gradient={MODERN_GRADIENTS.indigo}
+          delay={0.1}
         />
         <StatCard
           title="Ortalama GPA"
           value={schoolStats?.academicOverview.averageGPA.toFixed(2) || '0.00'}
-          icon={<TrendingUp className="h-5 w-5" />}
-          trend="+0.3"
+          icon={TrendingUp}
+          gradient={MODERN_GRADIENTS.teal}
+          delay={0.2}
         />
         <StatCard
           title="Risk Altında"
           value={(schoolStats?.riskDistribution.high || 0) + (schoolStats?.riskDistribution.critical || 0)}
-          icon={<AlertTriangle className="h-5 w-5" />}
-          variant="danger"
+          icon={AlertTriangle}
+          gradient={MODERN_GRADIENTS.rose}
+          delay={0.3}
         />
-      </div>
+      </StatsGrid>
       
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
@@ -220,38 +228,6 @@ export default function SchoolDashboard() {
   );
 }
 
-function StatCard({ 
-  title, 
-  value, 
-  icon, 
-  trend, 
-  variant = 'default' 
-}: { 
-  title: string; 
-  value: string | number; 
-  icon: React.ReactNode; 
-  trend?: string;
-  variant?: 'default' | 'danger';
-}) {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        {icon}
-      </CardHeader>
-      <CardContent>
-        <div className={`text-2xl font-bold ${variant === 'danger' ? 'text-destructive' : ''}`}>
-          {value}
-        </div>
-        {trend && (
-          <p className="text-xs text-muted-foreground mt-1">
-            {trend} geçen aya göre
-          </p>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
 
 function RiskDistributionChart({ data }: { data?: SchoolStatsType }) {
   if (!data) return null;

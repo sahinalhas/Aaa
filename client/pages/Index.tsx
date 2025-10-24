@@ -6,6 +6,8 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { StatCard } from "@/components/ui/stat-card";
+import { StatsGrid } from "@/components/ui/stats-grid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/page-header";
@@ -50,6 +52,7 @@ import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import AISuggestionPanel from "@/components/ai-suggestions/AISuggestionPanel";
 import { apiClient } from "@/lib/api/api-client";
 import { STUDENT_ENDPOINTS, SURVEY_ENDPOINTS, COUNSELING_ENDPOINTS } from "@/lib/constants/api-endpoints";
+import { MODERN_GRADIENTS } from "@/lib/config/theme.config";
 
 interface DashboardStats {
   studentCount: number;
@@ -218,48 +221,32 @@ export default function Index() {
   const displayStats = useMemo(() => {
     return [
       { 
-        label: "Toplam Öğrenci", 
+        title: "Toplam Öğrenci", 
         value: stats.studentCount, 
         icon: Users2, 
-        color: "from-violet-500/20 to-purple-600/20",
-        bgGradient: "from-violet-50/50 via-purple-50/30 to-background dark:from-violet-950/20 dark:via-purple-950/10 dark:to-background",
-        iconColor: "text-violet-600",
-        borderColor: "hover:border-violet-300 dark:hover:border-violet-700",
-        change: "+12%",
-        trend: "up"
+        gradient: MODERN_GRADIENTS.purple,
+        subtitle: `${stats.studentCount} kayıtlı öğrenci`
       },
       { 
-        label: "Bu Hafta Görüşme", 
+        title: "Bu Hafta Görüşme", 
         value: stats.meetingCount, 
         icon: CalendarDays, 
-        color: "from-blue-500/20 to-indigo-600/20",
-        bgGradient: "from-blue-50/50 via-indigo-50/30 to-background dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-background",
-        iconColor: "text-blue-600",
-        borderColor: "hover:border-blue-300 dark:hover:border-blue-700",
-        change: `${stats.activeCounselingSessionsToday} bugün`,
-        trend: "neutral"
+        gradient: MODERN_GRADIENTS.blue,
+        subtitle: `${stats.activeCounselingSessionsToday} bugün`
       },
       { 
-        label: "Açık Müdahale", 
+        title: "Açık Müdahale", 
         value: stats.openInterventionCount, 
         icon: AlertTriangle, 
-        color: "from-amber-500/20 to-orange-600/20",
-        bgGradient: "from-amber-50/50 via-orange-50/30 to-background dark:from-amber-950/20 dark:via-orange-950/10 dark:to-background",
-        iconColor: "text-amber-600",
-        borderColor: "hover:border-amber-300 dark:hover:border-amber-700",
-        change: `${stats.completedInterventionsThisMonth} bu ay`,
-        trend: "neutral"
+        gradient: MODERN_GRADIENTS.amber,
+        subtitle: `${stats.completedInterventionsThisMonth} bu ay tamamlandı`
       },
       { 
-        label: "Aktif Anket", 
+        title: "Aktif Anket", 
         value: stats.activeSurveyCount, 
         icon: MessageSquare, 
-        color: "from-emerald-500/20 to-green-600/20",
-        bgGradient: "from-emerald-50/50 via-green-50/30 to-background dark:from-emerald-950/20 dark:via-green-950/10 dark:to-background",
-        iconColor: "text-emerald-600",
-        borderColor: "hover:border-emerald-300 dark:hover:border-emerald-700",
-        change: "Devam ediyor",
-        trend: "neutral"
+        gradient: MODERN_GRADIENTS.green,
+        subtitle: "Devam eden anketler"
       },
     ];
   }, [stats]);
@@ -310,36 +297,19 @@ export default function Index() {
         />
       </motion.div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <StatsGrid columns={4}>
         {displayStats.map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08, duration: 0.3 }}
-          >
-            <Card className={`group relative overflow-hidden hover:shadow-xl transition-all duration-300 border ${stat.borderColor}`}>
-              <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-              <CardContent className="relative p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-3 flex-1 min-w-0">
-                    <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                    <p className="text-3xl font-bold tracking-tight">{stat.value.toLocaleString()}</p>
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                      {stat.trend === "up" && <ArrowUpRight className="h-3.5 w-3.5 text-success" />}
-                      {stat.trend === "down" && <ArrowDownRight className="h-3.5 w-3.5 text-destructive" />}
-                      <span className="truncate">{stat.change}</span>
-                    </div>
-                  </div>
-                  <div className={`size-12 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-                    <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+          <StatCard
+            key={stat.title}
+            title={stat.title}
+            value={stat.value}
+            subtitle={stat.subtitle}
+            icon={stat.icon}
+            gradient={stat.gradient}
+            delay={i * 0.1}
+          />
         ))}
-      </div>
+      </StatsGrid>
 
       <div className="grid gap-6 md:grid-cols-3">
         <motion.div 

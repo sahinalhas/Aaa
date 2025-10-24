@@ -69,7 +69,7 @@ export default function RiskSummaryWidget() {
   }
 
   return (
-    <Card className="border-orange-200 dark:border-orange-900">
+    <Card className="border-orange-200 dark:border-orange-900 shadow-md hover:shadow-lg transition-shadow">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -91,23 +91,23 @@ export default function RiskSummaryWidget() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
-          <div className="text-center">
+          <div className="text-center p-3 rounded-lg border border-border/50 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/20 dark:to-orange-900/20">
             <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
               {summary.totalActiveAlerts}
             </div>
-            <div className="text-xs text-muted-foreground">Aktif Uyarı</div>
+            <div className="text-xs font-medium text-muted-foreground mt-1">Aktif Uyarı</div>
           </div>
-          <div className="text-center">
+          <div className="text-center p-3 rounded-lg border border-border/50 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/20 dark:to-red-900/20">
             <div className="text-2xl font-bold text-red-600 dark:text-red-400">
               {summary.criticalAlerts}
             </div>
-            <div className="text-xs text-muted-foreground">Kritik</div>
+            <div className="text-xs font-medium text-muted-foreground mt-1">Kritik</div>
           </div>
-          <div className="text-center">
+          <div className="text-center p-3 rounded-lg border border-border/50 bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950/20 dark:to-yellow-900/20">
             <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {summary.highRiskStudentCount}
             </div>
-            <div className="text-xs text-muted-foreground">Riskli Öğrenci</div>
+            <div className="text-xs font-medium text-muted-foreground mt-1">Riskli Öğrenci</div>
           </div>
         </div>
 

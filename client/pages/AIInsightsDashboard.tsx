@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatCard } from '@/components/ui/stat-card';
+import { StatsGrid } from '@/components/ui/stats-grid';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertTriangle, TrendingUp, Users, Calendar, Brain, FileText, School } from 'lucide-react';
+import { MODERN_GRADIENTS } from '@/lib/config/theme.config';
 import BulkAnalysisDashboard from '@/components/ai/BulkAnalysisDashboard';
 import { apiClient } from '@/lib/api/api-client';
 import { AI_ENDPOINTS } from '@/lib/constants/api-endpoints';
@@ -113,67 +116,36 @@ export default function AIInsightsDashboard() {
           {insights && (
             <>
               {/* Özet Kartları */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Toplam Öğrenci
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-primary" />
-                  <span className="text-2xl font-bold">{insights.insight.totalStudents}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Yüksek Risk
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-red-500" />
-                  <span className="text-2xl font-bold text-red-500">
-                    {insights.insight.highRiskCount}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Kritik Uyarı
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-orange-500" />
-                  <span className="text-2xl font-bold">
-                    {insights.insight.criticalAlertsCount}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Yeni Uyarı
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-blue-500" />
-                  <span className="text-2xl font-bold">{insights.insight.newAlertsCount}</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              <StatsGrid columns={4}>
+                <StatCard
+                  title="Toplam Öğrenci"
+                  value={insights.insight.totalStudents}
+                  icon={Users}
+                  gradient={MODERN_GRADIENTS.blue}
+                  delay={0}
+                />
+                <StatCard
+                  title="Yüksek Risk"
+                  value={insights.insight.highRiskCount}
+                  icon={AlertTriangle}
+                  gradient={MODERN_GRADIENTS.rose}
+                  delay={0.1}
+                />
+                <StatCard
+                  title="Kritik Uyarı"
+                  value={insights.insight.criticalAlertsCount}
+                  icon={AlertTriangle}
+                  gradient={MODERN_GRADIENTS.amber}
+                  delay={0.2}
+                />
+                <StatCard
+                  title="Yeni Uyarı"
+                  value={insights.insight.newAlertsCount}
+                  icon={TrendingUp}
+                  gradient={MODERN_GRADIENTS.cyan}
+                  delay={0.3}
+                />
+              </StatsGrid>
 
           {/* Ana Bulgular ve AI Insights */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
