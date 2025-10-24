@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PageHeader } from '@/components/ui/page-header';
 import {
   Select,
   SelectContent,
@@ -32,7 +33,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { Upload, Download, UserPlus, FileSpreadsheet, FileText } from 'lucide-react';
+import { Upload, Download, UserPlus, FileSpreadsheet, FileText, Users } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
@@ -395,17 +396,13 @@ export default function Students() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/15 via-primary/5 to-accent/15 border border-primary/20 p-8 shadow-lg">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
-        <div className="relative">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-2 text-primary">Öğrenci Yönetimi</h1>
-              <p className="text-muted-foreground">
-                Öğrenci kayıtlarını görüntüleyin ve yönetin
-              </p>
-            </div>
+    <div className="container mx-auto py-6 space-y-6">
+      <PageHeader
+        title="Öğrenci Yönetimi"
+        subtitle="Öğrenci kayıtlarını görüntüleyin ve yönetin"
+        icon={Users}
+        actions={
+          <>
             <div className="flex gap-2 flex-wrap">
               <label className="inline-flex items-center">
                 <input
@@ -472,8 +469,9 @@ export default function Students() {
 
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    <UserPlus className="mr-2 h-4 w-4" /> Yeni Öğrenci
+                  <Button size="lg" className="gap-2">
+                    <UserPlus className="h-5 w-5" />
+                    Yeni Öğrenci
                   </Button>
                 </DialogTrigger>
                 <StudentFormDialog
@@ -487,9 +485,9 @@ export default function Students() {
                 />
               </Dialog>
             </div>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       <StatsCards stats={stats} isLoading={isLoading} />
 
