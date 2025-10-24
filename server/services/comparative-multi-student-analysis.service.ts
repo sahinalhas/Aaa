@@ -329,7 +329,7 @@ Yanıtını JSON formatında ver (TypeScript ComparativeAnalysisReport tipine uy
         const validatedReport = {
           analysisDate: new Date().toISOString(),
           classId: classId !== 'custom' ? classId : undefined,
-          className: students[0]?.className,
+          class: students[0]?.class,
           studentCount: students.length,
           studentComparisons: Array.isArray(parsed.studentComparisons) ? parsed.studentComparisons : fallback.studentComparisons,
           classPatterns: Array.isArray(parsed.classPatterns) ? parsed.classPatterns : fallback.classPatterns,
@@ -366,7 +366,7 @@ Yanıtını JSON formatında ver (TypeScript ComparativeAnalysisReport tipine uy
     return {
       analysisDate: new Date().toISOString(),
       classId: classId !== 'custom' ? classId : undefined,
-      className: students[0]?.className,
+      class: students[0]?.class,
       studentCount: students.length,
       studentComparisons,
       classPatterns: [
@@ -517,7 +517,7 @@ Yanıtını JSON formatında ver (TypeScript ComparativeAnalysisReport tipine uy
     return {
       analysisDate: new Date().toISOString(),
       classId: classId !== 'custom' ? classId : undefined,
-      className: students[0]?.className,
+      class: students[0]?.class,
       studentCount: students.length,
       studentComparisons,
       classPatterns,

@@ -46,7 +46,7 @@ export const getPriorityStudents: RequestHandler = async (req, res) => {
       return {
         studentId: status.studentId,
         studentName: student?.name || 'Bilinmiyor',
-        className: student?.className || '',
+        class: student?.class || '',
         priorityScore,
         status: status.overallStatus,
         criticalAlerts: alerts.length,

@@ -99,7 +99,7 @@ export class ExportService {
       
       schoolStats.classDistribution.forEach(cd => {
         data.push([
-          cd.className,
+          cd.class,
           cd.studentCount,
           cd.maleCount,
           cd.femaleCount,
@@ -120,7 +120,7 @@ export class ExportService {
     
     report.classComparisons.forEach(cc => {
       data.push([
-        cc.className,
+        cc.class,
         cc.studentCount as any,
         cc.averageGPA.toFixed(2),
         (cc.attendanceRate * 100).toFixed(1),
@@ -140,7 +140,7 @@ export class ExportService {
     
     report.classComparisons.forEach(cc => {
       data.push([
-        cc.className,
+        cc.class,
         cc.strengths.join('; '),
         cc.challenges.join('; ')
       ]);

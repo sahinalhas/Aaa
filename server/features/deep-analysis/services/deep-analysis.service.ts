@@ -299,7 +299,7 @@ async function generateComparativeAnalysis(studentId: string): Promise<Comparati
     studentId,
     studentName: `${student.name} ${student.surname}`,
     classComparison: {
-      className: student.class || 'Bilinmiyor',
+      class: student.class || 'Bilinmiyor',
       studentRank: 0,
       totalStudents: classStats?.totalStudents || 0,
       percentile: 50,
