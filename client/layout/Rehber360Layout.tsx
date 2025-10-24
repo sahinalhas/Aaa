@@ -248,7 +248,7 @@ export default function Rehber360Layout() {
           </ScrollArea>
 
           <div className="border-t px-3 py-4">
-            <AIStatusIndicator />
+            <AIStatusIndicator collapsed={!sidebarOpen} />
           </div>
         </aside>
       )}
