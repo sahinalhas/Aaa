@@ -2,9 +2,6 @@
 export { default as StandardizedHealthSection } from './StandardizedHealthSection';
 export { default as OzelEgitimSection } from './OzelEgitimSection';
 
-// ESKİ BİLEŞENLER - Geriye dönük uyumluluk için (artık yeni yapıda kullanılmıyor)
-export { default as BasicInfoSection } from './BasicInfoSection';
-
 // Akademik Bileşenler
 export { default as StandardizedAcademicSection } from './StandardizedAcademicSection';
 export { default as CalismaProgramiSection } from './CalismaProgramiSection';
@@ -36,7 +33,3 @@ export { default as CareerGuidanceSection } from './CareerGuidanceSection';
 export { default as UnifiedRiskSection } from './UnifiedRiskSection';
 export { default as UnifiedMeetingsSection } from './UnifiedMeetingsSection';
 export { default as AIToolsHub } from './AIToolsHub';
-
-// ESKİ BİLEŞENLER (Geriye dönük uyumluluk)
-export { default as GorusmelerSection } from './GorusmelerSection';
-export { default as VeliGorusmeleriSection } from './VeliGorusmeleriSection';

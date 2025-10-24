@@ -5,7 +5,7 @@
  */
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RISK_TABS, TAB_COLORS } from "@/pages/StudentProfile/constants";
+import { TAB_COLORS } from "@/pages/StudentProfile/constants";
 import UnifiedRiskSection from "./UnifiedRiskSection";
 import { Student } from "@/lib/storage";
 

@@ -5,7 +5,7 @@
  */
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MAIN_TABS, KIMLIK_TABS, SAGLIK_TABS, TAB_COLORS } from "./constants";
+import { MAIN_TABS, TAB_COLORS } from "./constants";
 import { StudentData } from "@/hooks/student-profile";
 import { Student } from "@/lib/storage";
 
