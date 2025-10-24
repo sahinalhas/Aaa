@@ -46,4 +46,17 @@ export function createStudentsTables(db: Database.Database): void {
       FOREIGN KEY (studentId) REFERENCES students (id) ON DELETE CASCADE
     );
   `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS attendance_records (
+      id TEXT PRIMARY KEY,
+      studentId TEXT NOT NULL,
+      date TEXT NOT NULL,
+      status TEXT NOT NULL,
+      reason TEXT,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (studentId) REFERENCES students (id) ON DELETE CASCADE
+    );
+  `);
 }

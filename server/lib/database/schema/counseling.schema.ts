@@ -120,8 +120,18 @@ export function createCounselingTables(db: Database.Database): void {
     CREATE TABLE IF NOT EXISTS family_participation (
       id TEXT PRIMARY KEY,
       studentId TEXT NOT NULL,
-      eventDate TEXT NOT NULL,
       eventType TEXT NOT NULL,
+      eventName TEXT,
+      eventDate TEXT NOT NULL,
+      participationStatus TEXT,
+      participants TEXT,
+      engagementLevel TEXT,
+      communicationFrequency TEXT,
+      preferredContactMethod TEXT,
+      parentAvailability TEXT,
+      notes TEXT,
+      recordedBy TEXT,
+      recordedAt TEXT,
       description TEXT,
       participantNames TEXT,
       outcomes TEXT,
@@ -130,6 +140,46 @@ export function createCounselingTables(db: Database.Database): void {
       FOREIGN KEY (studentId) REFERENCES students (id) ON DELETE CASCADE
     );
   `);
+
+  try {
+    db.exec(`ALTER TABLE family_participation ADD COLUMN eventName TEXT`);
+  } catch (e) {  }
+  
+  try {
+    db.exec(`ALTER TABLE family_participation ADD COLUMN participationStatus TEXT`);
+  } catch (e) {  }
+  
+  try {
+    db.exec(`ALTER TABLE family_participation ADD COLUMN participants TEXT`);
+  } catch (e) {  }
+  
+  try {
+    db.exec(`ALTER TABLE family_participation ADD COLUMN engagementLevel TEXT`);
+  } catch (e) {  }
+  
+  try {
+    db.exec(`ALTER TABLE family_participation ADD COLUMN communicationFrequency TEXT`);
+  } catch (e) {  }
+  
+  try {
+    db.exec(`ALTER TABLE family_participation ADD COLUMN preferredContactMethod TEXT`);
+  } catch (e) {  }
+  
+  try {
+    db.exec(`ALTER TABLE family_participation ADD COLUMN parentAvailability TEXT`);
+  } catch (e) {  }
+  
+  try {
+    db.exec(`ALTER TABLE family_participation ADD COLUMN recordedBy TEXT`);
+  } catch (e) {  }
+  
+  try {
+    db.exec(`ALTER TABLE family_participation ADD COLUMN recordedAt TEXT`);
+  } catch (e) {  }
+  
+  try {
+    db.exec(`ALTER TABLE family_participation ADD COLUMN notes TEXT`);
+  } catch (e) {  }
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS counseling_reminders (
