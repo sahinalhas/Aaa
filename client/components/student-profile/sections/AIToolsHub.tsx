@@ -55,22 +55,18 @@ export default function AIToolsHub({ studentId, studentName, onUpdate }: AITools
   return (
     <div className="space-y-6">
       {/* AI Araçları Sekmeleri */}
-      <Tabs defaultValue="mudahale" className="space-y-6">
-        <TabsList className="grid grid-cols-3 md:grid-cols-4 gap-2 h-auto">
-          <TabsTrigger value="mudahale" className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4" />
+      <Tabs defaultValue="mudahale" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+          <TabsTrigger value="mudahale">
             Müdahale Önerileri
           </TabsTrigger>
-          <TabsTrigger value="raporlar" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
+          <TabsTrigger value="raporlar">
             Otomatik Raporlar
           </TabsTrigger>
-          <TabsTrigger value="veli-iletisim" className="flex items-center gap-2">
-            <Mail className="h-4 w-4" />
+          <TabsTrigger value="veli-iletisim">
             Veli İletişimi
           </TabsTrigger>
-          <TabsTrigger value="sesli-not" className="flex items-center gap-2">
-            <Activity className="h-4 w-4" />
+          <TabsTrigger value="sesli-not">
             Sesli Not
           </TabsTrigger>
         </TabsList>

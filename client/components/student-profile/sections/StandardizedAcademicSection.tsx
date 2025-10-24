@@ -71,9 +71,8 @@ export default function StandardizedAcademicSection({
   });
 
   return (
-    <Card className="relative overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-blue-500 to-blue-600" />
-      <CardHeader className="relative">
+    <Card>
+      <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <GraduationCap className="h-5 w-5" />
           Standartlaştırılmış Akademik Profil
@@ -82,7 +81,7 @@ export default function StandardizedAcademicSection({
           Ölçülebilir akademik yetkinlikler ve öğrenme stilleri
         </CardDescription>
       </CardHeader>
-      <CardContent className="relative">
+      <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField

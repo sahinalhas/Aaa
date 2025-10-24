@@ -128,21 +128,16 @@ export default function CommunicationCenter({
       </div>
 
       {/* Alt Sekmeler */}
-      <Tabs defaultValue="tum-gorusmeler" className="space-y-6" onValueChange={loadStats}>
-        <TabsList className={`w-full justify-start ${TAB_COLORS.iletisim.bg} p-2 flex-wrap h-auto min-h-[2.5rem] border-2 ${TAB_COLORS.iletisim.border} rounded-xl shadow-md`}>
-          {ILETISIM_TABS.map(({ value, label, icon: Icon }) => (
-            <TabsTrigger 
-              key={value} 
-              value={value} 
-              className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-md shrink-0 px-4 py-2.5 transition-all duration-200 rounded-lg"
-            >
-              <Icon className="h-4 w-4" />
-              <span className="font-medium text-sm">{label}</span>
+      <Tabs defaultValue="tum-gorusmeler" className="space-y-4" onValueChange={loadStats}>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+          {ILETISIM_TABS.map(({ value, label }) => (
+            <TabsTrigger key={value} value={value}>
+              {label}
             </TabsTrigger>
           ))}
         </TabsList>
 
-        <TabsContent value="tum-gorusmeler" className="animate-in slide-in-from-left-10 duration-300">
+        <TabsContent value="tum-gorusmeler" className="space-y-4">
           <UnifiedMeetingsSection
             studentId={studentId}
             onUpdate={() => {
@@ -152,7 +147,7 @@ export default function CommunicationCenter({
           />
         </TabsContent>
 
-        <TabsContent value="ev-ziyaretleri" className="animate-in slide-in-from-left-10 duration-300">
+        <TabsContent value="ev-ziyaretleri" className="space-y-4">
           <EvZiyaretleriSection
             studentId={studentId}
             homeVisits={homeVisitsData}
@@ -163,7 +158,7 @@ export default function CommunicationCenter({
           />
         </TabsContent>
 
-        <TabsContent value="aile-katilimi" className="animate-in slide-in-from-left-10 duration-300">
+        <TabsContent value="aile-katilimi" className="space-y-4">
           <AileKatilimiSection
             studentId={studentId}
             familyParticipation={familyParticipationData}
@@ -174,7 +169,7 @@ export default function CommunicationCenter({
           />
         </TabsContent>
 
-        <TabsContent value="gecmis" className="animate-in slide-in-from-left-10 duration-300">
+        <TabsContent value="gecmis" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>İletişim Geçmişi</CardTitle>

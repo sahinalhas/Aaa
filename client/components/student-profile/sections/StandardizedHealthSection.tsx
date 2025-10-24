@@ -83,9 +83,8 @@ export default function StandardizedHealthSection({
   });
 
   return (
-    <Card className="relative overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-green-500 to-green-600" />
-      <CardHeader className="relative">
+    <Card>
+      <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Activity className="h-5 w-5" />
           Standartlaştırılmış Sağlık Profili
@@ -94,7 +93,7 @@ export default function StandardizedHealthSection({
           Kategorize edilmiş sağlık bilgileri ve tıbbi öykü
         </CardDescription>
       </CardHeader>
-      <CardContent className="relative">
+      <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-4">

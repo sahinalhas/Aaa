@@ -75,9 +75,8 @@ export default function StandardizedSocialEmotionalSection({
   });
 
   return (
-    <Card className="relative overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-rose-500 to-rose-600" />
-      <CardHeader className="relative">
+    <Card>
+      <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Heart className="h-5 w-5" />
           Standartlaştırılmış Sosyal-Duygusal Profil
@@ -86,7 +85,7 @@ export default function StandardizedSocialEmotionalSection({
           Ölçülebilir SEL yetkinlikleri ve sosyal etkileşim becerileri
         </CardDescription>
       </CardHeader>
-      <CardContent className="relative">
+      <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
