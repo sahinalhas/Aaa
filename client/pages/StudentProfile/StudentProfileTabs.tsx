@@ -237,7 +237,8 @@ export function StudentProfileTabs({
             studentName={studentName}
             onUpdate={onUpdate}
           />
-        </motion.div>
+          </motion.div>
+        </div>
       </TabsContent>
     </Tabs>
   );
