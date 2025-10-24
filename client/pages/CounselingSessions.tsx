@@ -278,28 +278,28 @@ export default function CounselingSessions() {
         <div className="flex gap-2 flex-wrap">
           <Button 
             onClick={() => setSearchOpen(true)}
-            size="lg"
+            size="sm"
             variant="outline"
             className="gap-2"
           >
-            <SearchIcon className="h-5 w-5" />
+            <SearchIcon className="h-4 w-4" />
             Ara (⌘K)
           </Button>
           <Button 
             onClick={() => setReportDialogOpen(true)}
-            size="lg"
+            size="sm"
             variant="outline"
             className="gap-2"
           >
-            <Download className="h-5 w-5" />
+            <Download className="h-4 w-4" />
             Rapor
           </Button>
           <Button 
             onClick={() => setDialogOpen(true)}
-            size="lg"
+            size="sm"
             className="gap-2"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
             Yeni Görüşme
           </Button>
         </div>
