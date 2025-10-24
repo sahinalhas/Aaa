@@ -1,8 +1,9 @@
 // Temel Bilgi Bileşenleri
-export { default as BasicInfoSection } from './BasicInfoSection';
 export { default as StandardizedHealthSection } from './StandardizedHealthSection';
 export { default as OzelEgitimSection } from './OzelEgitimSection';
-export { default as SaglikBilgileriSection } from './SaglikBilgileriSection';
+
+// ESKİ BİLEŞENLER - Geriye dönük uyumluluk için (artık yeni yapıda kullanılmıyor)
+export { default as BasicInfoSection } from './BasicInfoSection';
 
 // Akademik Bileşenler
 export { default as StandardizedAcademicSection } from './StandardizedAcademicSection';
