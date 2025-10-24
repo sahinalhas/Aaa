@@ -198,19 +198,20 @@
     inset: 0;
     pointer-events: none;
     background:
+      url('data:image/svg+xml;utf8,<svg width="120" height="120" xmlns="http://www.w3.org/2000/svg"><g opacity="0.06" fill="%233b82f6"><path d="M30 40h-8v-8h2v6h6v2zm10-8v14h-2V34h10v2h-8zm12 8c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6-6-2.69-6-6zm2 0c0 2.21 1.79 4 4 4s4-1.79 4-4-1.79-4-4-4-4 1.79-4 4zm16-8l4 6 4-6h2.5l-5.5 8v6h-2v-6l-5.5-8h2.5z"/><circle cx="30" cy="80" r="1.5"/><circle cx="90" cy="30" r="1.5"/><circle cx="80" cy="90" r="1.5"/></g></svg>') repeat,
       radial-gradient(
         circle 1200px at 10% 20%,
-        hsl(var(--primary) / 0.08),
+        hsl(var(--primary) / 0.05),
         transparent 60%
       ),
       radial-gradient(
         circle 1000px at 90% 10%,
-        hsl(var(--chart-2) / 0.06),
+        hsl(var(--chart-2) / 0.04),
         transparent 60%
       ),
       radial-gradient(
         circle 800px at 50% 100%,
-        hsl(var(--primary) / 0.04),
+        hsl(var(--primary) / 0.03),
         transparent 70%
       );
     z-index: -1;

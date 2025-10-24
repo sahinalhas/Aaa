@@ -318,7 +318,7 @@ export default function Index() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08, duration: 0.3 }}
           >
-            <Card className={`group relative overflow-hidden hover:shadow-xl transition-all duration-300 border ${stat.borderColor}`}>
+            <Card className={`group relative overflow-hidden hover:shadow-xl transition-all duration-300 border ${stat.borderColor} glass-light`}>
               <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
               <CardContent className="relative p-6">
                 <div className="flex items-start justify-between gap-4">
@@ -348,7 +348,7 @@ export default function Index() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="h-full border-2 hover:shadow-xl transition-shadow duration-300">
+          <Card className="h-full border-2 hover:shadow-xl transition-shadow duration-300 glass-light">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-primary" />
@@ -403,7 +403,7 @@ export default function Index() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="h-full border-2 hover:shadow-xl transition-shadow duration-300">
+          <Card className="h-full border-2 hover:shadow-xl transition-shadow duration-300 glass-light">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-amber-600" />
@@ -444,7 +444,7 @@ export default function Index() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Card className="border-2 hover:shadow-xl transition-shadow duration-300">
+          <Card className="border-2 hover:shadow-xl transition-shadow duration-300 glass-light">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Activity className="h-5 w-5 text-primary" />
@@ -515,7 +515,7 @@ export default function Index() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Card className="border-2 hover:shadow-xl transition-shadow duration-300">
+          <Card className="border-2 hover:shadow-xl transition-shadow duration-300 glass-light">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-primary" />

@@ -289,6 +289,23 @@ export default {
         '.safe-area-inset-right': {
           'padding-right': 'env(safe-area-inset-right)',
         },
+        '.bg-soft-gradient': {
+          'background': 'linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted) / 0.3) 100%)',
+        },
+        '.bg-subtle-gradient': {
+          'background': 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--primary) / 0.02) 100%)',
+        },
+        '.glass-card': {
+          'background': 'hsl(var(--background) / 0.8)',
+          'backdrop-filter': 'blur(12px) saturate(150%)',
+          '-webkit-backdrop-filter': 'blur(12px) saturate(150%)',
+          'border': '1px solid hsl(var(--border) / 0.5)',
+          'box-shadow': '0 4px 16px hsl(var(--foreground) / 0.04)',
+        },
+        '.glass-light': {
+          'backdrop-filter': 'blur(6px) saturate(110%)',
+          '-webkit-backdrop-filter': 'blur(6px) saturate(110%)',
+        },
       });
     }
   ],
