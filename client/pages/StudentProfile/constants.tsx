@@ -16,14 +16,9 @@ import {
   BookOpen,
   Trophy,
   PieChart,
-  Shield,
-  AlertTriangle,
   Users,
   Home,
   Calendar,
-  Mail,
-  FileText,
-  Info,
 } from "lucide-react";
 
 /**
