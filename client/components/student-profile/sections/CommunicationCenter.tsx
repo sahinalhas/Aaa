@@ -9,6 +9,7 @@ import { ILETISIM_TABS, TAB_COLORS } from "@/pages/StudentProfile/constants";
 import UnifiedMeetingsSection from "./UnifiedMeetingsSection";
 import EvZiyaretleriSection from "./EvZiyaretleriSection";
 import AileKatilimiSection from "./AileKatilimiSection";
+import AIToolsHub from "./AIToolsHub";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageCircle, Calendar, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -19,11 +20,13 @@ import { tr } from "date-fns/locale";
 
 interface CommunicationCenterProps {
   studentId: string;
+  studentName?: string;
   onUpdate: () => void;
 }
 
 export default function CommunicationCenter({
   studentId,
+  studentName = "Öğrenci",
   onUpdate
 }: CommunicationCenterProps) {
   const [stats, setStats] = useState({
@@ -129,7 +132,7 @@ export default function CommunicationCenter({
 
       {/* Alt Sekmeler */}
       <Tabs defaultValue="tum-gorusmeler" className="space-y-4" onValueChange={loadStats}>
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
           {ILETISIM_TABS.map(({ value, label }) => (
             <TabsTrigger key={value} value={value}>
               {label}
@@ -183,6 +186,14 @@ export default function CommunicationCenter({
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="ai-araclari" className="space-y-4">
+          <AIToolsHub
+            studentId={studentId}
+            studentName={studentName}
+            onUpdate={onUpdate}
+          />
         </TabsContent>
       </Tabs>
     </div>

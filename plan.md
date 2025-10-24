@@ -197,18 +197,20 @@
 
 ### Faz 5: Ana Yapı Değişiklikleri
 
-- [ ] **Adım 13:** İletişim & Raporlar birleştirmesi
-  - [ ] Ana sekme ismini "İletişim & Raporlar" yap
-  - [ ] CommunicationCenter'a AI Araçları alt sekmesi ekle
-  - [ ] AIToolsHub'ı bu sekmeye taşı
-  - [ ] `ILETISIM_TABS` dizisine 'ai-araclari' ekle
+- [x] **Adım 13:** İletişim & Raporlar birleştirmesi ✅
+  - [x] Ana sekme ismini "İletişim & Raporlar" yap
+  - [x] CommunicationCenter'a AI Araçları alt sekmesi ekle
+  - [x] AIToolsHub'ı bu sekmeye taşı
+  - [x] `ILETISIM_TABS` dizisine 'ai-araclari' eklendi
+  - [x] CommunicationCenter'a studentName prop'u eklendi
 
-- [ ] **Adım 14:** Ana sekme yapısını güncelle
-  - [ ] `MAIN_TABS` dizisini 8 sekmeye düşür
-  - [ ] "ai-hub" sekmesini kaldır
-  - [ ] "iletisim" sekmesini "iletisim-raporlar" yap
-  - [ ] StudentProfileTabs.tsx'de "ai-hub" TabsContent'i kaldır
-  - [ ] Description'ları güncelle
+- [x] **Adım 14:** Ana sekme yapısını güncelle ✅
+  - [x] `MAIN_TABS` dizisini 8 sekmeye düşür
+  - [x] "ai-hub" sekmesini kaldır
+  - [x] "iletisim" label'ı "İletişim & Raporlar" yapıldı
+  - [x] StudentProfileTabs.tsx'de "ai-hub" TabsContent'i kaldırıldı
+  - [x] TabsList grid yapısı 9'dan 8'e düşürüldü
+  - [x] AIToolsHub import'u kaldırıldı
 
 ### Faz 6: Test ve Review
 
@@ -334,12 +336,15 @@ export const ILETISIM_TABS = [
 **Başlangıç:** 24 Ekim 2025  
 **Tahmini Tamamlanma:** 24 Ekim 2025  
 **Toplam Adım:** 16  
-**Tamamlanan:** 11/16  
-**Kalan:** 5
+**Tamamlanan:** 14/16  
+**Kalan:** 2
 
 ---
 
-**Son Güncelleme:** 24 Ekim 2025 - Adım 7-11 tamamlandı ✅
+**Son Güncelleme:** 24 Ekim 2025 - Adım 7-14 tamamlandı ✅
 - HedeflerPlanlamaSection oluşturuldu
 - Gelişim sekmesi 360 Derece alt sekmesi eklendi
 - Bilgi taşıma işlemleri tamamlandı
+- Risk sekmesine DisciplineSection eklendi
+- AI Araçları İletişim & Raporlar sekmesine taşındı
+- Ana sekme yapısı 9'dan 8'e düşürüldü

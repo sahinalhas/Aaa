@@ -73,15 +73,9 @@ export const MAIN_TABS = [
   },
   {
     value: "iletisim",
-    label: "💬 İletişim Merkezi",
+    label: "💬 İletişim & Raporlar",
     icon: MessageCircle,
-    description: "Tüm görüşmeler, ev ziyaretleri, iletişim geçmişi"
-  },
-  {
-    value: "ai-hub",
-    label: "🤖 AI Araçları",
-    icon: Bot,
-    description: "AI müdahale önerileri, rapor üretimi, veli iletişimi"
+    description: "Görüşmeler, ev ziyaretleri, iletişim geçmişi, AI araçları"
   },
 ] as const;
 
@@ -184,6 +178,11 @@ export const ILETISIM_TABS = [
     value: "gecmis",
     label: "İletişim Geçmişi",
     icon: Calendar,
+  },
+  {
+    value: "ai-araclari",
+    label: "AI Araçları",
+    icon: Bot,
   },
 ] as const;
 
