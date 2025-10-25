@@ -25,8 +25,11 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
     const [isListening, setIsListening] = React.useState(false);
     const [isVoiceSupported, setIsVoiceSupported] = React.useState(false);
     const recognitionRef = React.useRef<any>(null);
-    const finalTranscriptRef = React.useRef<string>('');
-    const startingValueRef = React.useRef<string>('');
+    
+    // Tracking refs - ONLY track what we've already processed
+    const processedResultsCountRef = React.useRef<number>(0);
+    const textBeforeVoiceRef = React.useRef<string>('');
+    const accumulatedVoiceTextRef = React.useRef<string>('');
 
     React.useEffect(() => {
       if (props.value !== undefined) {
@@ -55,37 +58,53 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
 
         recognition.onstart = () => {
           setIsListening(true);
+          console.log('Voice recognition started');
         };
 
         recognition.onresult = (event: any) => {
-          let finalText = '';
+          // Sadece YENİ sonuçları işle
+          const currentResultsCount = event.results.length;
           
-          // Sadece YENİ final sonuçları topla
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            if (event.results[i].isFinal) {
-              finalText += event.results[i][0].transcript + ' ';
-            }
+          // Eğer yeni sonuç yoksa, çık
+          if (currentResultsCount <= processedResultsCountRef.current) {
+            return;
           }
 
-          // Eğer yeni final text varsa ekle
-          if (finalText) {
-            finalTranscriptRef.current += finalText;
+          // Sadece yeni eklenen sonuçları işle
+          for (let i = processedResultsCountRef.current; i < currentResultsCount; i++) {
+            const result = event.results[i];
             
-            const newValue = startingValueRef.current + finalTranscriptRef.current;
-            setCurrentValue(newValue);
-            onValueChange?.(newValue);
-            
-            if (textareaRef.current) {
-              const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-                window.HTMLTextAreaElement.prototype,
-                'value'
-              )?.set;
-              nativeInputValueSetter?.call(textareaRef.current, newValue);
+            if (result.isFinal) {
+              const newText = result[0].transcript;
               
-              const inputEvent = new Event('input', { bubbles: true });
-              textareaRef.current.dispatchEvent(inputEvent);
+              // Yeni metni sadece BIRIKIMLI metne ekle
+              accumulatedVoiceTextRef.current += newText + ' ';
+              
+              // Toplam metni oluştur: başlangıç metni + ses metni
+              const fullText = textBeforeVoiceRef.current + accumulatedVoiceTextRef.current;
+              
+              // UI'ı güncelle
+              setCurrentValue(fullText);
+              onValueChange?.(fullText);
+              
+              if (textareaRef.current) {
+                const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                  window.HTMLTextAreaElement.prototype,
+                  'value'
+                )?.set;
+                nativeInputValueSetter?.call(textareaRef.current, fullText);
+                
+                const inputEvent = new Event('input', { bubbles: true });
+                textareaRef.current.dispatchEvent(inputEvent);
+              }
+              
+              console.log('New final text added:', newText);
+              console.log('Accumulated voice text:', accumulatedVoiceTextRef.current);
             }
           }
+          
+          // İşlenen sonuç sayısını güncelle
+          processedResultsCountRef.current = currentResultsCount;
         };
 
         recognition.onerror = (event: any) => {
@@ -104,6 +123,7 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
         };
 
         recognition.onend = () => {
+          console.log('Voice recognition ended');
           setIsListening(false);
         };
 
@@ -131,14 +151,19 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
         try {
           recognitionRef.current.stop();
           setIsListening(false);
+          
+          // Refs'leri sıfırlama - ses girişi tamamlandı
+          processedResultsCountRef.current = 0;
+          
           toast.success('Sesli giriş durduruldu');
         } catch (err) {
           console.error('Failed to stop recognition:', err);
         }
       } else {
-        // Başlat
-        finalTranscriptRef.current = '';
-        startingValueRef.current = currentValue;
+        // Başlat - tüm tracking değişkenlerini sıfırla
+        processedResultsCountRef.current = 0;
+        textBeforeVoiceRef.current = currentValue; // Mevcut metni kaydet
+        accumulatedVoiceTextRef.current = ''; // Ses metnini sıfırla
         
         try {
           recognitionRef.current.start();
