@@ -50,10 +50,10 @@ export default function EnhancedSessionsTable({
     { key: 'topic2', label: '1. Aşama', visible: true },
     { key: 'topic3', label: '2. Aşama', visible: true },
     { key: 'topic', label: 'Konu', visible: true },
-    { key: 'mode', label: 'Mod', visible: true },
+    { key: 'mode', label: 'Çalışma Yöntemi', visible: true },
     { key: 'duration', label: 'Süre', visible: true },
     { key: 'status', label: 'Durum', visible: true },
-    { key: 'notes', label: 'Notlar', visible: false },
+    { key: 'notes', label: 'Açıklama', visible: false },
   ]);
 
   const toggleColumn = (key: string) => {
@@ -233,7 +233,7 @@ export default function EnhancedSessionsTable({
                   <th className="text-left px-4 py-3">Konu</th>
                 )}
                 {columns.find(c => c.key === 'mode')?.visible && (
-                  <th className="text-left px-4 py-3">Mod</th>
+                  <th className="text-left px-4 py-3">Çalışma Yöntemi</th>
                 )}
                 {columns.find(c => c.key === 'duration')?.visible && (
                   <th className="text-left px-4 py-3">
@@ -244,7 +244,7 @@ export default function EnhancedSessionsTable({
                   <th className="text-left px-4 py-3">Durum</th>
                 )}
                 {columns.find(c => c.key === 'notes')?.visible && (
-                  <th className="text-left px-4 py-3">Notlar</th>
+                  <th className="text-left px-4 py-3">Açıklama</th>
                 )}
               </tr>
             </thead>
@@ -254,7 +254,7 @@ export default function EnhancedSessionsTable({
                   ? calculateSessionDuration(session.entryTime, session.exitTime)
                   : null;
                 const studentName = session.sessionType === 'individual'
-                  ? session.student?.name
+                  ? `${session.student?.name || ''} ${session.student?.surname || ''}`.trim()
                   : session.groupName || 'Grup Görüşmesi';
 
                 return (
