@@ -75,7 +75,7 @@ export default function EnhancedCompleteSessionDialog({
   });
 
   const followUpNeeded = form.watch("followUpNeeded");
-  
+
   useEffect(() => {
     if (followUpNeeded && !form.getValues("followUpDate")) {
       setDatePickerOpen(true);
@@ -241,6 +241,8 @@ export default function EnhancedCompleteSessionDialog({
                             placeholder="Görüşmede neler konuşuldu, hangi kararlar alındı, ulaşılan sonuçlar neler oldu..."
                             rows={8}
                             className="border-2 focus:border-blue-400 resize-none"
+                            enableVoice={true}
+                            voiceLanguage="tr-TR"
                           />
                         </FormControl>
                         <FormDescription className="text-xs text-muted-foreground">
@@ -593,7 +595,7 @@ export default function EnhancedCompleteSessionDialog({
         </div>
 
         <Separator />
-        
+
         <DialogFooter className="gap-2 sm:gap-0 pt-4 sticky bottom-0 bg-background">
           <Button 
             type="button" 

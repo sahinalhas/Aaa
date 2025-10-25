@@ -1,24 +1,97 @@
-
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Sparkles, Loader2 } from "lucide-react";
 import { Button } from "./button";
 import { toast } from "sonner";
+import { VoiceInputButton } from "./voice-input-button";
+import { VoiceInputStatus } from "./voice-input-status";
+import type { 
+  EnhancedTextareaVoiceProps,
+  SpeechRecognitionStatus 
+} from "@/shared/types/speech.types";
 
 export interface EnhancedTextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+    EnhancedTextareaVoiceProps {
   enableAIPolish?: boolean;
   aiContext?: 'academic' | 'counseling' | 'notes' | 'general';
   onValueChange?: (value: string) => void;
 }
 
 const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaProps>(
-  ({ className, enableAIPolish = true, aiContext = 'general', onValueChange, ...props }, ref) => {
+  ({ className, enableAIPolish = true, aiContext = 'general', onValueChange,
+    enableVoice = false,
+    voiceMode = 'append',
+    voiceLanguage = 'tr-TR',
+    onVoiceStart,
+    onVoiceEnd,
+    onChange,
+    value,
+    ...props 
+  }, ref) => {
     const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
     const [isPolishing, setIsPolishing] = React.useState(false);
     const [isFocused, setIsFocused] = React.useState(false);
     const [currentValue, setCurrentValue] = React.useState(props.value?.toString() || props.defaultValue?.toString() || '');
     const previousValueRef = React.useRef<string | undefined>(undefined);
+
+    const [voiceStatus, setVoiceStatus] = React.useState<SpeechRecognitionStatus>('idle');
+    const [isVoiceActive, setIsVoiceActive] = React.useState(false);
+    const internalTextareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+    React.useImperativeHandle(ref, () => internalTextareaRef.current!);
+
+    const handleVoiceTranscript = (transcript: string) => {
+      if (!internalTextareaRef.current) return;
+  
+      const currentTextareaValue = internalTextareaRef.current.value;
+      const newValue = voiceMode === 'append' 
+        ? `${currentTextareaValue}${currentTextareaValue ? ' ' : ''}${transcript}` 
+        : transcript;
+  
+      // Directly update the textarea value and dispatch input event
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+        window.HTMLTextAreaElement.prototype,
+        'value'
+      )?.set;
+  
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(internalTextareaRef.current, newValue);
+        const event = new Event('input', { bubbles: true });
+        internalTextareaRef.current.dispatchEvent(event);
+      }
+  
+      if (onChange) {
+        const syntheticEvent = {
+          target: { value: newValue }
+        } as React.ChangeEvent<HTMLTextAreaElement>;
+        onChange(syntheticEvent);
+      }
+  
+      setVoiceStatus('success');
+      setTimeout(() => setVoiceStatus('idle'), 2000);
+    };
+  
+    const handleVoiceError = (error: any) => {
+      console.error("Voice error:", error);
+      setVoiceStatus('error');
+      setIsVoiceActive(false);
+      onVoiceEnd?.();
+      setTimeout(() => setVoiceStatus('idle'), 3000);
+    };
+  
+    React.useEffect(() => {
+      if (isVoiceActive) {
+        setVoiceStatus('listening');
+        onVoiceStart?.();
+      } else {
+        // Only reset status if it was listening and isVoiceActive is false
+        if (voiceStatus === 'listening') {
+          setVoiceStatus('idle');
+          onVoiceEnd?.();
+        }
+      }
+    }, [isVoiceActive, onVoiceStart, onVoiceEnd, voiceStatus]);
 
     React.useEffect(() => {
       if (props.value !== undefined) {
@@ -56,7 +129,7 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
 
         const data = await response.json();
         const polishedText = data.polishedText;
-        
+
         setCurrentValue(polishedText);
         onValueChange?.(polishedText);
 
@@ -82,7 +155,8 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
       const newValue = e.target.value;
       setCurrentValue(newValue);
       onValueChange?.(newValue);
-      props.onChange?.(e);
+      // Prop onChange should be handled by the caller, this internal one is for state management
+      // props.onChange?.(e); 
     };
 
     const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
@@ -98,14 +172,15 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
     const setRefs = React.useCallback(
       (node: HTMLTextAreaElement | null) => {
         textareaRef.current = node;
-        
+        internalTextareaRef.current = node!; // Assign to internal ref as well
+
         if (typeof ref === 'function') {
           ref(node);
         } else if (ref) {
           ref.current = node;
         }
       },
-      [ref]
+      [ref] // Dependency array includes ref
     );
 
     return (
@@ -114,15 +189,17 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
           className={cn(
             "flex min-h-[80px] w-full rounded-lg border border-input bg-background/80 supports-[backdrop-filter]:bg-background/60 backdrop-blur-sm px-3.5 py-2.5 text-sm ring-offset-background transition-all duration-200 placeholder:text-muted-foreground/60 hover:border-border hover:bg-background/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-1 focus-visible:border-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none",
             enableAIPolish && "pr-12",
+            enableVoice && "pr-24", // Reserve space for voice button and status
             className,
           )}
           ref={setRefs}
           {...props}
-          onChange={handleChange}
+          value={value !== undefined ? value : currentValue} // Use controlled value if provided
+          onChange={onChange || handleChange} // Use provided onChange or internal handler
           onFocus={handleFocus}
           onBlur={handleBlur}
         />
-        
+
         {enableAIPolish && (
           <div className={cn(
             "absolute top-2 right-2 flex items-center gap-1 transition-all duration-300 ease-out",
@@ -149,6 +226,31 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
                 <Sparkles className="h-4 w-4" />
               )}
             </Button>
+          </div>
+        )}
+
+        {enableVoice && (
+          <div className={cn(
+            "absolute top-2 right-2 flex items-center gap-1 transition-all duration-300 ease-out",
+            (isFocused || isVoiceActive)
+              ? "opacity-100 translate-x-0"
+              : "opacity-0 translate-x-2 pointer-events-none",
+            enableAIPolish && "translate-x-12" // Adjust position if AI polish is also enabled
+          )}>
+            <VoiceInputButton
+              onTranscript={handleVoiceTranscript}
+              onError={handleVoiceError}
+              language={voiceLanguage}
+              size="sm"
+              variant="inline"
+              onClick={() => setIsVoiceActive(!isVoiceActive)} // Toggle voice activity on button click
+            />
+          </div>
+        )}
+
+        {enableVoice && voiceStatus !== 'idle' && (
+          <div className="absolute bottom-2 right-2">
+            <VoiceInputStatus status={voiceStatus} />
           </div>
         )}
       </div>

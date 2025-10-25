@@ -211,7 +211,14 @@ export default function DavranisTakibiSection({ studentId, behaviorIncidents, on
                 <FormItem>
                   <FormLabel>Davranış Açıklaması</FormLabel>
                   <FormControl>
-                    <EnhancedTextarea placeholder="Davranışı detaylı olarak açıklayın" rows={2} {...field} aiContext="notes" />
+                    <EnhancedTextarea 
+                      placeholder="Davranışı detaylı olarak açıklayın" 
+                      rows={2} 
+                      {...field} 
+                      aiContext="notes"
+                      enableVoice={true}
+                      voiceLanguage="tr-TR"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

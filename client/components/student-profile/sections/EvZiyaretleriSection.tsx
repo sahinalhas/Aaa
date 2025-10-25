@@ -241,7 +241,13 @@ export default function EvZiyaretleriSection({ studentId, homeVisits, onUpdate }
                 <FormItem>
                   <FormLabel>Gözlemler</FormLabel>
                   <FormControl>
-                    <EnhancedTextarea placeholder="Ev ziyareti sırasındaki gözlemlerinizi yazın" {...field} aiContext="notes" />
+                    <EnhancedTextarea 
+                      placeholder="Ev ziyareti sırasındaki gözlemlerinizi yazın" 
+                      {...field} 
+                      aiContext="notes"
+                      enableVoice={true}
+                      voiceLanguage="tr-TR"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

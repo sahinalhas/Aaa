@@ -295,7 +295,13 @@ export default function AileKatilimiSection({ studentId, familyParticipation, on
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <EnhancedTextarea placeholder="Notlar" {...field} aiContext="notes" />
+                    <EnhancedTextarea 
+                      placeholder="Notlar" 
+                      {...field} 
+                      aiContext="notes"
+                      enableVoice={true}
+                      voiceLanguage="tr-TR"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
