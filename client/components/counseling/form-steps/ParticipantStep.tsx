@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Check, ChevronDown, Users as UsersIcon, Search, UserCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 
 import type { IndividualSessionFormValues, GroupSessionFormValues, Student, CounselingTopic } from "../types";
 import StudentInsightCard from "../form-widgets/StudentInsightCard";
+import { getStudentSessionHistory } from "@/lib/api/counseling.api";
 
 interface ParticipantStepProps {
   form: UseFormReturn<IndividualSessionFormValues | GroupSessionFormValues>;
@@ -33,6 +34,8 @@ export default function ParticipantStep({
   const [studentSearchOpen, setStudentSearchOpen] = useState(false);
   const [topicSearchOpen, setTopicSearchOpen] = useState(false);
   const [topicSearch, setTopicSearch] = useState("");
+  const [studentSessionCount, setStudentSessionCount] = useState(0);
+  const [lastSession, setLastSession] = useState<{ date: string; topic: string } | undefined>();
 
   const filteredTopics = topics.filter(topic => 
     topicSearch.trim() === "" || 
@@ -44,6 +47,29 @@ export default function ParticipantStep({
 
   const selectedStudentId = sessionType === 'individual' ? (form.watch("studentId") as string) : null;
   const selectedStudent = selectedStudentId ? students.find(s => s.id === selectedStudentId) : null;
+
+  // Fetch student session history when student is selected
+  useEffect(() => {
+    if (selectedStudentId) {
+      getStudentSessionHistory(selectedStudentId).then((stats) => {
+        setStudentSessionCount(stats.sessionCount);
+        if (stats.lastSessionDate && stats.history.length > 0) {
+          setLastSession({
+            date: stats.lastSessionDate,
+            topic: stats.history[0].topic
+          });
+        } else {
+          setLastSession(undefined);
+        }
+      }).catch(() => {
+        setStudentSessionCount(0);
+        setLastSession(undefined);
+      });
+    } else {
+      setStudentSessionCount(0);
+      setLastSession(undefined);
+    }
+  }, [selectedStudentId]);
 
   return (
     <div className="space-y-6 animate-in fade-in-50 slide-in-from-bottom-4 duration-700">
@@ -426,7 +452,8 @@ export default function ParticipantStep({
             <StudentInsightCard
               studentName={`${selectedStudent.name} ${selectedStudent.surname}`}
               className={selectedStudent.class}
-              totalSessions={0}
+              totalSessions={studentSessionCount}
+              lastSession={lastSession}
             />
           </div>
         )}
