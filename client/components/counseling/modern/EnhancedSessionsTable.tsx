@@ -14,7 +14,7 @@ import {
 import { Download, Eye, Columns, ArrowUpDown, ArrowUp, ArrowDown, CheckCircle2, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import type { CounselingSession } from '../types';
+import type { CounselingSession, CounselingTopic } from '../types';
 import { calculateSessionDuration } from '../utils/sessionHelpers';
 
 type SortField = 'date' | 'time' | 'duration' | 'student' | 'type';
@@ -28,12 +28,14 @@ interface Column {
 
 interface EnhancedSessionsTableProps {
   sessions: CounselingSession[];
+  topics: CounselingTopic[];
   onExport: () => void;
   onSelectSession: (session: CounselingSession) => void;
 }
 
 export default function EnhancedSessionsTable({ 
-  sessions, 
+  sessions,
+  topics,
   onExport,
   onSelectSession 
 }: EnhancedSessionsTableProps) {
@@ -67,6 +69,14 @@ export default function EnhancedSessionsTable({
       setSortDirection('asc');
     }
   };
+
+  const topicsMap = useMemo(() => {
+    const map = new Map<string, CounselingTopic>();
+    topics.forEach(topic => {
+      map.set(topic.title, topic);
+    });
+    return map;
+  }, [topics]);
 
   const sortedSessions = useMemo(() => {
     return [...sessions].sort((a, b) => {
@@ -116,6 +126,17 @@ export default function EnhancedSessionsTable({
       {sortField !== field && <ArrowUpDown className="h-3 w-3 opacity-40" />}
     </button>
   );
+
+  const getTopicHierarchy = (topicTitle: string) => {
+    if (!topicTitle) {
+      return ['Konu belirtilmedi'];
+    }
+    const topic = topicsMap.get(topicTitle);
+    if (!topic || !topic.fullPath) {
+      return [topicTitle];
+    }
+    return topic.fullPath.split('>').map(s => s.trim());
+  };
 
   const visibleColumnCount = columns.filter(c => c.visible).length;
 
@@ -266,8 +287,23 @@ export default function EnhancedSessionsTable({
                       </td>
                     )}
                     {columns.find(c => c.key === 'topic')?.visible && (
-                      <td className="px-4 py-3 text-sm max-w-xs truncate">
-                        {session.topic}
+                      <td className="px-4 py-3">
+                        <div className="flex flex-col gap-1 max-w-md">
+                          {getTopicHierarchy(session.topic).map((level, idx, arr) => (
+                            <div key={idx} className="flex items-center gap-1">
+                              <Badge
+                                variant="outline"
+                                className={
+                                  idx === arr.length - 1
+                                    ? "bg-blue-50 text-blue-700 border-blue-300 text-xs font-semibold"
+                                    : "bg-gray-50 text-gray-600 border-gray-200 text-xs"
+                                }
+                              >
+                                {level}
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
                       </td>
                     )}
                     {columns.find(c => c.key === 'mode')?.visible && (

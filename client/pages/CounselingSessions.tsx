@@ -375,6 +375,7 @@ export default function CounselingSessions() {
               {viewMode === 'table' && (
                 <EnhancedSessionsTable
                   sessions={filteredSessions}
+                  topics={topics}
                   onExport={handleExport}
                   onSelectSession={handleSelectSession}
                 />
@@ -406,6 +407,7 @@ export default function CounselingSessions() {
           ) : (
             <EnhancedSessionsTable
               sessions={completedSessions}
+              topics={topics}
               onExport={handleExport}
               onSelectSession={handleSelectSession}
             />
