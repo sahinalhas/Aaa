@@ -37,6 +37,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
   const recognitionRef = useRef<any>(null);
   const onTranscriptRef = useRef(onTranscript);
   const onErrorRef = useRef(onError);
+  const lastProcessedIndexRef = useRef<number>(0);
 
   useEffect(() => {
     onTranscriptRef.current = onTranscript;
@@ -61,11 +62,12 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
         let finalText = '';
         let interimText = '';
 
-        for (let i = event.resultIndex; i < event.results.length; i++) {
+        for (let i = lastProcessedIndexRef.current; i < event.results.length; i++) {
           const transcriptPart = event.results[i][0].transcript;
           
           if (event.results[i].isFinal) {
             finalText += transcriptPart + ' ';
+            lastProcessedIndexRef.current = i + 1;
           } else {
             interimText += transcriptPart;
           }
@@ -120,6 +122,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     if (!recognitionRef.current || isListening) return;
 
     setError(null);
+    lastProcessedIndexRef.current = 0;
     try {
       recognitionRef.current.start();
       setIsListening(true);
@@ -144,6 +147,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     setTranscript('');
     setInterimTranscript('');
     setError(null);
+    lastProcessedIndexRef.current = 0;
   }, []);
 
   return {

@@ -45,6 +45,7 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
   const recognitionRef = useRef<any>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const browserTranscriptRef = useRef<string>('');
+  const lastProcessedIndexRef = useRef<number>(0);
   
   const { toast } = useToast();
 
@@ -104,18 +105,14 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
         recognition.lang = 'tr-TR';
         
         browserTranscriptRef.current = '';
+        lastProcessedIndexRef.current = 0;
         
         recognition.onresult = (event: any) => {
-          let interimTranscript = '';
-
-          for (let i = event.resultIndex; i < event.results.length; i++) {
+          for (let i = lastProcessedIndexRef.current; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-              // Sadece final sonuçları biriktir
               browserTranscriptRef.current += transcript + ' ';
-            } else {
-              // Interim sonuçları sadece göster, biriktirme
-              interimTranscript = transcript;
+              lastProcessedIndexRef.current = i + 1;
             }
           }
         };
