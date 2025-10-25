@@ -1,11 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Textarea } from '../ui/textarea';
 import { Mic, Square, Loader2, CheckCircle, AlertTriangle, Edit2, Trash2, Save, X } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
-import { apiClient } from '@/lib/api/api-client';
-import { VOICE_ENDPOINTS } from '@/lib/constants/api-endpoints';
+import { useSpeechRecognition } from '../../hooks/voice-recorder/useSpeechRecognition';
+import { useAudioRecorder } from '../../hooks/voice-recorder/useAudioRecorder';
+import { transcriptionClient, TranscriptionResult } from '../../services/voice/transcriptionClient';
 
 interface VoiceRecorderProps {
   onTranscriptionComplete?: (result: TranscriptionResult) => void;
@@ -13,65 +14,43 @@ interface VoiceRecorderProps {
   sessionType?: 'INDIVIDUAL' | 'GROUP' | 'PARENT' | 'OTHER';
 }
 
-interface TranscriptionResult {
-  transcription: {
-    text: string;
-    provider: string;
-    confidence?: number;
-    duration?: number;
-  };
-  analysis: {
-    summary: string;
-    keywords: string[];
-    category: string;
-    sentiment: string;
-    riskLevel: string;
-    riskKeywords: string[];
-    urgentAction: boolean;
-    recommendations: string[];
-  };
-}
-
 export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType }: VoiceRecorderProps) {
-  const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcriptionResult, setTranscriptionResult] = useState<TranscriptionResult | null>(null);
   const [useBrowserAPI, setUseBrowserAPI] = useState(false);
   const [provider, setProvider] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState<string>('');
-  
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recognitionRef = useRef<any>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const browserTranscriptRef = useRef<string>('');
-  const lastProcessedIndexRef = useRef<number>(0);
-  
+
   const { toast } = useToast();
 
-  // Check aktif provider
+  const speechRecognition = useSpeechRecognition({
+    language: 'tr-TR',
+    continuous: true,
+  });
+
+  const audioRecorder = useAudioRecorder({
+    mimeType: 'audio/webm',
+  });
+
   useEffect(() => {
     checkProvider();
   }, []);
 
   const checkProvider = async () => {
     try {
-      const response = await apiClient.get<{ success: boolean; data: { provider: string; useBrowserAPI: boolean } }>('/api/voice-transcription/provider');
-      
-      if (response?.data) {
-        setProvider(response.data.provider || '');
-        setUseBrowserAPI(response.data.useBrowserAPI);
-      }
+      const providerInfo = await transcriptionClient.getProvider();
+      setProvider(providerInfo.provider || '');
+      setUseBrowserAPI(providerInfo.useBrowserAPI);
     } catch (error) {
       console.error('Provider kontrol hatası:', error);
-      setUseBrowserAPI(true); // Fallback to browser
+      setUseBrowserAPI(true);
     }
   };
 
   const startRecording = async () => {
     try {
-      // Browser Web Speech API kontrolü
-      if (useBrowserAPI && !('webkitSpeechRecognition' in window)) {
+      if (useBrowserAPI && !speechRecognition.isSupported) {
         toast({
           title: 'Uyumsuz Tarayıcı',
           description: 'Sesli not özelliği için Chrome veya Edge kullanmanız gerekmektedir.',
@@ -80,62 +59,22 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
         return;
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      // MediaRecorder başlat (audio data için)
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.start();
-
-      // Browser Speech API başlat (real-time transcription için)
-      if (useBrowserAPI && 'webkitSpeechRecognition' in window) {
-        const SpeechRecognition = (window as any).webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = 'tr-TR';
-        
-        browserTranscriptRef.current = '';
-        lastProcessedIndexRef.current = 0;
-        
-        recognition.onresult = (event: any) => {
-          for (let i = lastProcessedIndexRef.current; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-              browserTranscriptRef.current += transcript + ' ';
-              lastProcessedIndexRef.current = i + 1;
-            }
-          }
-        };
-
-        recognition.onerror = (event: any) => {
-          console.error('Speech recognition hatası:', event.error);
-        };
-
-        recognition.start();
-        recognitionRef.current = recognition;
+      if (!useBrowserAPI) {
+        await audioRecorder.startRecording();
       }
 
-      setIsRecording(true);
-      
+      if (useBrowserAPI && speechRecognition.isSupported) {
+        speechRecognition.startListening();
+      }
+
       toast({
         title: 'Kayıt Başladı',
-        description: useBrowserAPI 
+        description: useBrowserAPI
           ? 'Konuşmaya başlayabilirsiniz (Tarayıcı API kullanılıyor)'
           : `Konuşmaya başlayabilirsiniz (${provider ? provider.toUpperCase() : 'AI'} ile işlenecek)`,
       });
-
     } catch (error) {
-      console.error('Mikrofon erişim hatası:', error);
+      console.error('Kayıt başlatma hatası:', error);
       toast({
         title: 'Hata',
         description: 'Mikrofona erişilemedi. Lütfen izin verin.',
@@ -145,113 +84,65 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
   };
 
   const stopRecording = async () => {
-    setIsRecording(false);
     setIsProcessing(true);
 
-    // Stop browser speech recognition
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
+    if (useBrowserAPI && speechRecognition.isSupported) {
+      speechRecognition.stopListening();
     }
 
-    // Stop media recorder
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
+    const audioBlob = await audioRecorder.stopRecording();
+
+    try {
+      let result: TranscriptionResult;
+
+      if (useBrowserAPI && speechRecognition.transcript) {
+        result = await transcriptionClient.transcribeFromBrowser(
+          speechRecognition.transcript,
+          studentId,
+          sessionType
+        );
+      } else if (useBrowserAPI && !speechRecognition.transcript) {
+        throw new Error('Ses tanıma başarısız oldu. Lütfen tekrar deneyin.');
+      } else if (audioBlob) {
+        result = await transcriptionClient.transcribeFromAudio(audioBlob, studentId, sessionType);
+      } else {
+        throw new Error('Ses kaydı oluşturulamadı');
+      }
+
+      setTranscriptionResult(result);
+
+      if (onTranscriptionComplete) {
+        onTranscriptionComplete(result);
+      }
+
+      if (result.analysis.urgentAction) {
+        toast({
+          title: '⚠️ Acil Durum Tespit Edildi',
+          description: `Risk anahtar kelimeleri: ${result.analysis.riskKeywords.join(', ')}`,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'İşlem Tamamlandı',
+          description: `Analiz: ${result.analysis.category} - ${result.analysis.sentiment}`,
+        });
+      }
+
+      speechRecognition.reset();
+    } catch (error) {
+      console.error('Transcription hatası:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Transkript oluşturulamadı';
+      toast({
+        title: 'Hata',
+        description: errorMessage,
+        variant: 'destructive',
+      });
       
-      mediaRecorderRef.current.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        
-        try {
-          let result;
-
-          // Browser API kullanıyorsak direkt transcript gönder
-          if (useBrowserAPI && browserTranscriptRef.current) {
-            result = await sendBrowserTranscription(browserTranscriptRef.current);
-          }
-          // Browser API gerekli ama transcript yok (recognition başarısız)
-          else if (useBrowserAPI && !browserTranscriptRef.current) {
-            throw new Error('Ses tanıma başarısız oldu. Lütfen tekrar deneyin.');
-          }
-          // Değilse audio dosyasını gönder
-          else {
-            result = await sendAudioFile(audioBlob);
-          }
-
-          setTranscriptionResult(result);
-          
-          if (onTranscriptionComplete) {
-            onTranscriptionComplete(result);
-          }
-
-          // Urgent action varsa özel uyarı
-          if (result.analysis.urgentAction) {
-            toast({
-              title: '⚠️ Acil Durum Tespit Edildi',
-              description: `Risk anahtar kelimeleri: ${result.analysis.riskKeywords.join(', ')}`,
-              variant: 'destructive',
-            });
-          } else {
-            toast({
-              title: 'İşlem Tamamlandı',
-              description: `Analiz: ${result.analysis.category} - ${result.analysis.sentiment}`,
-            });
-          }
-
-        } catch (error) {
-          console.error('Transcription hatası:', error);
-          const errorMessage = error instanceof Error ? error.message : 'Transkript oluşturulamadı';
-          toast({
-            title: 'Hata',
-            description: errorMessage,
-            variant: 'destructive',
-          });
-        } finally {
-          setIsProcessing(false);
-        }
-
-        // Cleanup
-        mediaRecorderRef.current?.stream.getTracks().forEach(track => track.stop());
-        mediaRecorderRef.current = null;
-      };
-    } else {
+      speechRecognition.reset();
+      audioRecorder.resetRecording();
+    } finally {
       setIsProcessing(false);
     }
-  };
-
-  const sendBrowserTranscription = async (text: string): Promise<TranscriptionResult> => {
-    const response = await apiClient.post<{ success: boolean; data: TranscriptionResult }>(VOICE_ENDPOINTS.TRANSCRIBE, {
-      browserTranscription: text,
-      studentId,
-      sessionType
-    });
-    return response.data;
-  };
-
-  const sendAudioFile = async (audioBlob: Blob): Promise<TranscriptionResult> => {
-    const reader = new FileReader();
-    
-    return new Promise((resolve, reject) => {
-      reader.onloadend = async () => {
-        try {
-          const base64Audio = (reader.result as string).split(',')[1];
-          
-          const response = await apiClient.post<{ success: boolean; data: TranscriptionResult }>(VOICE_ENDPOINTS.TRANSCRIBE, {
-            audioData: base64Audio,
-            mimeType: audioBlob.type,
-            studentId,
-            sessionType
-          });
-          
-          resolve(response.data);
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Transcription failed';
-          reject(new Error(errorMessage));
-        }
-      };
-
-      reader.onerror = () => reject(new Error('Dosya okunamadı'));
-      reader.readAsDataURL(audioBlob);
-    });
   };
 
   const handleEdit = () => {
@@ -267,17 +158,17 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
         ...transcriptionResult,
         transcription: {
           ...transcriptionResult.transcription,
-          text: editedText.trim()
-        }
+          text: editedText.trim(),
+        },
       };
-      
+
       setTranscriptionResult(updatedResult);
       setIsEditing(false);
-      
+
       if (onTranscriptionComplete) {
         onTranscriptionComplete(updatedResult);
       }
-      
+
       toast({
         title: 'Başarılı',
         description: 'Not güncellendi',
@@ -294,12 +185,16 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
     setTranscriptionResult(null);
     setIsEditing(false);
     setEditedText('');
-    
+    speechRecognition.reset();
+    audioRecorder.resetRecording();
+
     toast({
       title: 'Silindi',
       description: 'Sesli not silindi',
     });
   };
+
+  const isRecording = audioRecorder.isRecording || speechRecognition.state === 'listening';
 
   return (
     <Card className="w-full">
@@ -309,7 +204,7 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
           Sesli Not Al
         </CardTitle>
         <CardDescription>
-          {useBrowserAPI 
+          {useBrowserAPI
             ? 'Tarayıcı ses tanıma kullanılıyor (gerçek zamanlı)'
             : `${provider ? provider.toUpperCase() : 'AI'} ile ses tanıma aktif`}
         </CardDescription>
@@ -317,12 +212,7 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
       <CardContent className="space-y-4">
         <div className="flex items-center justify-center gap-4">
           {!isRecording && !isProcessing && (
-            <Button
-              type="button"
-              size="lg"
-              onClick={startRecording}
-              className="gap-2"
-            >
+            <Button type="button" size="lg" onClick={startRecording} className="gap-2">
               <Mic className="h-5 w-5" />
               Kaydı Başlat
             </Button>
@@ -348,6 +238,21 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
             </Button>
           )}
         </div>
+
+        {speechRecognition.interimTranscript && isRecording && (
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <p className="text-sm text-blue-700">
+              <span className="font-semibold">Dinleniyor: </span>
+              {speechRecognition.interimTranscript}
+            </p>
+          </div>
+        )}
+
+        {speechRecognition.error && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-700">{speechRecognition.error}</p>
+          </div>
+        )}
 
         {transcriptionResult && (
           <div className="space-y-4 border-t pt-4">
@@ -407,7 +312,7 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
                   )}
                 </div>
               </div>
-              
+
               {isEditing ? (
                 <Textarea
                   value={editedText}
@@ -420,7 +325,7 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
                   {transcriptionResult?.transcription?.text || 'Transkript mevcut değil'}
                 </p>
               )}
-              
+
               <p className="text-xs text-muted-foreground">
                 Sağlayıcı: {transcriptionResult?.transcription?.provider?.toUpperCase() || 'Bilinmiyor'}
                 {transcriptionResult?.transcription?.duration && ` • ${transcriptionResult.transcription.duration}ms`}
@@ -429,30 +334,34 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
 
             <div className="space-y-2">
               <h4 className="font-semibold">AI Analizi</h4>
-              
+
               <div className="grid gap-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Özet:</span>
                   <span className="font-medium">{transcriptionResult.analysis.summary}</span>
                 </div>
-                
+
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Kategori:</span>
                   <span className="font-medium">{transcriptionResult.analysis.category}</span>
                 </div>
-                
+
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Duygu:</span>
                   <span className="font-medium">{transcriptionResult.analysis.sentiment}</span>
                 </div>
-                
+
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Risk Seviyesi:</span>
-                  <span className={`font-medium ${
-                    transcriptionResult.analysis.riskLevel === 'YÜKSEK' ? 'text-red-500' :
-                    transcriptionResult.analysis.riskLevel === 'ORTA' ? 'text-yellow-500' :
-                    'text-green-500'
-                  }`}>
+                  <span
+                    className={`font-medium ${
+                      transcriptionResult.analysis.riskLevel === 'YÜKSEK'
+                        ? 'text-red-500'
+                        : transcriptionResult.analysis.riskLevel === 'ORTA'
+                        ? 'text-yellow-500'
+                        : 'text-green-500'
+                    }`}
+                  >
                     {transcriptionResult.analysis.riskLevel}
                   </span>
                 </div>
@@ -462,7 +371,10 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
                     <span className="text-muted-foreground">Anahtar Kelimeler:</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {transcriptionResult.analysis.keywords.map((keyword, i) => (
-                        <span key={i} className="px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs">
+                        <span
+                          key={i}
+                          className="px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs"
+                        >
                           {keyword}
                         </span>
                       ))}
@@ -478,7 +390,10 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
                     </span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {transcriptionResult.analysis.riskKeywords.map((keyword, i) => (
-                        <span key={i} className="px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs font-medium">
+                        <span
+                          key={i}
+                          className="px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs font-medium"
+                        >
                           {keyword}
                         </span>
                       ))}
@@ -491,7 +406,9 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
                     <span className="text-muted-foreground">Öneriler:</span>
                     <ul className="list-disc list-inside mt-1 space-y-1">
                       {transcriptionResult.analysis.recommendations.map((rec, i) => (
-                        <li key={i} className="text-sm">{rec}</li>
+                        <li key={i} className="text-sm">
+                          {rec}
+                        </li>
                       ))}
                     </ul>
                   </div>

@@ -18,6 +18,16 @@ interface UseSpeechRecognitionReturn {
   reset: () => void;
 }
 
+interface SpeechRecognitionEvent {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+  message: string;
+}
+
 export function useSpeechRecognition(
   options: UseSpeechRecognitionOptions = {}
 ): UseSpeechRecognitionReturn {
@@ -29,8 +39,9 @@ export function useSpeechRecognition(
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(false);
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const finalTranscriptRef = useRef('');
+  const lastProcessedIndexRef = useRef(0);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -54,12 +65,13 @@ export function useSpeechRecognition(
       recognition.onresult = (event: SpeechRecognitionEvent) => {
         let currentInterim = '';
 
-        for (let i = 0; i < event.results.length; i++) {
+        for (let i = lastProcessedIndexRef.current; i < event.results.length; i++) {
           const result = event.results[i];
           const transcriptText = result[0].transcript;
 
           if (result.isFinal) {
             finalTranscriptRef.current += transcriptText + ' ';
+            lastProcessedIndexRef.current = i + 1;
           } else {
             currentInterim += transcriptText;
           }
@@ -111,6 +123,7 @@ export function useSpeechRecognition(
     if (state === 'listening') return;
 
     finalTranscriptRef.current = '';
+    lastProcessedIndexRef.current = 0;
     setTranscript('');
     setInterimTranscript('');
     setError(null);
@@ -138,6 +151,7 @@ export function useSpeechRecognition(
 
   const reset = useCallback(() => {
     finalTranscriptRef.current = '';
+    lastProcessedIndexRef.current = 0;
     setTranscript('');
     setInterimTranscript('');
     setError(null);
