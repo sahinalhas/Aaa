@@ -11,7 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { Download, Eye, Columns, ArrowUpDown, ArrowUp, ArrowDown, CheckCircle2, Clock } from 'lucide-react';
+import { Download, Eye, Columns, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import type { CounselingSession, CounselingTopic } from '../types';
@@ -52,7 +52,6 @@ export default function EnhancedSessionsTable({
     { key: 'topic', label: 'Konu', visible: true },
     { key: 'mode', label: 'Çalışma Yöntemi', visible: true },
     { key: 'duration', label: 'Süre', visible: true },
-    { key: 'status', label: 'Durum', visible: true },
     { key: 'notes', label: 'Açıklama', visible: false },
   ]);
 
@@ -240,9 +239,6 @@ export default function EnhancedSessionsTable({
                     <SortButton field="duration" label="Süre" />
                   </th>
                 )}
-                {columns.find(c => c.key === 'status')?.visible && (
-                  <th className="text-left px-4 py-3">Durum</th>
-                )}
                 {columns.find(c => c.key === 'notes')?.visible && (
                   <th className="text-left px-4 py-3">Açıklama</th>
                 )}
@@ -349,21 +345,6 @@ export default function EnhancedSessionsTable({
                     {columns.find(c => c.key === 'duration')?.visible && (
                       <td className="px-4 py-3 text-sm">
                         {duration ? `${duration} dk` : '-'}
-                      </td>
-                    )}
-                    {columns.find(c => c.key === 'status')?.visible && (
-                      <td className="px-4 py-3">
-                        {session.completed ? (
-                          <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                            Tamamlandı
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Devam Ediyor
-                          </Badge>
-                        )}
                       </td>
                     )}
                     {columns.find(c => c.key === 'notes')?.visible && (
