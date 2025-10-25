@@ -53,8 +53,8 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
 
     React.useEffect(() => {
       if (transcript && transcript !== lastTranscriptRef.current) {
+        // Sadece yeni eklenen parçayı al
         const newText = transcript.substring(lastTranscriptRef.current.length);
-        lastTranscriptRef.current = transcript;
         
         if (newText.trim()) {
           setCurrentValue(prevValue => {
@@ -75,15 +75,23 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
             return newValue;
           });
         }
+        
+        // Son transkripti güncelle
+        lastTranscriptRef.current = transcript;
       }
     }, [transcript]);
 
     const handleVoiceToggle = () => {
       if (isListening) {
         stopListening();
-        lastTranscriptRef.current = '';
+        // Dinleme durduğunda sıfırla
+        setTimeout(() => {
+          resetTranscript();
+          lastTranscriptRef.current = '';
+        }, 100);
         toast.success('Sesli giriş durduruldu');
       } else {
+        // Başlamadan önce her şeyi sıfırla
         resetTranscript();
         lastTranscriptRef.current = '';
         startListening();
