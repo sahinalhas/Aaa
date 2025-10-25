@@ -15,9 +15,8 @@ import { Download, Eye, Columns, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import type { CounselingSession, CounselingTopic } from '../types';
-import { calculateSessionDuration } from '../utils/sessionHelpers';
 
-type SortField = 'date' | 'time' | 'duration' | 'student' | 'type';
+type SortField = 'date' | 'time' | 'student' | 'type';
 type SortDirection = 'asc' | 'desc';
 
 interface Column {
@@ -51,7 +50,6 @@ export default function EnhancedSessionsTable({
     { key: 'topic3', label: '2. Aşama', visible: true },
     { key: 'topic', label: 'Konu', visible: true },
     { key: 'mode', label: 'Çalışma Yöntemi', visible: true },
-    { key: 'duration', label: 'Süre', visible: true },
     { key: 'notes', label: 'Açıklama', visible: false },
   ]);
 
@@ -91,12 +89,6 @@ export default function EnhancedSessionsTable({
         case 'time':
           comparison = a.entryTime.localeCompare(b.entryTime);
           break;
-        case 'duration': {
-          const durationA = a.exitTime ? calculateSessionDuration(a.entryTime, a.exitTime) || 0 : 0;
-          const durationB = b.exitTime ? calculateSessionDuration(b.entryTime, b.exitTime) || 0 : 0;
-          comparison = durationA - durationB;
-          break;
-        }
         case 'student': {
           const nameA = a.sessionType === 'individual' ? a.student?.name || '' : a.groupName || '';
           const nameB = b.sessionType === 'individual' ? b.student?.name || '' : b.groupName || '';
@@ -234,11 +226,6 @@ export default function EnhancedSessionsTable({
                 {columns.find(c => c.key === 'mode')?.visible && (
                   <th className="text-left px-4 py-3">Çalışma Yöntemi</th>
                 )}
-                {columns.find(c => c.key === 'duration')?.visible && (
-                  <th className="text-left px-4 py-3">
-                    <SortButton field="duration" label="Süre" />
-                  </th>
-                )}
                 {columns.find(c => c.key === 'notes')?.visible && (
                   <th className="text-left px-4 py-3">Açıklama</th>
                 )}
@@ -246,9 +233,6 @@ export default function EnhancedSessionsTable({
             </thead>
             <tbody>
               {sortedSessions.map((session, index) => {
-                const duration = session.exitTime
-                  ? calculateSessionDuration(session.entryTime, session.exitTime)
-                  : null;
                 const studentName = session.sessionType === 'individual'
                   ? `${session.student?.name || ''} ${session.student?.surname || ''}`.trim()
                   : session.groupName || 'Grup Görüşmesi';
@@ -263,20 +247,13 @@ export default function EnhancedSessionsTable({
                     onClick={() => onSelectSession(session)}
                   >
                     {columns.find(c => c.key === 'date')?.visible && (
-                      <td className="px-4 py-3 text-sm">
+                      <td className="px-4 py-3 text-sm whitespace-nowrap">
                         {format(new Date(session.sessionDate), 'dd MMM yyyy', { locale: tr })}
                       </td>
                     )}
                     {columns.find(c => c.key === 'time')?.visible && (
-                      <td className="px-4 py-3 text-sm">
-                        <div className="flex flex-col gap-0.5">
-                          <span>{session.entryTime}</span>
-                          {session.exitTime && (
-                            <span className="text-xs text-muted-foreground">
-                              {session.exitTime}
-                            </span>
-                          )}
-                        </div>
+                      <td className="px-4 py-3 text-sm whitespace-nowrap">
+                        {session.entryTime}{session.exitTime ? ` - ${session.exitTime}` : ''}
                       </td>
                     )}
                     {columns.find(c => c.key === 'student')?.visible && (
@@ -285,9 +262,9 @@ export default function EnhancedSessionsTable({
                       </td>
                     )}
                     {columns.find(c => c.key === 'type')?.visible && (
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <Badge
-                          variant={session.sessionType === 'individual' ? 'default' : 'secondary'}
+                          variant="outline"
                           className="text-xs"
                         >
                           {session.sessionType === 'individual' ? 'Bireysel' : 'Grup'}
@@ -295,11 +272,11 @@ export default function EnhancedSessionsTable({
                       </td>
                     )}
                     {columns.find(c => c.key === 'topic1')?.visible && (
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         {getTopicHierarchy(session.topic)[0] && (
                           <Badge
                             variant="outline"
-                            className="bg-gray-50 text-gray-700 border-gray-300 text-xs"
+                            className="text-xs"
                           >
                             {getTopicHierarchy(session.topic)[0]}
                           </Badge>
@@ -307,11 +284,11 @@ export default function EnhancedSessionsTable({
                       </td>
                     )}
                     {columns.find(c => c.key === 'topic2')?.visible && (
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         {getTopicHierarchy(session.topic)[1] && (
                           <Badge
                             variant="outline"
-                            className="bg-blue-50 text-blue-700 border-blue-300 text-xs"
+                            className="text-xs"
                           >
                             {getTopicHierarchy(session.topic)[1]}
                           </Badge>
@@ -319,11 +296,11 @@ export default function EnhancedSessionsTable({
                       </td>
                     )}
                     {columns.find(c => c.key === 'topic3')?.visible && (
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         {getTopicHierarchy(session.topic)[2] && (
                           <Badge
                             variant="outline"
-                            className="bg-green-50 text-green-700 border-green-300 text-xs font-semibold"
+                            className="text-xs"
                           >
                             {getTopicHierarchy(session.topic)[2]}
                           </Badge>
@@ -331,20 +308,15 @@ export default function EnhancedSessionsTable({
                       </td>
                     )}
                     {columns.find(c => c.key === 'topic')?.visible && (
-                      <td className="px-4 py-3 text-sm max-w-xs">
-                        <span className="line-clamp-2">
+                      <td className="px-4 py-3 text-sm">
+                        <span className="truncate block max-w-xs">
                           {session.topic || 'Konu belirtilmedi'}
                         </span>
                       </td>
                     )}
                     {columns.find(c => c.key === 'mode')?.visible && (
-                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                      <td className="px-4 py-3 text-sm whitespace-nowrap">
                         {session.sessionMode}
-                      </td>
-                    )}
-                    {columns.find(c => c.key === 'duration')?.visible && (
-                      <td className="px-4 py-3 text-sm">
-                        {duration ? `${duration} dk` : '-'}
                       </td>
                     )}
                     {columns.find(c => c.key === 'notes')?.visible && (
