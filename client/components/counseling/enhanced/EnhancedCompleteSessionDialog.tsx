@@ -37,7 +37,6 @@ import { Badge } from "@/components/ui/badge";
 
 import { completeSessionSchema, type CompleteSessionFormValues, type CounselingSession } from "../types";
 import ActionItemsManager from "./ActionItemsManager";
-import { VoiceRecorder } from "../../voice/VoiceRecorder";
 import { cn } from "@/lib/utils";
 
 interface EnhancedCompleteSessionDialogProps {
@@ -56,7 +55,6 @@ export default function EnhancedCompleteSessionDialog({
   isPending,
 }: EnhancedCompleteSessionDialogProps) {
   const [activeTab, setActiveTab] = useState("summary");
-  const [isAutoFilling, setIsAutoFilling] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   const form = useForm<CompleteSessionFormValues>({
@@ -228,130 +226,6 @@ export default function EnhancedCompleteSessionDialog({
                       </FormItem>
                     )}
                   />
-
-                  <Card className="border-2 border-blue-100 dark:border-blue-900 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20">
-                    <CardContent className="pt-6 space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl blur-sm opacity-40" />
-                          <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600">
-                            <Sparkles className="h-5 w-5 text-white" />
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-bold text-base bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            AI ile Otomatik Form Doldurma
-                          </h4>
-                          <p className="text-sm text-muted-foreground mt-0.5">
-                            Sesli notunuzu kaydedin, AI tüm alanları otomatik doldursun
-                          </p>
-                        </div>
-                      </div>
-
-                      {isAutoFilling && (
-                        <div className="p-4 bg-blue-100 dark:bg-blue-950/50 border-2 border-blue-200 dark:border-blue-800 rounded-xl">
-                          <div className="flex items-center gap-3">
-                            <Loader2 className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
-                            <div>
-                              <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">
-                                AI formu dolduruyor...
-                              </p>
-                              <p className="text-xs text-blue-600/80 dark:text-blue-400/80 mt-0.5">
-                                Lütfen bekleyin, bu birkaç saniye sürebilir
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      <VoiceRecorder
-                        onTranscriptionComplete={async (result) => {
-                          setIsAutoFilling(true);
-                          
-                          try {
-                            if (!result?.transcription?.text) {
-                              console.error('Transcription result is invalid:', result);
-                              setIsAutoFilling(false);
-                              toast.error("Transkripsiyon hatası", {
-                                description: "Sesli not çevrilemedi, lütfen tekrar deneyin."
-                              });
-                              return;
-                            }
-
-                            const sessionType = session?.sessionType === 'individual' ? 'INDIVIDUAL' : session?.sessionType === 'group' ? 'GROUP' : session?.participantType === 'veli' ? 'PARENT' : 'OTHER';
-                            
-                            const response = await fetch('/api/voice-transcription/auto-fill-form', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({
-                                transcriptionText: result.transcription.text,
-                                sessionType
-                              }),
-                            });
-
-                            const data = await response.json();
-
-                            if (data.success && data.data) {
-                              const formData = data.data;
-                              
-                              const isFallback = formData.detailedNotes?.startsWith('[Otomatik Form Doldurma Başarısız]');
-                              
-                              if (formData.sessionFlow) form.setValue("sessionFlow", formData.sessionFlow);
-                              if (formData.detailedNotes) form.setValue("detailedNotes", formData.detailedNotes);
-                              if (formData.studentParticipationLevel) form.setValue("studentParticipationLevel", formData.studentParticipationLevel);
-                              if (formData.cooperationLevel) form.setValue("cooperationLevel", formData.cooperationLevel);
-                              if (formData.emotionalState) form.setValue("emotionalState", formData.emotionalState);
-                              if (formData.physicalState) form.setValue("physicalState", formData.physicalState);
-                              if (formData.communicationQuality) form.setValue("communicationQuality", formData.communicationQuality);
-                              if (formData.actionItems && formData.actionItems.length > 0) {
-                                const validActionItems = formData.actionItems
-                                  .filter(item => item.id && item.description)
-                                  .map(item => ({
-                                    id: item.id!,
-                                    description: item.description!,
-                                    assignedTo: item.assignedTo,
-                                    dueDate: item.dueDate,
-                                    priority: item.priority
-                                  }));
-                                form.setValue("actionItems", validActionItems);
-                              }
-                              if (formData.followUpNeeded !== undefined) form.setValue("followUpNeeded", formData.followUpNeeded);
-                              if (formData.followUpPlan) form.setValue("followUpPlan", formData.followUpPlan);
-
-                              if (isFallback) {
-                                toast.warning("Kısmi başarı", {
-                                  description: "AI form doldurma kısmen başarısız oldu. Sesli not manuel olarak eklendi - lütfen formu kontrol edin.",
-                                  duration: 5000,
-                                });
-                              } else {
-                                toast.success("Form otomatik dolduruldu!", {
-                                  description: "AI tüm alanları doldurdu. Lütfen kontrol edin ve gerekirse düzenleyin.",
-                                  duration: 4000,
-                                });
-                              }
-                            } else {
-                              throw new Error(data.error || 'Form doldurma başarısız');
-                            }
-                          } catch (error: any) {
-                            console.error('Auto-fill error:', error);
-                            
-                            const fallbackNotes = `[Sesli Not - ${new Date().toLocaleString('tr-TR')}]\n${result.transcription.text}\n\n[AI Analizi: ${result.analysis.category} - ${result.analysis.sentiment}]\n${result.analysis.summary}`;
-                            const currentNotes = form.getValues("detailedNotes");
-                            form.setValue("detailedNotes", currentNotes ? `${currentNotes}\n\n${fallbackNotes}` : fallbackNotes);
-                            
-                            toast.error("Otomatik doldurma hatası", {
-                              description: "Sesli not manuel olarak eklendi. Lütfen formu kendiniz doldurun.",
-                              duration: 5000,
-                            });
-                          } finally {
-                            setIsAutoFilling(false);
-                          }
-                        }}
-                        studentId={session?.student?.id || session?.students?.[0]?.id}
-                        sessionType={session?.sessionType === 'individual' ? 'INDIVIDUAL' : session?.sessionType === 'group' ? 'GROUP' : session?.participantType === 'veli' ? 'PARENT' : 'OTHER'}
-                      />
-                    </CardContent>
-                  </Card>
 
                   <FormField
                     control={form.control}

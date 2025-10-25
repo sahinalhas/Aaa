@@ -101,14 +101,6 @@ export const BACKUP_ENDPOINTS = {
 } as const;
 
 /**
- * Voice Transcription Endpoints
- */
-export const VOICE_ENDPOINTS = {
-  TRANSCRIBE: `${API_BASE}/voice-transcription/transcribe`,
-  ANALYZE: `${API_BASE}/voice-transcription/analyze`,
-} as const;
-
-/**
  * Analytics Endpoints
  */
 export const ANALYTICS_ENDPOINTS = {

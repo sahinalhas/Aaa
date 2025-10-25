@@ -9,7 +9,6 @@ import { Bot, Shield, Sparkles, FileText, Mail, Activity } from "lucide-react";
 import InterventionRecommendations from "@/components/ai/InterventionRecommendations";
 import AutoReportGenerator from "@/components/ai/AutoReportGenerator";
 import ParentCommunication from "@/components/ai/ParentCommunication";
-import { VoiceRecorder } from "@/components/voice/VoiceRecorder";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -56,7 +55,7 @@ export default function AIToolsHub({ studentId, studentName, onUpdate }: AITools
     <div className="space-y-6">
       {/* AI Araçları Sekmeleri */}
       <Tabs defaultValue="mudahale" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="mudahale">
             Müdahale Önerileri
           </TabsTrigger>
@@ -65,9 +64,6 @@ export default function AIToolsHub({ studentId, studentName, onUpdate }: AITools
           </TabsTrigger>
           <TabsTrigger value="veli-iletisim">
             Veli İletişimi
-          </TabsTrigger>
-          <TabsTrigger value="sesli-not">
-            Sesli Not
           </TabsTrigger>
         </TabsList>
 
@@ -90,27 +86,6 @@ export default function AIToolsHub({ studentId, studentName, onUpdate }: AITools
             studentId={studentId}
             studentName={studentName}
           />
-        </TabsContent>
-
-        <TabsContent value="sesli-not" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sesli Not ve AI Analizi</CardTitle>
-              <CardDescription>
-                Öğrenci ile ilgili sesli not alın, otomatik transkript ve AI analizi alın
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <VoiceRecorder
-                studentId={studentId}
-                sessionType="INDIVIDUAL"
-                onTranscriptionComplete={(result) => {
-                  console.log('Voice note completed:', result);
-                  onUpdate?.();
-                }}
-              />
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
 

@@ -42,7 +42,6 @@ Rehber360, eğitim kurumları için geliştirilmiş kapsamlı bir öğrenci rehb
 
 ### 📝 Görüşme ve Oturum Yönetimi
 - **Gelişmiş Görüşme Kaydı**: Bireysel ve grup görüşmeleri
-- **Sesli Kayıt ve Transkript**: Gemini/OpenAI/Web Speech API desteği
 - **AI Destekli Analiz**: Otomatik özet, anahtar kelime, risk tespiti
 - **Takip Sistemi**: Aksiyon maddeleri ve takip notları
 - **Etiket ve Şablon Sistemi**: Hızlı not alma
@@ -182,9 +181,8 @@ Rehber360, eğitim kurumları için geliştirilmiş kapsamlı bir öğrenci rehb
 ### Görüşme Kaydı
 
 1. **Yeni Görüşme**: Bireysel veya grup seçimi
-2. **Sesli Kayıt**: Mikrofon ile kayıt + AI transkript
-3. **AI Analiz**: Otomatik özet ve risk değerlendirmesi
-4. **Takip**: Aksiyon maddeleri ve hatırlatıcılar
+2. **AI Analiz**: Otomatik özet ve risk değerlendirmesi
+3. **Takip**: Aksiyon maddeleri ve hatırlatıcılar
 
 ### Anket Oluşturma
 
@@ -357,7 +355,7 @@ npm run test:e2e
 
 - ✅ 71 meslek profili
 - ✅ AI öneri kuyruğu sistemi
-- ✅ Sesli kayıt ve transkript
+- ✅ AI destekli anket analizi
 - ✅ Excel toplu işlemler
 - ✅ Otomatik yedekleme
 - ✅ Real-time analytics

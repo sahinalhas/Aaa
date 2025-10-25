@@ -35,7 +35,6 @@ import enhancedRiskRouter from './enhanced-risk/index.js';
 import personalizedLearningRouter from './personalized-learning/index.js';
 import advancedAnalyticsRouter from './advanced-analytics/index.js';
 import socialNetworkRouter from './social-network/index.js';
-import voiceTranscriptionRouter from './voice-transcription/index.js';
 import searchRouter from './search/index.js';
 import careerGuidanceRouter from './career-guidance/index.js';
 import aiTextPolishRouter from '../routes/ai-text-polish.routes.js';
@@ -193,9 +192,6 @@ featureRegistry.use('/advanced-analytics', advancedAnalyticsRouter);
 
 // =================== SOCIAL NETWORK ANALYSIS ===================
 featureRegistry.use('/social-network', socialNetworkRouter);
-
-// =================== VOICE TRANSCRIPTION & AI ANALYSIS ===================
-featureRegistry.use('/voice-transcription', voiceTranscriptionRouter);
 
 // =================== CAREER DEVELOPMENT & GUIDANCE ===================
 featureRegistry.use('/career-guidance', careerGuidanceRouter);

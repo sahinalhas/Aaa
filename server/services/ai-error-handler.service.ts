@@ -12,7 +12,6 @@ export type AIServiceType =
   | 'comparative-analysis'
   | 'predictive-timeline'
   | 'pattern-analysis'
-  | 'voice-transcription'
   | 'other';
 
 export type AIErrorSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
