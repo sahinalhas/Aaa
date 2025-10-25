@@ -38,6 +38,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
   const onTranscriptRef = useRef(onTranscript);
   const onErrorRef = useRef(onError);
   const lastProcessedIndexRef = useRef<number>(0);
+  const finalTranscriptRef = useRef<string>('');
 
   useEffect(() => {
     onTranscriptRef.current = onTranscript;
@@ -59,28 +60,22 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
       recognitionRef.current.maxAlternatives = 1;
 
       recognitionRef.current.onresult = (event: any) => {
-        let finalText = '';
-        let interimText = '';
+        let currentInterim = '';
 
         for (let i = lastProcessedIndexRef.current; i < event.results.length; i++) {
-          const transcriptPart = event.results[i][0].transcript;
+          const result = event.results[i];
+          const transcriptText = result[0].transcript;
           
-          if (event.results[i].isFinal) {
-            finalText += transcriptPart + ' ';
+          if (result.isFinal) {
+            finalTranscriptRef.current += transcriptText + ' ';
             lastProcessedIndexRef.current = i + 1;
           } else {
-            interimText += transcriptPart;
+            currentInterim += transcriptText;
           }
         }
 
-        if (finalText) {
-          setTranscript(prev => prev + finalText);
-          setInterimTranscript('');
-        }
-        
-        if (interimText) {
-          setInterimTranscript(interimText);
-        }
+        setTranscript(finalTranscriptRef.current.trim());
+        setInterimTranscript(currentInterim);
       };
 
       recognitionRef.current.onerror = (event: any) => {
@@ -117,6 +112,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
 
     setError(null);
     lastProcessedIndexRef.current = 0;
+    finalTranscriptRef.current = '';
     setTranscript('');
     setInterimTranscript('');
     
@@ -141,6 +137,8 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
   }, [isListening]);
 
   const resetTranscript = useCallback(() => {
+    finalTranscriptRef.current = '';
+    lastProcessedIndexRef.current = 0;
     setTranscript('');
     setInterimTranscript('');
     setError(null);
