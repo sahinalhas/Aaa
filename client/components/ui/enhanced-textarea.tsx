@@ -34,12 +34,10 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
   }, ref) => {
     const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
     const [isPolishing, setIsPolishing] = React.useState(false);
-    const [isFocused, setIsFocused] = React.useState(false);
     const [currentValue, setCurrentValue] = React.useState(value?.toString() || defaultValue?.toString() || '');
     const previousValueRef = React.useRef<string | undefined>(undefined);
 
     const [voiceStatus, setVoiceStatus] = React.useState<SpeechRecognitionStatus>('idle');
-    const [isVoiceActive, setIsVoiceActive] = React.useState(false);
     const [voiceDuration, setVoiceDuration] = React.useState(0);
     const internalTextareaRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -79,23 +77,9 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
     const handleVoiceError = (error: any) => {
       console.error("Voice error:", error);
       setVoiceStatus('error');
-      setIsVoiceActive(false);
       onVoiceEnd?.();
       setTimeout(() => setVoiceStatus('idle'), 3000);
     };
-  
-    React.useEffect(() => {
-      if (isVoiceActive) {
-        setVoiceStatus('listening');
-        onVoiceStart?.();
-      } else {
-        // Only reset status if it was listening and isVoiceActive is false
-        if (voiceStatus === 'listening') {
-          setVoiceStatus('idle');
-          onVoiceEnd?.();
-        }
-      }
-    }, [isVoiceActive, onVoiceStart, onVoiceEnd, voiceStatus]);
 
     React.useEffect(() => {
       if (value !== undefined) {
@@ -163,16 +147,6 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
       // props.onChange?.(e); 
     };
 
-    const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-      setIsFocused(true);
-      props.onFocus?.(e);
-    };
-
-    const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-      setIsFocused(false);
-      props.onBlur?.(e);
-    };
-
     const setRefs = React.useCallback(
       (node: HTMLTextAreaElement | null) => {
         textareaRef.current = node;
@@ -200,17 +174,10 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
           {...props}
           value={value !== undefined ? value : currentValue} // Use controlled value if provided
           onChange={onChange || handleChange} // Use provided onChange or internal handler
-          onFocus={handleFocus}
-          onBlur={handleBlur}
         />
 
         {enableAIPolish && (
-          <div className={cn(
-            "absolute top-2 right-2 flex items-center gap-1 transition-all duration-300 ease-out",
-            (isFocused || isPolishing) 
-              ? "opacity-100 translate-x-0" 
-              : "opacity-0 translate-x-2 pointer-events-none"
-          )}>
+          <div className="absolute top-2 right-2 flex items-center gap-1">
             <Button
               type="button"
               variant="ghost"
@@ -235,11 +202,8 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
 
         {enableVoice && (
           <div className={cn(
-            // Desktop (>768px): absolute position inside textarea
-            "hidden md:flex absolute top-2 right-2 items-center gap-1 transition-all duration-300 ease-out",
-            (isFocused || isVoiceActive)
-              ? "opacity-100 translate-x-0"
-              : "opacity-0 translate-x-2 pointer-events-none",
+            // Desktop (>768px): absolute position inside textarea - always visible
+            "hidden md:flex absolute top-2 right-2 items-center gap-1",
             enableAIPolish && "right-14" // Adjust position if AI polish is also enabled
           )}>
             <VoiceInputButton
@@ -249,7 +213,6 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
               size="sm"
               variant="inline"
               onDurationChange={setVoiceDuration}
-              onListeningChange={setIsVoiceActive}
             />
           </div>
         )}
@@ -270,7 +233,6 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
               size="md"
               variant="standalone"
               onDurationChange={setVoiceDuration}
-              onListeningChange={setIsVoiceActive}
             />
           </div>
         )}

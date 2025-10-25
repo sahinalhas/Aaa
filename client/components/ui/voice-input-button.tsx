@@ -21,8 +21,7 @@ export function VoiceInputButton({
   continuous = true,
   disabled = false,
   className,
-  onDurationChange,
-  onListeningChange
+  onDurationChange
 }: VoiceInputButtonProps) {
   const [hasStarted, setHasStarted] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -59,7 +58,6 @@ export function VoiceInputButton({
       }
       setDuration(0);
       onDurationChange?.(0);
-      onListeningChange?.(false);
     } else {
       startListening();
       // Start duration counter
@@ -71,7 +69,6 @@ export function VoiceInputButton({
           return newDuration;
         });
       }, 1000);
-      onListeningChange?.(true);
     }
   };
 
@@ -100,9 +97,8 @@ export function VoiceInputButton({
       durationIntervalRef.current = null;
       setDuration(0);
       onDurationChange?.(0);
-      onListeningChange?.(false);
     }
-  }, [isListening, onDurationChange, onListeningChange]);
+  }, [isListening, onDurationChange]);
 
   const sizeClasses = {
     sm: 'h-8 w-8',
