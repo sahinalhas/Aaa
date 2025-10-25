@@ -36,6 +36,26 @@ export const PARTICIPANT_TYPE_LABELS: Record<ParticipantType, string> = {
   [PARTICIPANT_TYPES.DIGER]: 'Diğer',
 };
 
+// Session location labels
+export const SESSION_LOCATION_LABELS: Record<string, string> = {
+  'rehberlik_servisi': 'Rehberlik Servisi',
+  'ogretmen_odasi': 'Öğretmen Odası',
+  'sinif': 'Sınıf',
+  'online': 'Online',
+  'ev_ziyareti': 'Ev Ziyareti',
+  'okul_bahcesi': 'Okul Bahçesi',
+  'toplanti_odasi': 'Toplantı Odası',
+  'diger': 'Diğer',
+};
+
+// Discipline status labels
+export const DISCIPLINE_STATUS_LABELS: Record<string, string> = {
+  'kurulu_sevk': 'Kurulu Sevk',
+  'gorusu_alinan': 'Görüşü Alınan',
+  'akran_gorusmesi': 'Akran Görüşmesi',
+  'none': '-',
+};
+
 export const INSIGHT_PERIODS = {
   GUNLUK: 'GÜNLÜK',
   HAFTALIK: 'HAFTALIK',

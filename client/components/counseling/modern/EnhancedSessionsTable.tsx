@@ -15,6 +15,7 @@ import { Download, Eye, Columns, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import type { CounselingSession, CounselingTopic } from '../types';
+import { SESSION_MODE_LABELS, SESSION_LOCATION_LABELS, DISCIPLINE_STATUS_LABELS } from '@shared/constants/common.constants';
 
 type SortField = 'date' | 'time' | 'student' | 'type';
 type SortDirection = 'asc' | 'desc';
@@ -378,20 +379,17 @@ export default function EnhancedSessionsTable({
                     )}
                     {columns.find(c => c.key === 'mode')?.visible && (
                       <td className="px-4 py-3 text-sm whitespace-nowrap">
-                        {session.sessionMode}
+                        {SESSION_MODE_LABELS[session.sessionMode as keyof typeof SESSION_MODE_LABELS] || session.sessionMode}
                       </td>
                     )}
                     {columns.find(c => c.key === 'location')?.visible && (
                       <td className="px-4 py-3 text-sm whitespace-nowrap">
-                        {session.sessionLocation || '-'}
+                        {session.sessionLocation ? (SESSION_LOCATION_LABELS[session.sessionLocation] || session.sessionLocation) : '-'}
                       </td>
                     )}
                     {columns.find(c => c.key === 'discipline')?.visible && (
                       <td className="px-4 py-3 text-sm whitespace-nowrap">
-                        {session.disciplineStatus === 'kurulu_sevk' ? 'Kurulu Sevk' :
-                         session.disciplineStatus === 'gorusu_alinan' ? 'Görüşü Alınan' :
-                         session.disciplineStatus === 'akran_gorusmesi' ? 'Akran Görüşmesi' :
-                         session.disciplineStatus === 'none' ? '-' : '-'}
+                        {session.disciplineStatus ? (DISCIPLINE_STATUS_LABELS[session.disciplineStatus] || session.disciplineStatus) : '-'}
                       </td>
                     )}
                     {columns.find(c => c.key === 'notes')?.visible && (

@@ -22,7 +22,7 @@ import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import type { CounselingSession } from '../types';
 import { calculateSessionDuration } from '../utils/sessionHelpers';
-import { SESSION_MODE_LABELS } from '@shared/constants/common.constants';
+import { SESSION_MODE_LABELS, SESSION_LOCATION_LABELS } from '@shared/constants/common.constants';
 
 interface SessionDrawerProps {
   session: CounselingSession | null;
@@ -166,7 +166,7 @@ export default function SessionDrawer({
                       <MapPin className="h-3.5 w-3.5" />
                       Konum:
                     </span>
-                    <span className="font-medium">{session.sessionLocation}</span>
+                    <span className="font-medium">{SESSION_LOCATION_LABELS[session.sessionLocation] || session.sessionLocation}</span>
                   </div>
                 )}
                 {participantInfo && (

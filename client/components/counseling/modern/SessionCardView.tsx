@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import type { CounselingSession } from '../types';
 import { calculateSessionDuration } from '../utils/sessionHelpers';
+import { SESSION_MODE_LABELS } from '@shared/constants/common.constants';
 
 interface SessionCardViewProps {
   sessions: CounselingSession[];
@@ -95,7 +96,7 @@ export default function SessionCardView({
                   </Badge>
                   {session.sessionMode && (
                     <Badge variant="outline" className="text-xs">
-                      {session.sessionMode}
+                      {SESSION_MODE_LABELS[session.sessionMode as keyof typeof SESSION_MODE_LABELS] || session.sessionMode}
                     </Badge>
                   )}
                 </div>
