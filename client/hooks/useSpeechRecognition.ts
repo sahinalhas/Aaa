@@ -10,7 +10,7 @@ import type {
   UseSpeechRecognitionReturn, 
   SpeechRecognitionLanguage,
   SpeechRecognitionError 
-} from '@/shared/types/speech.types';
+} from '@shared/types/speech.types';
 import { 
   checkBrowserSupport, 
   getSpeechRecognition, 
@@ -46,6 +46,7 @@ export function useSpeechRecognition(
 
   const recognitionRef = useRef<any>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize recognition
   useEffect(() => {
@@ -106,12 +107,40 @@ export function useSpeechRecognition(
       });
     };
 
+    recognition.onspeechend = () => {
+      // Clear any existing silence timeout
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
+      
+      // Start silence timeout
+      silenceTimeoutRef.current = setTimeout(() => {
+        if (recognitionRef.current) {
+          recognition.stop();
+          toast.info('Sessizlik tespit edildi', {
+            description: `${SPEECH_CONFIG.silenceTimeout / 1000} saniye süreyle ses algılanamadı`
+          });
+        }
+      }, SPEECH_CONFIG.silenceTimeout);
+    };
+
+    recognition.onspeechstart = () => {
+      // Clear silence timeout when speech starts again
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+        silenceTimeoutRef.current = null;
+      }
+    };
+
     recognition.onend = () => {
       setIsListening(false);
       setInterimTranscript('');
       
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+      }
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
       }
     };
 
@@ -123,6 +152,9 @@ export function useSpeechRecognition(
       }
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+      }
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
       }
     };
   }, [isSupported, language, continuous, interimResults, onTranscript, onError]);
@@ -167,6 +199,9 @@ export function useSpeechRecognition(
       
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+      }
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
       }
     } catch (err) {
       console.error('Error stopping recognition:', err);

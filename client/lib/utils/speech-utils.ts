@@ -3,7 +3,7 @@
  * Speech Recognition Utility Functions
  */
 
-import { SpeechRecognitionError, SpeechRecognitionConfig } from '@/shared/types/speech.types';
+import { SpeechRecognitionError, SpeechRecognitionConfig } from '@shared/types/speech.types';
 
 export const SPEECH_CONFIG: SpeechRecognitionConfig = {
   language: 'tr-TR',
@@ -51,7 +51,7 @@ export function checkBrowserSupport(): boolean {
   return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
 }
 
-export function getSpeechRecognition(): typeof SpeechRecognition | null {
+export function getSpeechRecognition(): any {
   if (typeof window === 'undefined') return null;
   
   const SpeechRecognitionAPI = 

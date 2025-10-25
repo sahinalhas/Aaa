@@ -8,7 +8,7 @@ import { Mic, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
-import type { VoiceInputStatusProps } from '@/shared/types/speech.types';
+import type { VoiceInputStatusProps } from '@shared/types/speech.types';
 
 export function VoiceInputStatus({ 
   status, 

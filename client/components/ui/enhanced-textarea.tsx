@@ -8,14 +8,16 @@ import { VoiceInputStatus } from "./voice-input-status";
 import type { 
   EnhancedTextareaVoiceProps,
   SpeechRecognitionStatus 
-} from "@/shared/types/speech.types";
+} from "@shared/types/speech.types";
 
 export interface EnhancedTextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'value'>,
     EnhancedTextareaVoiceProps {
   enableAIPolish?: boolean;
   aiContext?: 'academic' | 'counseling' | 'notes' | 'general';
   onValueChange?: (value: string) => void;
+  value?: string | number | readonly string[];
+  defaultValue?: string | number | readonly string[];
 }
 
 const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaProps>(
@@ -27,16 +29,18 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
     onVoiceEnd,
     onChange,
     value,
+    defaultValue,
     ...props 
   }, ref) => {
     const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
     const [isPolishing, setIsPolishing] = React.useState(false);
     const [isFocused, setIsFocused] = React.useState(false);
-    const [currentValue, setCurrentValue] = React.useState(props.value?.toString() || props.defaultValue?.toString() || '');
+    const [currentValue, setCurrentValue] = React.useState(value?.toString() || defaultValue?.toString() || '');
     const previousValueRef = React.useRef<string | undefined>(undefined);
 
     const [voiceStatus, setVoiceStatus] = React.useState<SpeechRecognitionStatus>('idle');
     const [isVoiceActive, setIsVoiceActive] = React.useState(false);
+    const [voiceDuration, setVoiceDuration] = React.useState(0);
     const internalTextareaRef = React.useRef<HTMLTextAreaElement>(null);
 
     React.useImperativeHandle(ref, () => internalTextareaRef.current!);
@@ -94,14 +98,14 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
     }, [isVoiceActive, onVoiceStart, onVoiceEnd, voiceStatus]);
 
     React.useEffect(() => {
-      if (props.value !== undefined) {
-        const newValue = props.value.toString();
+      if (value !== undefined) {
+        const newValue = value.toString();
         if (previousValueRef.current !== newValue) {
           previousValueRef.current = newValue;
           setCurrentValue(newValue);
         }
       }
-    }, [props.value]);
+    }, [value]);
 
     const handleAIPolish = async () => {
       const textarea = textareaRef.current;
@@ -231,11 +235,12 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
 
         {enableVoice && (
           <div className={cn(
-            "absolute top-2 right-2 flex items-center gap-1 transition-all duration-300 ease-out",
+            // Desktop (>768px): absolute position inside textarea
+            "hidden md:flex absolute top-2 right-2 items-center gap-1 transition-all duration-300 ease-out",
             (isFocused || isVoiceActive)
               ? "opacity-100 translate-x-0"
               : "opacity-0 translate-x-2 pointer-events-none",
-            enableAIPolish && "translate-x-12" // Adjust position if AI polish is also enabled
+            enableAIPolish && "right-14" // Adjust position if AI polish is also enabled
           )}>
             <VoiceInputButton
               onTranscript={handleVoiceTranscript}
@@ -243,14 +248,28 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
               language={voiceLanguage}
               size="sm"
               variant="inline"
-              onClick={() => setIsVoiceActive(!isVoiceActive)} // Toggle voice activity on button click
+              onDurationChange={setVoiceDuration}
             />
           </div>
         )}
 
         {enableVoice && voiceStatus !== 'idle' && (
           <div className="absolute bottom-2 right-2">
-            <VoiceInputStatus status={voiceStatus} />
+            <VoiceInputStatus status={voiceStatus} duration={voiceDuration} />
+          </div>
+        )}
+        
+        {/* Mobile & Tablet: Voice button below textarea */}
+        {enableVoice && (
+          <div className="md:hidden mt-2 flex justify-end">
+            <VoiceInputButton
+              onTranscript={handleVoiceTranscript}
+              onError={handleVoiceError}
+              language={voiceLanguage}
+              size="md"
+              variant="standalone"
+              onDurationChange={setVoiceDuration}
+            />
           </div>
         )}
       </div>

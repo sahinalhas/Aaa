@@ -61,6 +61,7 @@ export interface VoiceInputButtonProps {
   continuous?: boolean;
   disabled?: boolean;
   className?: string;
+  onDurationChange?: (duration: number) => void;
 }
 
 export interface VoiceInputStatusProps {
