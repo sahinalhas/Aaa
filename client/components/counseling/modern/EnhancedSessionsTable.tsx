@@ -288,11 +288,11 @@ export default function EnhancedSessionsTable({
                     )}
                     {columns.find(c => c.key === 'topic')?.visible && (
                       <td className="px-4 py-3">
-                        <div className="flex flex-col gap-1.5 max-w-md">
+                        <div className="flex flex-col gap-2 max-w-md">
                           {getTopicHierarchy(session.topic).map((level, idx, arr) => (
-                            <div key={idx} className="flex items-center gap-2">
+                            <div key={idx} className="flex flex-col gap-1">
                               <span className="text-xs text-muted-foreground font-medium">
-                                {idx === 0 ? '1.' : idx === 1 ? '2.' : '3.'} Aşama:
+                                {idx === 0 ? '1.' : idx === 1 ? '2.' : '3.'} Aşama
                               </span>
                               <Badge
                                 variant="outline"

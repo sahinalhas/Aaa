@@ -148,13 +148,13 @@ export default function SessionsTable({ sessions, onExport }: SessionsTableProps
                         {participantInfo || '-'}
                       </td>
                       <td className="px-4 py-3 text-sm max-w-md">
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-2">
                           {session.topic?.split('>').map((level: string, idx: number) => (
-                            <div key={idx} className="flex items-center gap-2">
+                            <div key={idx} className="flex flex-col gap-0.5">
                               <span className="text-xs text-muted-foreground font-medium">
-                                {idx + 1}. Aşama:
+                                {idx + 1}. Aşama
                               </span>
-                              <span className="text-xs">{level.trim()}</span>
+                              <span className="text-xs font-medium">{level.trim()}</span>
                             </div>
                           ))}
                         </div>
