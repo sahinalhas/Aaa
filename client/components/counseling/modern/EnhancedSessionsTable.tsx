@@ -41,6 +41,7 @@ export default function EnhancedSessionsTable({
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [columns, setColumns] = useState<Column[]>([
+    { key: 'sessionNumber', label: '#', visible: true },
     { key: 'date', label: 'Tarih', visible: true },
     { key: 'time', label: 'Saat', visible: true },
     { key: 'student', label: 'Öğrenci/Grup', visible: true },
@@ -79,6 +80,40 @@ export default function EnhancedSessionsTable({
     });
     return map;
   }, [topics]);
+
+  // Calculate session numbers for each student
+  const sessionNumbersMap = useMemo(() => {
+    const map = new Map<string, Map<string, number>>();
+    
+    // Group sessions by student and sort by date
+    const studentSessions = new Map<string, CounselingSession[]>();
+    sessions.forEach(session => {
+      if (session.sessionType === 'individual' && session.student?.id) {
+        const studentId = session.student.id;
+        if (!studentSessions.has(studentId)) {
+          studentSessions.set(studentId, []);
+        }
+        studentSessions.get(studentId)!.push(session);
+      }
+    });
+    
+    // Sort each student's sessions by date and assign numbers
+    studentSessions.forEach((studentSessionList, studentId) => {
+      const sorted = [...studentSessionList].sort((a, b) => {
+        const dateComparison = new Date(a.sessionDate).getTime() - new Date(b.sessionDate).getTime();
+        if (dateComparison !== 0) return dateComparison;
+        return a.entryTime.localeCompare(b.entryTime);
+      });
+      
+      const sessionMap = new Map<string, number>();
+      sorted.forEach((session, index) => {
+        sessionMap.set(session.id, index + 1);
+      });
+      map.set(studentId, sessionMap);
+    });
+    
+    return map;
+  }, [sessions]);
 
   const sortedSessions = useMemo(() => {
     return [...sessions].sort((a, b) => {
@@ -193,6 +228,11 @@ export default function EnhancedSessionsTable({
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b text-sm font-medium text-muted-foreground">
+                {columns.find(c => c.key === 'sessionNumber')?.visible && (
+                  <th className="text-center px-3 py-3 w-16">
+                    #
+                  </th>
+                )}
                 {columns.find(c => c.key === 'date')?.visible && (
                   <th className="text-left px-4 py-3">
                     <SortButton field="date" label="Tarih" />
@@ -245,6 +285,10 @@ export default function EnhancedSessionsTable({
                   ? `${session.student?.name || ''} ${session.student?.surname || ''}`.trim()
                   : session.groupName || 'Grup Görüşmesi';
 
+                const sessionNumber = session.sessionType === 'individual' && session.student?.id
+                  ? sessionNumbersMap.get(session.student.id)?.get(session.id) || '-'
+                  : '-';
+
                 return (
                   <motion.tr
                     key={session.id}
@@ -254,6 +298,16 @@ export default function EnhancedSessionsTable({
                     className="border-b hover:bg-muted/50 transition-colors cursor-pointer"
                     onClick={() => onSelectSession(session)}
                   >
+                    {columns.find(c => c.key === 'sessionNumber')?.visible && (
+                      <td className="px-3 py-3 text-center">
+                        <Badge 
+                          variant="secondary" 
+                          className="text-xs font-semibold px-2 min-w-[2rem]"
+                        >
+                          {sessionNumber}
+                        </Badge>
+                      </td>
+                    )}
                     {columns.find(c => c.key === 'date')?.visible && (
                       <td className="px-4 py-3 text-sm whitespace-nowrap">
                         {format(new Date(session.sessionDate), 'dd MMM yyyy', { locale: tr })}
