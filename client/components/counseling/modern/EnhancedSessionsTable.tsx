@@ -46,10 +46,10 @@ export default function EnhancedSessionsTable({
     { key: 'time', label: 'Saat', visible: true },
     { key: 'student', label: 'Öğrenci/Grup', visible: true },
     { key: 'type', label: 'Tip', visible: true },
+    { key: 'topic1', label: 'RPD Hizmet Türü', visible: true },
+    { key: 'topic2', label: '1. Aşama', visible: true },
+    { key: 'topic3', label: '2. Aşama', visible: true },
     { key: 'topic', label: 'Konu', visible: true },
-    { key: 'topic1', label: '1. Aşama', visible: true },
-    { key: 'topic2', label: '2. Aşama', visible: true },
-    { key: 'topic3', label: '3. Aşama', visible: true },
     { key: 'mode', label: 'Mod', visible: true },
     { key: 'duration', label: 'Süre', visible: true },
     { key: 'status', label: 'Durum', visible: true },
@@ -220,17 +220,17 @@ export default function EnhancedSessionsTable({
                     <SortButton field="type" label="Tip" />
                   </th>
                 )}
-                {columns.find(c => c.key === 'topic')?.visible && (
-                  <th className="text-left px-4 py-3">Konu</th>
-                )}
                 {columns.find(c => c.key === 'topic1')?.visible && (
-                  <th className="text-left px-4 py-3">1. Aşama</th>
+                  <th className="text-left px-4 py-3">RPD Hizmet Türü</th>
                 )}
                 {columns.find(c => c.key === 'topic2')?.visible && (
-                  <th className="text-left px-4 py-3">2. Aşama</th>
+                  <th className="text-left px-4 py-3">1. Aşama</th>
                 )}
                 {columns.find(c => c.key === 'topic3')?.visible && (
-                  <th className="text-left px-4 py-3">3. Aşama</th>
+                  <th className="text-left px-4 py-3">2. Aşama</th>
+                )}
+                {columns.find(c => c.key === 'topic')?.visible && (
+                  <th className="text-left px-4 py-3">Konu</th>
                 )}
                 {columns.find(c => c.key === 'mode')?.visible && (
                   <th className="text-left px-4 py-3">Mod</th>
@@ -298,13 +298,6 @@ export default function EnhancedSessionsTable({
                         </Badge>
                       </td>
                     )}
-                    {columns.find(c => c.key === 'topic')?.visible && (
-                      <td className="px-4 py-3 text-sm max-w-xs">
-                        <span className="line-clamp-2">
-                          {session.topic || 'Konu belirtilmedi'}
-                        </span>
-                      </td>
-                    )}
                     {columns.find(c => c.key === 'topic1')?.visible && (
                       <td className="px-4 py-3">
                         {getTopicHierarchy(session.topic)[0] && (
@@ -339,6 +332,13 @@ export default function EnhancedSessionsTable({
                             {getTopicHierarchy(session.topic)[2]}
                           </Badge>
                         )}
+                      </td>
+                    )}
+                    {columns.find(c => c.key === 'topic')?.visible && (
+                      <td className="px-4 py-3 text-sm max-w-xs">
+                        <span className="line-clamp-2">
+                          {session.topic || 'Konu belirtilmedi'}
+                        </span>
                       </td>
                     )}
                     {columns.find(c => c.key === 'mode')?.visible && (
