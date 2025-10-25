@@ -623,11 +623,16 @@ export default function EnhancedCompleteSessionDialog({
                                     mode="single"
                                     selected={field.value}
                                     onSelect={(date) => {
-                                      field.onChange(date);
-                                      setDatePickerOpen(false);
+                                      if (date) {
+                                        field.onChange(date);
+                                        setDatePickerOpen(false);
+                                      }
                                     }}
-                                    locale={tr}
-                                    disabled={(date) => date < new Date()}
+                                    disabled={(date) => {
+                                      const today = new Date();
+                                      today.setHours(0, 0, 0, 0);
+                                      return date < today;
+                                    }}
                                     initialFocus
                                   />
                                 </PopoverContent>

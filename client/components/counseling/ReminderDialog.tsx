@@ -244,10 +244,11 @@ export default function ReminderDialog({
                             mode="single"
                             selected={field.value}
                             onSelect={(date) => {
-                              field.onChange(date);
-                              setDateOpen(false);
+                              if (date) {
+                                field.onChange(date);
+                                setDateOpen(false);
+                              }
                             }}
-                            locale={tr}
                             initialFocus
                           />
                         </PopoverContent>
