@@ -74,18 +74,12 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
         }
 
         if (finalText) {
-          setTranscript(prev => {
-            const newTranscript = prev + finalText;
-            onTranscriptRef.current?.(newTranscript, true);
-            return newTranscript;
-          });
+          setTranscript(prev => prev + finalText);
           setInterimTranscript('');
-        } else if (interimText) {
+        }
+        
+        if (interimText) {
           setInterimTranscript(interimText);
-          setTranscript(prev => {
-            onTranscriptRef.current?.(prev + interimText, false);
-            return prev;
-          });
         }
       };
 
@@ -123,6 +117,9 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
 
     setError(null);
     lastProcessedIndexRef.current = 0;
+    setTranscript('');
+    setInterimTranscript('');
+    
     try {
       recognitionRef.current.start();
       setIsListening(true);
