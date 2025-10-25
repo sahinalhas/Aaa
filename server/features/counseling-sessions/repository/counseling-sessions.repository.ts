@@ -31,6 +31,13 @@ function ensureInitialized(): void {
       WHERE css.sessionId = ?
       LIMIT 1
     `),
+    getStudentSessions: db.prepare(`
+      SELECT cs.*, css.studentId
+      FROM counseling_sessions cs
+      INNER JOIN counseling_session_students css ON cs.id = css.sessionId
+      WHERE css.studentId = ? AND cs.completed = 1
+      ORDER BY cs.sessionDate DESC, cs.entryTime DESC
+    `),
     insertSession: db.prepare(`
       INSERT INTO counseling_sessions (
         id, sessionType, groupName, counselorId, sessionDate, entryTime, entryClassHourId,
@@ -217,6 +224,51 @@ export function getAppSettings(): any {
   ensureInitialized();
   const row = statements.getAppSettings.get();
   return row;
+}
+
+export function getStudentSessionHistory(studentId: string): any {
+  ensureInitialized();
+  const db = getDatabase();
+  
+  // Get all completed sessions for this student
+  const sessions = db.prepare(`
+    SELECT cs.*, css.studentId
+    FROM counseling_sessions cs
+    INNER JOIN counseling_session_students css ON cs.id = css.sessionId
+    WHERE css.studentId = ? AND cs.completed = 1
+    ORDER BY cs.sessionDate DESC, cs.entryTime DESC
+  `).all(studentId);
+  
+  // Extract topics
+  const topics = [...new Set(sessions.map((s: any) => s.topic).filter(Boolean))];
+  
+  // Get last session date
+  const lastSessionDate = sessions.length > 0 ? sessions[0].sessionDate : null;
+  
+  // Map to history format
+  const history = sessions.map((session: any) => {
+    let duration = 0;
+    if (session.exitTime && session.entryTime) {
+      const [entryHour, entryMin] = session.entryTime.split(':').map(Number);
+      const [exitHour, exitMin] = session.exitTime.split(':').map(Number);
+      duration = (exitHour * 60 + exitMin) - (entryHour * 60 + entryMin);
+    }
+    
+    return {
+      sessionId: session.id,
+      sessionDate: session.sessionDate,
+      topic: session.topic,
+      sessionMode: session.sessionMode,
+      duration: duration
+    };
+  });
+  
+  return {
+    sessionCount: sessions.length,
+    lastSessionDate: lastSessionDate,
+    topics: topics,
+    history: history
+  };
 }
 
 export function getFilteredSessions(filters: SessionFilters): CounselingSession[] {
