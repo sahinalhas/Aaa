@@ -37,7 +37,7 @@ export function VoiceInputButton({
   } = useSpeechRecognition({
     language,
     continuous,
-    interimResults: true,
+    interimResults: false,
     onTranscript: (text) => {
       onTranscript(text);
       setHasStarted(true);
