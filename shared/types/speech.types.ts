@@ -62,6 +62,7 @@ export interface VoiceInputButtonProps {
   disabled?: boolean;
   className?: string;
   onDurationChange?: (duration: number) => void;
+  onListeningChange?: (isListening: boolean) => void;
 }
 
 export interface VoiceInputStatusProps {

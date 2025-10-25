@@ -249,6 +249,7 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
               size="sm"
               variant="inline"
               onDurationChange={setVoiceDuration}
+              onListeningChange={setIsVoiceActive}
             />
           </div>
         )}
@@ -269,6 +270,7 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
               size="md"
               variant="standalone"
               onDurationChange={setVoiceDuration}
+              onListeningChange={setIsVoiceActive}
             />
           </div>
         )}
