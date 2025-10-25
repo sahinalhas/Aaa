@@ -147,7 +147,18 @@ export default function SessionsTable({ sessions, onExport }: SessionsTableProps
                       <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs truncate">
                         {participantInfo || '-'}
                       </td>
-                      <td className="px-4 py-3 text-sm max-w-xs truncate">{session.topic}</td>
+                      <td className="px-4 py-3 text-sm max-w-md">
+                        <div className="flex flex-col gap-1">
+                          {session.topic?.split('>').map((level: string, idx: number) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground font-medium">
+                                {idx + 1}. Aşama:
+                              </span>
+                              <span className="text-xs">{level.trim()}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </td>
                       <td className="px-4 py-3 max-w-xs">
                         <TagsCell tags={tags} />
                       </td>
