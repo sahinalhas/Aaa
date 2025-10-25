@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as service from '../services/analytics.service.js';
+import * as sessionService from '../services/counseling-sessions.service.js';
 
 export function getOverview(req: Request, res: Response) {
   try {
@@ -84,7 +85,7 @@ export function getStudentStats(req: Request, res: Response) {
       return res.status(400).json({ error: 'Öğrenci ID gereklidir' });
     }
 
-    const data = service.getStudentSessionStats(studentId);
+    const data = sessionService.getStudentSessionStats(studentId);
     res.json(data);
   } catch (error) {
     console.error('Error fetching student session stats:', error);
