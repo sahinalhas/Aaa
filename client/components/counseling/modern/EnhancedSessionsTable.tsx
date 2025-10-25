@@ -46,7 +46,9 @@ export default function EnhancedSessionsTable({
     { key: 'time', label: 'Saat', visible: true },
     { key: 'student', label: 'Öğrenci/Grup', visible: true },
     { key: 'type', label: 'Tip', visible: true },
-    { key: 'topic', label: 'Konu', visible: true },
+    { key: 'topic1', label: '1. Aşama', visible: true },
+    { key: 'topic2', label: '2. Aşama', visible: true },
+    { key: 'topic3', label: '3. Aşama', visible: true },
     { key: 'mode', label: 'Mod', visible: true },
     { key: 'duration', label: 'Süre', visible: true },
     { key: 'status', label: 'Durum', visible: true },
@@ -217,8 +219,14 @@ export default function EnhancedSessionsTable({
                     <SortButton field="type" label="Tip" />
                   </th>
                 )}
-                {columns.find(c => c.key === 'topic')?.visible && (
-                  <th className="text-left px-4 py-3">Konu</th>
+                {columns.find(c => c.key === 'topic1')?.visible && (
+                  <th className="text-left px-4 py-3">1. Aşama</th>
+                )}
+                {columns.find(c => c.key === 'topic2')?.visible && (
+                  <th className="text-left px-4 py-3">2. Aşama</th>
+                )}
+                {columns.find(c => c.key === 'topic3')?.visible && (
+                  <th className="text-left px-4 py-3">3. Aşama</th>
                 )}
                 {columns.find(c => c.key === 'mode')?.visible && (
                   <th className="text-left px-4 py-3">Mod</th>
@@ -286,27 +294,40 @@ export default function EnhancedSessionsTable({
                         </Badge>
                       </td>
                     )}
-                    {columns.find(c => c.key === 'topic')?.visible && (
+                    {columns.find(c => c.key === 'topic1')?.visible && (
                       <td className="px-4 py-3">
-                        <div className="flex flex-col gap-2 max-w-md">
-                          {getTopicHierarchy(session.topic).map((level, idx, arr) => (
-                            <div key={idx} className="flex flex-col gap-1">
-                              <span className="text-xs text-muted-foreground font-medium">
-                                {idx === 0 ? '1.' : idx === 1 ? '2.' : '3.'} Aşama
-                              </span>
-                              <Badge
-                                variant="outline"
-                                className={
-                                  idx === arr.length - 1
-                                    ? "bg-blue-50 text-blue-700 border-blue-300 text-xs font-semibold"
-                                    : "bg-gray-50 text-gray-600 border-gray-200 text-xs"
-                                }
-                              >
-                                {level}
-                              </Badge>
-                            </div>
-                          ))}
-                        </div>
+                        {getTopicHierarchy(session.topic)[0] && (
+                          <Badge
+                            variant="outline"
+                            className="bg-gray-50 text-gray-700 border-gray-300 text-xs"
+                          >
+                            {getTopicHierarchy(session.topic)[0]}
+                          </Badge>
+                        )}
+                      </td>
+                    )}
+                    {columns.find(c => c.key === 'topic2')?.visible && (
+                      <td className="px-4 py-3">
+                        {getTopicHierarchy(session.topic)[1] && (
+                          <Badge
+                            variant="outline"
+                            className="bg-blue-50 text-blue-700 border-blue-300 text-xs"
+                          >
+                            {getTopicHierarchy(session.topic)[1]}
+                          </Badge>
+                        )}
+                      </td>
+                    )}
+                    {columns.find(c => c.key === 'topic3')?.visible && (
+                      <td className="px-4 py-3">
+                        {getTopicHierarchy(session.topic)[2] && (
+                          <Badge
+                            variant="outline"
+                            className="bg-green-50 text-green-700 border-green-300 text-xs font-semibold"
+                          >
+                            {getTopicHierarchy(session.topic)[2]}
+                          </Badge>
+                        )}
                       </td>
                     )}
                     {columns.find(c => c.key === 'mode')?.visible && (
