@@ -49,35 +49,43 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
       onValueChangeRef.current = onValueChange;
     }, [onValueChange]);
 
+    const lastTranscriptRef = React.useRef<string>('');
+
     React.useEffect(() => {
-      if (transcript) {
-        setCurrentValue(prevValue => {
-          const newValue = prevValue + (prevValue && !prevValue.endsWith(' ') ? ' ' : '') + transcript;
-          onValueChangeRef.current?.(newValue);
-          
-          if (textareaRef.current) {
-            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-              window.HTMLTextAreaElement.prototype,
-              'value'
-            )?.set;
-            nativeInputValueSetter?.call(textareaRef.current, newValue);
-            
-            const event = new Event('input', { bubbles: true });
-            textareaRef.current.dispatchEvent(event);
-          }
-          
-          return newValue;
-        });
+      if (transcript && transcript !== lastTranscriptRef.current) {
+        const newText = transcript.substring(lastTranscriptRef.current.length);
+        lastTranscriptRef.current = transcript;
         
-        resetTranscript();
+        if (newText.trim()) {
+          setCurrentValue(prevValue => {
+            const newValue = prevValue + (prevValue && !prevValue.endsWith(' ') ? ' ' : '') + newText;
+            onValueChangeRef.current?.(newValue);
+            
+            if (textareaRef.current) {
+              const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                window.HTMLTextAreaElement.prototype,
+                'value'
+              )?.set;
+              nativeInputValueSetter?.call(textareaRef.current, newValue);
+              
+              const event = new Event('input', { bubbles: true });
+              textareaRef.current.dispatchEvent(event);
+            }
+            
+            return newValue;
+          });
+        }
       }
-    }, [transcript, resetTranscript]);
+    }, [transcript]);
 
     const handleVoiceToggle = () => {
       if (isListening) {
         stopListening();
+        lastTranscriptRef.current = '';
         toast.success('Sesli giriş durduruldu');
       } else {
+        resetTranscript();
+        lastTranscriptRef.current = '';
         startListening();
         toast.success('Sesli giriş başladı - konuşmaya başlayın');
       }

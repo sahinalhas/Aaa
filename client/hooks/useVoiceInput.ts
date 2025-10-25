@@ -144,7 +144,6 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     setTranscript('');
     setInterimTranscript('');
     setError(null);
-    lastProcessedIndexRef.current = 0;
   }, []);
 
   return {
