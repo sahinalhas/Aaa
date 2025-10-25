@@ -1,6 +1,6 @@
+
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { useVoiceInput } from "@/hooks/useVoiceInput";
 import { Mic, MicOff, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "./button";
 import { toast } from "sonner";
@@ -20,6 +20,13 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
     const [isFocused, setIsFocused] = React.useState(false);
     const [currentValue, setCurrentValue] = React.useState(props.value?.toString() || props.defaultValue?.toString() || '');
     const previousValueRef = React.useRef<string | undefined>(undefined);
+    
+    // Modern voice input state
+    const [isListening, setIsListening] = React.useState(false);
+    const [isVoiceSupported, setIsVoiceSupported] = React.useState(false);
+    const recognitionRef = React.useRef<any>(null);
+    const finalTranscriptRef = React.useRef<string>('');
+    const startingValueRef = React.useRef<string>('');
 
     React.useEffect(() => {
       if (props.value !== undefined) {
@@ -31,35 +38,42 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
       }
     }, [props.value]);
 
-    const {
-      isListening,
-      isSupported: isVoiceSupported,
-      transcript,
-      startListening,
-      stopListening,
-      resetTranscript,
-    } = useVoiceInput({
-      language: 'tr-TR',
-      continuous: true,
-      interimResults: true,
-    });
-
-    const onValueChangeRef = React.useRef(onValueChange);
+    // Initialize Speech Recognition
     React.useEffect(() => {
-      onValueChangeRef.current = onValueChange;
-    }, [onValueChange]);
+      if (typeof window === 'undefined') return;
 
-    const lastTranscriptRef = React.useRef<string>('');
-
-    React.useEffect(() => {
-      if (transcript && transcript !== lastTranscriptRef.current) {
-        // Sadece yeni eklenen parçayı al
-        const newText = transcript.substring(lastTranscriptRef.current.length);
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      
+      if (SpeechRecognition) {
+        setIsVoiceSupported(true);
+        const recognition = new SpeechRecognition();
         
-        if (newText.trim()) {
-          setCurrentValue(prevValue => {
-            const newValue = prevValue + (prevValue && !prevValue.endsWith(' ') ? ' ' : '') + newText;
-            onValueChangeRef.current?.(newValue);
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'tr-TR';
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+          setIsListening(true);
+        };
+
+        recognition.onresult = (event: any) => {
+          let finalText = '';
+          
+          // Sadece YENİ final sonuçları topla
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              finalText += event.results[i][0].transcript + ' ';
+            }
+          }
+
+          // Eğer yeni final text varsa ekle
+          if (finalText) {
+            finalTranscriptRef.current += finalText;
+            
+            const newValue = startingValueRef.current + finalTranscriptRef.current;
+            setCurrentValue(newValue);
+            onValueChange?.(newValue);
             
             if (textareaRef.current) {
               const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
@@ -68,34 +82,71 @@ const EnhancedTextarea = React.forwardRef<HTMLTextAreaElement, EnhancedTextareaP
               )?.set;
               nativeInputValueSetter?.call(textareaRef.current, newValue);
               
-              const event = new Event('input', { bubbles: true });
-              textareaRef.current.dispatchEvent(event);
+              const inputEvent = new Event('input', { bubbles: true });
+              textareaRef.current.dispatchEvent(inputEvent);
             }
-            
-            return newValue;
-          });
-        }
-        
-        // Son transkripti güncelle
-        lastTranscriptRef.current = transcript;
+          }
+        };
+
+        recognition.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          const errorMessages: Record<string, string> = {
+            'not-allowed': 'Mikrofon erişimi reddedildi.',
+            'no-speech': 'Ses algılanamadı.',
+            'audio-capture': 'Mikrofon bulunamadı.',
+            'network': 'Ağ hatası oluştu.',
+            'aborted': 'Ses kaydı iptal edildi.',
+          };
+          
+          const errorMessage = errorMessages[event.error] || 'Bir hata oluştu.';
+          toast.error(errorMessage);
+          setIsListening(false);
+        };
+
+        recognition.onend = () => {
+          setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+      } else {
+        setIsVoiceSupported(false);
       }
-    }, [transcript]);
+
+      return () => {
+        if (recognitionRef.current) {
+          try {
+            recognitionRef.current.stop();
+          } catch (e) {
+            // ignore
+          }
+        }
+      };
+    }, [onValueChange]);
 
     const handleVoiceToggle = () => {
+      if (!recognitionRef.current) return;
+
       if (isListening) {
-        stopListening();
-        // Dinleme durduğunda sıfırla
-        setTimeout(() => {
-          resetTranscript();
-          lastTranscriptRef.current = '';
-        }, 100);
-        toast.success('Sesli giriş durduruldu');
+        // Durdur
+        try {
+          recognitionRef.current.stop();
+          setIsListening(false);
+          toast.success('Sesli giriş durduruldu');
+        } catch (err) {
+          console.error('Failed to stop recognition:', err);
+        }
       } else {
-        // Başlamadan önce her şeyi sıfırla
-        resetTranscript();
-        lastTranscriptRef.current = '';
-        startListening();
-        toast.success('Sesli giriş başladı - konuşmaya başlayın');
+        // Başlat
+        finalTranscriptRef.current = '';
+        startingValueRef.current = currentValue;
+        
+        try {
+          recognitionRef.current.start();
+          toast.success('Sesli giriş başladı - konuşmaya başlayın');
+        } catch (err) {
+          console.error('Failed to start recognition:', err);
+          toast.error('Ses kaydı başlatılamadı.');
+        }
       }
     };
 
