@@ -107,18 +107,17 @@ export function VoiceRecorder({ onTranscriptionComplete, studentId, sessionType 
         
         recognition.onresult = (event: any) => {
           let interimTranscript = '';
-          let finalTranscript = '';
 
           for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-              finalTranscript += transcript + ' ';
+              // Sadece final sonuçları biriktir
+              browserTranscriptRef.current += transcript + ' ';
             } else {
-              interimTranscript += transcript;
+              // Interim sonuçları sadece göster, biriktirme
+              interimTranscript = transcript;
             }
           }
-
-          browserTranscriptRef.current = finalTranscript || interimTranscript;
         };
 
         recognition.onerror = (event: any) => {
