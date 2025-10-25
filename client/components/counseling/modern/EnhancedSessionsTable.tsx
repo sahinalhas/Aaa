@@ -50,6 +50,8 @@ export default function EnhancedSessionsTable({
     { key: 'topic3', label: '2. Aşama', visible: true },
     { key: 'topic', label: 'Konu', visible: true },
     { key: 'mode', label: 'Çalışma Yöntemi', visible: true },
+    { key: 'location', label: 'Görüşme Yeri', visible: true },
+    { key: 'discipline', label: 'Disiplin/Davranış', visible: true },
     { key: 'notes', label: 'Açıklama', visible: false },
   ]);
 
@@ -226,6 +228,12 @@ export default function EnhancedSessionsTable({
                 {columns.find(c => c.key === 'mode')?.visible && (
                   <th className="text-left px-4 py-3">Çalışma Yöntemi</th>
                 )}
+                {columns.find(c => c.key === 'location')?.visible && (
+                  <th className="text-left px-4 py-3">Görüşme Yeri</th>
+                )}
+                {columns.find(c => c.key === 'discipline')?.visible && (
+                  <th className="text-left px-4 py-3">Disiplin/Davranış</th>
+                )}
                 {columns.find(c => c.key === 'notes')?.visible && (
                   <th className="text-left px-4 py-3">Açıklama</th>
                 )}
@@ -317,6 +325,19 @@ export default function EnhancedSessionsTable({
                     {columns.find(c => c.key === 'mode')?.visible && (
                       <td className="px-4 py-3 text-sm whitespace-nowrap">
                         {session.sessionMode}
+                      </td>
+                    )}
+                    {columns.find(c => c.key === 'location')?.visible && (
+                      <td className="px-4 py-3 text-sm whitespace-nowrap">
+                        {session.sessionLocation || '-'}
+                      </td>
+                    )}
+                    {columns.find(c => c.key === 'discipline')?.visible && (
+                      <td className="px-4 py-3 text-sm whitespace-nowrap">
+                        {session.disciplineStatus === 'kurulu_sevk' ? 'Kurulu Sevk' :
+                         session.disciplineStatus === 'gorusu_alinan' ? 'Görüşü Alınan' :
+                         session.disciplineStatus === 'akran_gorusmesi' ? 'Akran Görüşmesi' :
+                         session.disciplineStatus === 'none' ? '-' : '-'}
                       </td>
                     )}
                     {columns.find(c => c.key === 'notes')?.visible && (
