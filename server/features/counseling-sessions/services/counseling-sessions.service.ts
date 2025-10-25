@@ -248,6 +248,11 @@ export function getCounselingTopics(): CounselingTopic[] {
   return topics;
 }
 
+export function getStudentSessionStats(studentId: string): any {
+  const sanitizedStudentId = sanitizeString(studentId);
+  return repository.getStudentSessionHistory(sanitizedStudentId);
+}
+
 export function getFilteredSessionsWithStudents(filters: any): CounselingSessionWithStudents[] {
   const sanitizedFilters: SessionFilters = {};
   
